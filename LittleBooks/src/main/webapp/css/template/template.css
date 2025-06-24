@@ -1,0 +1,118 @@
+@charset "UTF-8";
+
+/* 기본 글꼴 및 텍스트 스타일 */
+body {
+  font-family: 'Noto Sans KR', 'Segoe UI', 'Malgun Gothic', system-ui, sans-serif;
+  font-size: 16px;
+  color: #333;
+  background-color: #ffffff;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* 전체 레이아웃 */
+#sideinfo {
+  background-color: #f1f1f1;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+#maininfo {
+  background-color: #ffffff;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+#footer {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 14px;
+}
+
+/* 기본 요소 스타일 */
+td, th, input, select, textarea, p {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+/* 이미지 */
+img {
+  border: none;
+  max-width: 100%;
+}
+
+/* 링크 스타일 */
+a {
+  text-decoration: none;
+  color: #0066cc;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #003366;
+  font-weight: 600;
+}
+
+/* 상태별 링크 색상 */
+a:visited {
+  color: #004c99;
+}
+
+a:active {
+  color: #001f4d;
+}
+
+/* 박스 스타일 */
+.box {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 1rem;
+  background-color: #fff;
+}
+
+.box2 {
+  border: 1px dashed #e74c3c;
+  border-radius: 6px;
+  padding: 1rem;
+  background-color: #fff5f5;
+}
+
+/* 테이블 스타일 */
+table.outline {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  border-top: 3px solid #333;
+  border-bottom: 3px solid #333;
+}
+
+table.outline th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+  padding: 0.75rem;
+}
+
+table.outline td {
+  padding: 0.75rem;
+  border-top: 1px solid #eee;
+}
+
+/* 에러 메시지 */
+.error {
+  color: #e74c3c;
+  padding-left: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* 배경 강조용 */
+.bgcol {
+  background-color: #e0e0e0;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+

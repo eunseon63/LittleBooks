@@ -1,0 +1,59 @@
+@charset "UTF-8";
+
+.book-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  transition: box-shadow 0.3s ease;
+}
+
+.book-img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  transition: opacity 0.4s ease;
+  display: block;
+  border: 1px solid #ccc;
+}
+
+/* Hover 효과 */
+.book-card:hover {
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.35);
+}
+
+.book-card:hover .book-img {
+  opacity: 0.3;
+}
+
+/* 소개문구 오버레이 */
+.book-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border-radius: 10px;
+}
+
+.book-card:hover .book-overlay {
+  opacity: 1;
+}
+
+/* 소개 텍스트 스타일 */
+.book-comment {
+  font-size: 1rem;
+  line-height: 1.5;
+  max-height: 90%;
+  overflow-y: auto;
+  padding: 10px;
+}
+
