@@ -51,9 +51,10 @@
 <nav class="navbar navbar-light fixed-top py-4" style="background-color: #FFFFFF;">
 
   <!-- 가운데: 어린이 서점 -->
-    <div style="position: absolute; left: 50%; transform: translateX(-50%);">
-    <a class="navbar-brand font-weight-bold" href="<%= ctxPath %>/index.jsp" style="font-size: 24px;"><img src="${pageContext.request.contextPath}/images/logo.png" alt="메인로고" style="height: 100px; margin-top:10%;"/></a>
+  <div style="position: absolute; left: 50%; transform: translateX(-50%);">
+    <a class="navbar-brand font-weight-bold" href="<%= ctxPath %>/index.go" style="font-size: 24px;"><img src="${pageContext.request.contextPath}/images/logo.png" alt="메인로고" style="height: 100px; margin-top:10%;"/></a>
   </div>
+
   <!-- 오른쪽 요소들 -->
   <div class="ml-auto d-flex align-items-center">
 
@@ -63,16 +64,24 @@
         책
       </span>
       <div class="dropdown-menu" aria-labelledby="bookMenu">
-        <a class="dropdown-item" href="<%= ctxPath %>/book/list.jsp?category=all">전체</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/book/totalBookList.go">전체</a>
         <a class="dropdown-item" href="<%= ctxPath %>/book/list.jsp?category=figure">위인전</a>
-        <a class="dropdown-item" href="<%= ctxPath %>/book/list.jsp?category=aesop">이솝우화</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/book/list.jsp?category=aesop">세계동화</a>
         <a class="dropdown-item" href="<%= ctxPath %>/book/list.jsp?category=legend">전래동화</a>
         <a class="dropdown-item" href="<%= ctxPath %>/book/list.jsp?category=series">만화책 시리즈</a>
       </div>
     </div>
 
-    <a class="nav-link" href="<%= ctxPath %>/login/login.jsp">로그인</a>
-    <a class="nav-link" href="<%= ctxPath %>/register/register.jsp">회원가입</a>
+	<c:if test="${empty sessionScope.loginuser}"> <%-- 로그인 안했을 경우 --%> 
+	    <a class="nav-link" href="<%= ctxPath %>/login/login.go">로그인</a>
+	    <a class="nav-link" href="<%= ctxPath %>/register/register.go">회원가입</a>
+    </c:if>
+    
+   	<c:if test="${not empty sessionScope.loginuser}"> <%-- 로그인 안했을 경우 --%> 
+	    <a class="nav-link" href="<%= ctxPath %>/login/login.go">마이페이지</a>
+	    <a class="nav-link" href="<%= ctxPath %>/login/logout.go">로그아웃</a>
+	    <a class="nav-link" href="<%= ctxPath %>/register/register.jsp">장바구니</a>
+    </c:if>
     <a class="nav-link" href="<%= ctxPath %>/search/search.jsp" style="color: black;" title="검색">
       <i class="fas fa-search fa-lg"></i>
     </a>
