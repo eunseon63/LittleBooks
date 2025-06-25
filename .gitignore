@@ -96,4 +96,5 @@ replay_pid*
 # End of https://www.toptal.com/developers/gitignore/api/java,eclipse
 .classpath
 .gitignore
+/LittleBooks/.gitignore
 /LittleBooks/src/main/java/common/controller/FrontController.java
