@@ -6,6 +6,7 @@ import java.util.Map;
 
 import myshop.domain.BookVO;
 import myshop.domain.CategoryVO;
+import myshop.domain.SpecVO;
 
 public interface BookDAO {
 
@@ -14,6 +15,12 @@ public interface BookDAO {
 	
 	// 도서 상세 정보 조회
 	BookVO selectOneBookByBookseq(String bookseq) throws SQLException;
+
+	// 카테고리 목록을 조회해오기
+	List<CategoryVO> getCategoryList() throws SQLException;
+
+	// SPEC 목록을 조회해오기
+	List<SpecVO> getSpecList() throws SQLException;
 
 	
 
