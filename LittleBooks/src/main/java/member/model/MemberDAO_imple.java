@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -325,5 +327,224 @@ public class MemberDAO_imple implements MemberDAO {
 		
 		return isUserExist;
 	} // end of public boolean isUserExist()-----------------------------
+
+	// 총 회원 페이지 수 구하기
+	@Override
+	public int getTotalPage(Map<String, String> paraMap) throws SQLException {
+
+		int totalPage = 0;
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " SELECT ceil(count(*)/?) "
+					   + " FROM tbl_member "
+					   + " WHERE userid != 'admin' ";
+			
+			String colname = paraMap.get("searchType");
+			String searchWord = paraMap.get("searchWord");
+			
+			// 검색대상이 email인 경우 암호화
+			if("email".equals(colname) && !"".equals(searchWord)) {
+				searchWord = aes.encrypt(searchWord);
+			}
+			
+			if(!"".equals(colname) && !"".equals(searchWord) ) {
+				sql +=  " AND " + colname + " LIKE '%' || ? || '%' ";
+			}
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, Integer.parseInt(paraMap.get("sizePerPage")));
+			
+			
+			if(!"".equals(colname) && !"".equals(searchWord) ) { // 검색이 있는 경우
+				pstmt.setString(2, searchWord);
+			}
+			
+			rs = pstmt.executeQuery();
+			
+			rs.next();
+			
+			totalPage = rs.getInt(1);
+			
+		} catch(GeneralSecurityException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} finally {
+			close();
+		}
+		
+		return totalPage;
+		
+	}
+
+	// 회원 페이징 
+	@Override
+	public List<MemberVO> select_Member_paging(Map<String, String> paraMap) throws SQLException {
+
+		List<MemberVO> memberList = new ArrayList<>();
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " SELECT userid, name, email "
+					   + " FROM tbl_member "
+					   + " WHERE userid != 'admin' ";
+			
+			String colname = paraMap.get("searchType");
+			String searchWord = paraMap.get("searchWord");
+			
+			// 검색대상이 email인 경우 암호화
+			if("email".equals(colname) && !"".equals(searchWord)) {
+				searchWord = aes.encrypt(searchWord);
+			}
+			
+			if(!"".equals(colname) && !"".equals(searchWord) ) {
+				sql +=  " AND " + colname + " LIKE '%' || ? || '%' ";
+			}
+				       
+			sql += " ORDER BY registerday desc "
+				 + " OFFSET (?-1)*? ROW "
+				 + " FETCH NEXT ? ROW ONLY ";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			int currentShowPageNo = Integer.parseInt(paraMap.get("currentShowPageNo"));
+			int sizePerPage = Integer.parseInt(paraMap.get("sizePerPage"));
+			
+			
+			if(!"".equals(colname) && !"".equals(searchWord) ) { // 검색이 있는 경우
+				pstmt.setString(1, searchWord);
+				pstmt.setInt(2, currentShowPageNo);
+				pstmt.setInt(3, sizePerPage);
+				pstmt.setInt(4, sizePerPage);
+			}
+			else { // 검색이 없는 경우
+				pstmt.setInt(1, currentShowPageNo);
+				pstmt.setInt(2, sizePerPage);
+				pstmt.setInt(3, sizePerPage);
+			}
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				
+				 MemberVO mvo = new MemberVO(); // userid, name, email
+				
+				 mvo.setUserid(rs.getString("userid"));
+				 mvo.setName(rs.getString("name"));
+				 mvo.setEmail(aes.decrypt(rs.getString("email"))); // 복호화 
+				 
+				 memberList.add(mvo);
+				
+			}// end of while(rs.next())------------------------
+			
+		} catch(GeneralSecurityException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} finally {
+			close();
+		}
+		
+		return memberList;
+		
+	}
+
+	// 총 회원 수 구하기
+	@Override
+	public int getTotalMemberCount(Map<String, String> paraMap) throws SQLException {
+
+		int totalMemberCount = 0;
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " SELECT count(*) "
+					   + " FROM tbl_member "
+					   + " WHERE userid != 'admin' ";
+			
+			String colname = paraMap.get("searchType");
+			String searchWord = paraMap.get("searchWord");
+			
+			// 검색대상이 email인 경우 암호화
+			if("email".equals(colname) && !"".equals(searchWord)) {
+				searchWord = aes.encrypt(searchWord);
+			}
+			
+			if(!"".equals(colname) && !"".equals(searchWord) ) {
+				sql +=  " AND " + colname + " LIKE '%' || ? || '%' ";
+			}
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			if(!"".equals(colname) && !"".equals(searchWord) ) { // 검색이 있는 경우
+				pstmt.setString(1, searchWord);
+			}
+			
+			rs = pstmt.executeQuery();
+			
+			rs.next();
+			
+			totalMemberCount = rs.getInt(1);
+			
+		} catch(GeneralSecurityException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} finally {
+			close();
+		}
+		
+		return totalMemberCount;
+	}
+
+	// 한 명의 회원 정보 
+	@Override
+	public MemberVO selectOneMember(String userid) throws SQLException {
+		
+		MemberVO member = new MemberVO();
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = "  SELECT userid, name, point, "
+					   + " 		   to_char(registerday, 'yyyy-mm-dd') AS registerday, "
+					   + "         idle, email, mobile, postcode, address, detailaddress, extraaddress, "
+					   + "         birthday"
+					   + "  FROM tbl_member "
+					   + "  WHERE status = 1 AND userid = ? " ;
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, userid);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				
+				member = new MemberVO();
+				
+				member.setUserid(rs.getString("userid"));
+				member.setName(rs.getString("name"));
+				member.setPoint(rs.getInt("point"));
+				member.setRegisterday(rs.getString("registerday"));
+				
+				member.setIdle(rs.getInt("idle"));
+				member.setEmail( aes.decrypt(rs.getString("email")) );
+				member.setMobile( aes.decrypt(rs.getString("mobile")) );
+				member.setPostcode( rs.getString("postcode") );
+				member.setAddress( rs.getString("address") );
+				member.setDetailaddress( rs.getString("detailaddress") );
+				member.setExtraaddress( rs.getString("extraaddress") );
+				member.setBirthday( rs.getString("birthday") );
+				
+			} // end of if(rs.next()) ----------
+			
+		} catch(GeneralSecurityException | UnsupportedEncodingException e) {
+	         e.printStackTrace();
+	    } finally {
+			close();
+		}
+		
+		return member;
+		
+	}
 	
 }
