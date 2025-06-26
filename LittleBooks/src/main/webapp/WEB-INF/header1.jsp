@@ -64,11 +64,11 @@
         책
       </span>
       <div class="dropdown-menu" aria-labelledby="bookMenu">
-        <a class="dropdown-item" href="<%= ctxPath %>/book/totalBookList.go">전체</a>
-        <a class="dropdown-item" href="<%= ctxPath %>/book/list.jsp?category=figure">위인전</a>
-        <a class="dropdown-item" href="<%= ctxPath %>/book/list.jsp?category=aesop">세계동화</a>
-        <a class="dropdown-item" href="<%= ctxPath %>/book/list.jsp?category=legend">전래동화</a>
-        <a class="dropdown-item" href="<%= ctxPath %>/book/list.jsp?category=series">만화책 시리즈</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/myshop/booklist.go?category=all">전체</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/myshop/booklist.go?category=위인전">위인전</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/myshop/booklist.go?category=전래동화">전래동화</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/myshop/booklist.go?category=세계동화">세계동화</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/myshop/booklist.go?category=만화책">만화책 시리즈</a>
       </div>
     </div>
 
@@ -76,11 +76,16 @@
 	    <a class="nav-link" href="<%= ctxPath %>/login/login.go">로그인</a>
 	    <a class="nav-link" href="<%= ctxPath %>/register/register.go">회원가입</a>
     </c:if>
-    
-   	<c:if test="${not empty sessionScope.loginuser}"> <%-- 로그인 안했을 경우 --%> 
+    <c:if test="${not empty sessionScope.loginuser and sessionScope.loginuser.userid != 'admin'}"> <%-- 로그인 했을 경우 --%> 
 	    <a class="nav-link" href="<%= ctxPath %>/login/login.go">마이페이지</a>
 	    <a class="nav-link" href="<%= ctxPath %>/login/logout.go">로그아웃</a>
 	    <a class="nav-link" href="<%= ctxPath %>/register/register.jsp">장바구니</a>
+    </c:if>
+   	<c:if test="${not empty sessionScope.loginuser and sessionScope.loginuser.userid == 'admin'}"> <%-- 로그인 했을 경우 --%> 
+	    <a class="nav-link" href="<%= ctxPath %>/.go">제품등록</a>
+	    <a class="nav-link" href="<%= ctxPath %>/member/memberList.go">회원목록</a>
+	    <a class="nav-link" href="<%= ctxPath %>/">전체매출확인</a>
+	    <a class="nav-link" href="<%= ctxPath %>/login/logout.go">로그아웃</a>
     </c:if>
     <a class="nav-link" href="<%= ctxPath %>/search/search.jsp" style="color: black;" title="검색">
       <i class="fas fa-search fa-lg"></i>

@@ -30,6 +30,18 @@ public interface MemberDAO {
 
 	// 비밀번호 변경
 	int pwdUpdate(Map<String, String> paraMap) throws SQLException;
+
+	// 총 회원 페이지 수 구하기
+	int getTotalPage(Map<String, String> paraMap) throws SQLException;
+
+	// 회원 페이징 
+	List<MemberVO> select_Member_paging(Map<String, String> paraMap) throws SQLException;
+
+	// 총 회원 수 구하기
+	int getTotalMemberCount(Map<String, String> paraMap) throws SQLException;
+
+	// 한 명의 회원 정보 
+	MemberVO selectOneMember(String userid) throws SQLException;
 	
 }
 
