@@ -25,8 +25,11 @@ public interface MemberDAO {
 	//비밀번호 찾기(아이디, 이메일을 입력 받아서 해당 사용자의 아이디를 알려준다)
 	boolean isUserExist(Map<String, String> paraMap)throws SQLException;
 	
-	//이메일
+	//이메일 중복확인
 	boolean emailDuplicateCheck(Map<String, String> paraMap)throws SQLException;
+
+	// 비밀번호 변경
+	int pwdUpdate(Map<String, String> paraMap) throws SQLException;
 	
 }
 

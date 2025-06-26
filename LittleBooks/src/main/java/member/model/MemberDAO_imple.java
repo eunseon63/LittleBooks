@@ -261,8 +261,32 @@ public class MemberDAO_imple implements MemberDAO {
 
 	@Override
 	public boolean emailDuplicateCheck(Map<String, String> paraMap) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		
+		boolean isExists = false;
+		
+		try {
+			  conn = ds.getConnection();
+			  
+			  String sql = " select email "
+			  		     + " from tbl_member "
+			  		     + " where userid != ? and email = ? ";
+			  
+			  pstmt = conn.prepareStatement(sql);
+			  pstmt.setString(1, paraMap.get("userid") );
+			  pstmt.setString(2, aes.encrypt(paraMap.get("email")));
+			  
+			  rs = pstmt.executeQuery();
+			  
+			  isExists = rs.next(); // 행이 있으면 true  (중복된 email) 
+			                        // 행이 없으면 false (사용가능한 email) 
+			
+		} catch(GeneralSecurityException | UnsupportedEncodingException e) {
+			  e.printStackTrace();
+		} finally {
+			  close();
+		}
+		
+		return isExists;
 	}
 
 	// 아이디 찾기 함수
@@ -325,5 +349,35 @@ public class MemberDAO_imple implements MemberDAO {
 		
 		return isUserExist;
 	} // end of public boolean isUserExist()-----------------------------
+
+	
+	// 비밀번호 변경 
+	@Override
+	public int pwdUpdate(Map<String, String> paraMap) throws SQLException {
+		
+		int result = 0;
+		
+		try {
+			  conn = ds.getConnection();
+			 
+			  String sql = " update tbl_member set passwd = ? "
+			  		     + "                     , lastpwdchangedate = sysdate " 
+			  		     + " where userid = ? ";
+			  
+			  pstmt = conn.prepareStatement(sql);
+			  
+			  pstmt.setString(1, Sha256.encrypt(paraMap.get("new_pwd")) ); // 암호를 SHA256 알고리즘으로 단방향 암호화 시킨다.  
+			  pstmt.setString(2, paraMap.get("userid"));
+			  			  
+			  result = pstmt.executeUpdate();
+			  
+		} finally {
+			  close();
+		}
+		
+		return result;		
+	}
+	
+	
 	
 }

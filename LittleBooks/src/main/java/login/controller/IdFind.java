@@ -15,36 +15,32 @@ public class IdFind extends AbstractController {
 	
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
-		String method = request.getMethod();
-		
-		if("POST".equalsIgnoreCase(method)) {
-			
-			String name = request.getParameter("name"); 
-			String email = request.getParameter("email"); 
-			
-			Map<String, String> paraMap = new HashMap<>();
-			paraMap.put("name", name);
-			paraMap.put("email", email);
-			
-			String userid = mdao.findUserid(paraMap);
-			
-			if(userid != null) {
-				request.setAttribute("userid", userid);
-			}
-			else {
-				request.setAttribute("userid", "존재하지 않습니다.");
-			}
-			
-			request.setAttribute("name", name);
-			request.setAttribute("email", email);
-		}
-		
-		request.setAttribute("method", method);
-		
-		super.setRedirect(false);
-		super.setViewPage("/WEB-INF/login/idFind.jsp");
 
+	    String method = request.getMethod();
+
+	    if ("POST".equalsIgnoreCase(method)) {
+	        String name = request.getParameter("name");
+	        String email = request.getParameter("email");
+
+	        Map<String, String> paraMap = new HashMap<>();
+	        paraMap.put("name", name);
+	        paraMap.put("email", email);
+
+	        String userid = mdao.findUserid(paraMap);
+
+	        request.setAttribute("userid", (userid != null) ? userid : "존재하지 않습니다.");
+
+	        // 팝업 결과 전용 JSP로 이동
+	        super.setRedirect(false);
+	        super.setViewPage("/WEB-INF/login/idFindSuccess.jsp");
+	        return;
+	    }
+
+	    //  GET 요청이면 아이디 찾기 폼 페이지
+	    request.setAttribute("method", method);
+	    super.setRedirect(false);
+	    super.setViewPage("/WEB-INF/login/idFind.jsp");
 	}
+
 
 }

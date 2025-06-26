@@ -1,6 +1,6 @@
 $(function () {
-	$('button#btnSubmit').click(()=>{
-		e.preventDefault();  // 기본 submit 동작 막기
+	$('button#btnSubmit').click((e)=>{
+		e.preventDefault();
 		goLogin();  // 로그인 시도한다.	
 	});
 	
@@ -27,7 +27,4 @@ function goLogin() {
 	
 	const frm = document.loginFrm;
 	frm.submit();
-	
-	$('input#loginUserid').val("");
-	$('input#loginPwd').val("");
 }// end of function goLogin() {}--------------------------

@@ -79,7 +79,7 @@ public class MemberRegister extends AbstractController {
 					request.setAttribute("name",name);
 					
 					super.setRedirect(false);
-					super.setViewPage("/WEB-INF/index.jsp");
+					super.setViewPage("/WEB-INF/login/memberRegister_after_autoLogin.jsp");
 				}
 				
 				
