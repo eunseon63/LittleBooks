@@ -64,11 +64,11 @@
         책
       </span>
       <div class="dropdown-menu" aria-labelledby="bookMenu">
-        <a class="dropdown-item" href="<%= ctxPath %>/book/totalBookList.go">전체</a>
-        <a class="dropdown-item" href="<%= ctxPath %>/book/list.jsp?category=figure">위인전</a>
-        <a class="dropdown-item" href="<%= ctxPath %>/book/list.jsp?category=aesop">세계동화</a>
-        <a class="dropdown-item" href="<%= ctxPath %>/book/list.jsp?category=legend">전래동화</a>
-        <a class="dropdown-item" href="<%= ctxPath %>/book/list.jsp?category=series">만화책 시리즈</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/myshop/booklist.go?category=all">전체</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/myshop/booklist.go?category=위인전">위인전</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/myshop/booklist.go?category=전래동화">전래동화</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/myshop/booklist.go?category=세계동화">세계동화</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/myshop/booklist.go?category=만화책">만화책 시리즈</a>
       </div>
     </div>
 
