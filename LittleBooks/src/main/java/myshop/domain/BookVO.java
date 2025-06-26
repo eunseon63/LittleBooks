@@ -15,6 +15,7 @@ public class BookVO {
 	
 	private CategoryVO cvo;
 	private SpecVO spvo;
+	private PublishVO pvo;
 	
 	public BookVO(){}
 	
@@ -111,5 +112,11 @@ public class BookVO {
 	}
 	public void setSpvo(SpecVO spvo) {
 		this.spvo = spvo;
+	}
+	public PublishVO getPvo() {
+		return pvo;
+	}
+	public void setPvo(PublishVO pvo) {
+		this.pvo = pvo;
 	}
 }
