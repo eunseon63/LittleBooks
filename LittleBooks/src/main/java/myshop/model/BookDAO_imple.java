@@ -33,6 +33,17 @@ public class BookDAO_imple implements BookDAO {
             e.printStackTrace();
         }
     }
+    
+	// 사용한 자원을 반납하는 close() 메소드 생성하기
+	private void close() {
+		try {
+			if(rs    != null) {rs.close();	  rs=null;}
+			if(pstmt != null) {pstmt.close(); pstmt=null;}
+			if(conn  != null) {conn.close();  conn=null;}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
     // 카테고리별 책 목록 조회 
     @Override
@@ -151,5 +162,76 @@ public class BookDAO_imple implements BookDAO {
 
 	    return book;
 	}
+
+	// 카테고리 목록을 조회해오기
+	@Override
+	public List<CategoryVO> getCategoryList() throws SQLException {
+
+		List<CategoryVO> categoryList = new ArrayList<>();
+		
+		try {
+			
+			conn = ds.getConnection();
+			
+			String sql = " select categoryseq, categoryname " 
+					   + " from tbl_category "
+					   + " order by categoryseq asc ";
+			
+			  pstmt = conn.prepareStatement(sql);
+			  
+			  rs = pstmt.executeQuery();
+			  
+			  while(rs.next()) {
+				  
+				  CategoryVO cvo = new CategoryVO();
+				  cvo.setCategoryseq(rs.getInt("categoryseq"));
+				  cvo.setCategoryname(rs.getString("categoryname"));
+				  
+				  categoryList.add(cvo);
+				  
+			  }
+			 
+		} finally {
+			close();
+		}
+		
+		return categoryList;
+	}
+
+	// SPEC 목록을 조회해오기
+	@Override
+	public List<SpecVO> getSpecList() throws SQLException {
+
+		List<SpecVO> specList = new ArrayList<>();
+		
+		try {
+			
+			conn = ds.getConnection();
+			
+			String sql = " select snum, sname "
+					   + " from tbl_spec "
+					   + " order by snum asc ";
+			
+			  pstmt = conn.prepareStatement(sql);
+			  
+			  rs = pstmt.executeQuery();
+			  
+			  while(rs.next()) {
+				  
+				  SpecVO spvo = new SpecVO();
+				  spvo.setSnum(rs.getInt("snum"));
+				  spvo.setSname(rs.getString("sname"));
+				  
+				  specList.add(spvo);
+				  
+			  }
+			 
+		} finally {
+			close();
+		}
+		
+		return specList;
+	}
+	
 }
 
