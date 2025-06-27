@@ -55,8 +55,8 @@
         <h4 class="mb-4">내 정보 수정</h4>
         <form action="mypageUpdate.go" method="post">
           <div class="form-group">
-            <label>이름 <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" name="name" value="${loginuser.name}" required>
+            <label>이름</label>
+            <input type="text" class="form-control" name="name" value="${loginuser.name}" readonly>
           </div>
           <div class="form-group">
             <label>비밀번호 <span class="text-danger">*</span></label>
