@@ -1,20 +1,30 @@
 package book.domain;
 
 public class BookVO {
+	private int bookseq;  // 고유번호 추가
     private String title;
     private String author;
     private String publish;
     private String image;
 	private String comment;
 
-    public BookVO(String title, String author, String publish, String image, String comment) {
+    public BookVO(int bookseq, String title, String author, String publish, String image, String comment) {
+    	this.bookseq = bookseq;
         this.title = title;
         this.author = author;
         this.publish = publish;
         this.image = image;
         this.comment = comment;
     }
+    
+    public int getBookseq() {
+        return bookseq;
+    }
 
+    public void setBookseq(int bookseq) {
+        this.bookseq = bookseq;
+    }
+    
 	public String getTitle() {
 		return title;
 	}
