@@ -72,8 +72,12 @@
       </div>
     </div>
 
+	<c:if test="${empty sessionScope.loginuser}"> <%-- 로그인 안했을 경우 --%> 
+	    <a class="nav-link" href="<%= ctxPath %>/login/login.go">로그인</a>
+	    <a class="nav-link" href="<%= ctxPath %>/register/register.go">회원가입</a>
+    </c:if>
     <c:if test="${not empty sessionScope.loginuser and sessionScope.loginuser.userid != 'admin'}"> <%-- 로그인 했을 경우 --%> 
-	    <a class="nav-link" href="<%= ctxPath %>/login/login.go">마이페이지</a>
+	    <a class="nav-link" href="<%= ctxPath %>/login/myPage.go">마이페이지</a>
 	    <a class="nav-link" href="<%= ctxPath %>/login/logout.go">로그아웃</a>
 	    <a class="nav-link" href="<%= ctxPath %>/register/register.jsp">장바구니</a>
     </c:if>
