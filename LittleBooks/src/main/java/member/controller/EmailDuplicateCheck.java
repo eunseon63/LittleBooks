@@ -19,8 +19,7 @@ public class EmailDuplicateCheck extends AbstractController {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String method= request.getMethod();
-		
-		
+
 		if("POST".equals(method)){
 		
 		String email = request.getParameter("email");
@@ -28,7 +27,7 @@ public class EmailDuplicateCheck extends AbstractController {
 		boolean isExists = mdao.emailDuplicateCheck(email);
 		
 		JSONObject jsonObj = new JSONObject(); //https://mvnrepository.com/artifact/org.json/json/20240303 에서 bundle 다운 후 webinf lib 폴더에 넣어둬야 import 사용 가능함
-		jsonObj.put("", isExists); // {"isExists":true}또는 {"isExists":false} 으로 만들어 준다.
+		jsonObj.put("isExists", isExists); // {"isExists":true}또는 {"isExists":false} 으로 만들어 준다.
 		
 		String json = jsonObj.toString(); // 문자열 형태인  "{"isExists":true}"또는 "{"isExists":false}" 으로 만들어 준다.
 		System.out.println(">>> 확인용 json =>" + json);

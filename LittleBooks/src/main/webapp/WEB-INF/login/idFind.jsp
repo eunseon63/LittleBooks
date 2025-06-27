@@ -55,9 +55,12 @@ function goFind() {
         alert("e메일을 올바르게 입력하세요!!");
         return;
     }
+    // 새 창 열기
+    const popup = window.open("", "idFindPopup", "width=500,height=400,left=300,top=150,resizable=no,scrollbars=no");
     
     frm.action = "<%= ctxPath%>/login/idFind.go";
     frm.method = "post";
+    frm.target = "idFindPopup"; // 이 창에 폼 제출
     frm.submit();
 }
 

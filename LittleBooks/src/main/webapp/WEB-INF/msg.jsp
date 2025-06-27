@@ -1,16 +1,18 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <script type="text/javascript">
+    alert("${message}");
 
-	alert("${requestScope.message}");      // 메시지 출력해주기
-	location.href = "${requestScope.loc}"; // 페이지 이동 
-
-	if( ${not empty requestScope.popup_close && requestScope.popup_close == true} ) {
-		 
-		//	opener.location.reload(true); // 부모창 새로고침
-			opener.history.go(0);         // 부모창 새로고침
-			self.close(); // 팝업창 닫기 
-	}
-	
-</script>    
+    <c:choose>
+        <c:when test="${popup_close eq true}">
+            if (window.opener && !window.opener.closed) {
+                window.opener.location.href = "${loc}"; // 부모창을 지정 URL로 이동시키기
+            }
+            window.close();
+        </c:when>
+        <c:otherwise>
+            location.href = "${loc}";
+        </c:otherwise>
+    </c:choose>
+</script>
