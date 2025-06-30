@@ -137,6 +137,14 @@ body {
     color: #f4c900;
     font-size: 18px;
 }
+.book-spec {
+    color: #d00000;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
 </style>
 
 <div class="detail-wrapper">
@@ -144,7 +152,7 @@ body {
     <div class="left-box">
         <c:choose>
             <c:when test="${not empty book.bimage}">
-                <img src="<c:url value='/images/${book.bimage}' />" alt="책 이미지" />
+                <img src="${pageContext.request.contextPath}/images/${book.bimage}" alt="책 이미지" />
             </c:when>
             <c:otherwise>
                 <div style="width: 360px; height: 360px; display: flex; align-items: center; justify-content: center; border: 1px solid #eee; border-radius: 12px; background: #f9f9f9;">
@@ -156,6 +164,15 @@ body {
 
     <!-- 상세 정보 -->
     <div class="right-box">
+    	<!-- 🔴 스펙 표시 (BEST / NEW 등) -->
+    	<c:choose>
+	        <c:when test="${book.fk_snum == 2}">
+	            <div class="book-spec">BEST(인기)!!</div>
+	        </c:when>
+	        <c:when test="${book.fk_snum == 3}">
+	            <div class="book-spec">NEW(신상)!!</div>
+	        </c:when>
+    	</c:choose>
         <h2>${book.bname}</h2>
         <div class="book-info">
             <div><strong>출판사:</strong>${book.pvo.pname}</div>

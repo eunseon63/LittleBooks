@@ -13,19 +13,27 @@ public class BookList extends AbstractController {
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
-		 // 1) category 파라미터 받기
+	    
+	    // 1) category, sort 파라미터 받기
 	    String category = request.getParameter("category");
 	    if (category == null || category.isEmpty()) {
-	        category = "all";  // 기본값 설정
+	        category = "all";
 	    }
-	    
-	    // 2) DAO 생성 및 메서드 호출
+
+	    String sort = request.getParameter("sort");  // "new" or null
+
+	    // 2) DAO 호출
 	    BookDAO dao = new BookDAO_imple();
-	    List<BookVO> bookList = dao.selectBooksByCategory(category);
-	    
-	 // ===== 콘솔에 출력해보기 =====
-	    System.out.println(">>> [카테고리: " + category + "] 도서 목록 조회 결과 <<<");
+	    List<BookVO> bookList;
+
+	    if ("all".equals(category)) {
+	        bookList = dao.selectAllBooksSorted(sort);  // 전체 정렬
+	    } else {
+	        bookList = dao.selectBooksByCategorySorted(category, sort); // 카테고리 정렬
+	    }
+
+	    // 3) 로그 찍기
+	    System.out.println(">>> [카테고리: " + category + ", 정렬: " + sort + "] 도서 목록 조회 결과 <<<");
 	    for (BookVO book : bookList) {
 	        System.out.println("책제목: " + book.getBname());
 	        System.out.println("저자: " + book.getAuthor());
@@ -34,16 +42,15 @@ public class BookList extends AbstractController {
 	        System.out.println("입고일자: " + book.getBinputdate());
 	        System.out.println("-----------------------------");
 	    }
-	    // ==============================
-	    
-	    // 3) 결과를 request 객체에 저장해서 JSP에 전달
+
+	    // 4) JSP에 전달
 	    request.setAttribute("bookList", bookList);
 	    request.setAttribute("category", category);
+	    request.setAttribute("sort", sort);  // 정렬 유지용
 
-	    // 4) 페이지 포워딩
 	    super.setRedirect(false);
 	    super.setViewPage("/WEB-INF/myshop/booklist.jsp");
-
 	}
+
 
 }

@@ -72,6 +72,24 @@
     width: 100%;
     height: 100%;
 }
+.sort-box {
+    margin: 20px 0 0 240px;  /* 책 목록과 정렬 위치 맞춤 */
+}
+
+.sort-select {
+    padding: 6px 12px;
+    font-size: 14px;
+    border: 1px solid #f4c900;
+    border-radius: 8px;
+    background-color: #fffef5;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.sort-select:hover {
+    background-color: #fff9d6;
+}
 
 </style>
 
@@ -89,6 +107,19 @@
     </div>
 </c:if>
 
+<!-- 정렬 기준 선택 드롭다운 -->
+<div class="sort-box">
+    <form method="get" action="<c:url value='/myshop/booklist.go' />">
+        <input type="hidden" name="category" value="${category}" />
+        <select name="sort" onchange="this.form.submit()" class="sort-select">
+            <option value="">-- 정렬 선택 --</option>
+            <option value="new" ${sort eq 'new' ? 'selected' : ''}>입고일 순</option>
+            <!-- 추후: <option value="sales">판매순</option> -->
+        </select>
+    </form>
+</div>
+
+
 <div class="container">
     <c:forEach var="book" items="${bookList}">
     <a href="<c:url value='/myshop/bookdetail.go?bookseq=${book.bookseq}' />" class="card-link">
@@ -96,7 +127,7 @@
             <div class="image-box">
                 <c:choose>
                     <c:when test="${not empty book.bimage}">
-                        <img src="<c:url value='/images/${book.bimage}'/>" alt="책 이미지" />
+                        <img src="${pageContext.request.contextPath}/images/${book.bimage}" alt="책 이미지" />
                     </c:when>
                     <c:otherwise>
                         책 이미지
