@@ -1,4 +1,4 @@
-package member.controller;
+package login.controller;
 
 import common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,9 +10,7 @@ public class MyPage extends AbstractController {
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		super.setRedirect(false);
-		super.setViewPage("/WEB-INF/member/mypage.jsp");
-		
-		
+		super.setViewPage("/WEB-INF/login/myPage/myPage.jsp");
 	}
 
 }
