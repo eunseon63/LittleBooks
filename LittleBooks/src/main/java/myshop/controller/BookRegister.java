@@ -1,9 +1,9 @@
 package myshop.controller;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 import common.controller.AbstractController;
 import jakarta.servlet.ServletContext;
@@ -26,6 +26,17 @@ public class BookRegister extends AbstractController {
         bdao = new BookDAO_imple();
     }
 
+    private String extractFileName(String partHeader) {
+        for (String cd : partHeader.split(";")) {
+            if (cd.trim().startsWith("filename")) {
+                String fileName = cd.substring(cd.indexOf("=") + 1).trim().replace("\"", "");
+                int index = fileName.lastIndexOf(File.separator);
+                return fileName.substring(index + 1);
+            }
+        }
+        return null;
+    }
+
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -37,6 +48,7 @@ public class BookRegister extends AbstractController {
             String method = request.getMethod();
 
             if (!"POST".equalsIgnoreCase(method)) {
+                // GET : 등록 폼 보여주기
                 List<CategoryVO> categoryList = bdao.getCategoryList();
                 List<SpecVO> specList = bdao.getSpecList();
 
@@ -45,14 +57,17 @@ public class BookRegister extends AbstractController {
 
                 super.setRedirect(false);
                 super.setViewPage("/WEB-INF/myshop/admin/bookRegister.jsp");
-            } else {
-                // POST 요청 처리 - 인코딩 설정 추가
-                request.setCharacterEncoding("UTF-8");
 
-                // === 업로드 경로를 webapp/images 로 설정 === //
-                String uploadDir = request.getServletContext().getRealPath("/images");
+            } else {
+                // POST : 등록 처리
+
+                ServletContext svlCtx = session.getServletContext();
+                String uploadDir = svlCtx.getRealPath("/images");
+
                 File uploadFolder = new File(uploadDir);
-                if (!uploadFolder.exists()) uploadFolder.mkdirs();
+                if (!uploadFolder.exists()) {
+                    uploadFolder.mkdirs();
+                }
 
                 String bimage = null;
 
@@ -62,8 +77,10 @@ public class BookRegister extends AbstractController {
                         String originalFileName = part.getSubmittedFileName();
                         String ext = originalFileName.substring(originalFileName.lastIndexOf("."));
 
-                        // UUID로 새 파일명 생성
-                        String newFileName = UUID.randomUUID().toString() + ext;
+                        // 유니크 파일명 생성
+                        String newFileName = originalFileName.substring(0, originalFileName.lastIndexOf("."))
+                                + "_" + String.format("%1$tY%1$tm%1$td%1$tH%1$tM%1$tS", Calendar.getInstance())
+                                + System.nanoTime() + ext;
 
                         // 파일 저장
                         part.write(uploadDir + File.separator + newFileName);
@@ -119,6 +136,7 @@ public class BookRegister extends AbstractController {
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/msg.jsp");
         }
+
     }
 
     private int parseOrZero(String str) {
