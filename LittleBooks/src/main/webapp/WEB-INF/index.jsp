@@ -52,13 +52,13 @@
                                 <a href="${pageContext.request.contextPath}/myshop/bookdetail.go?bookseq=${book.bookseq}" style="text-decoration: none; color: inherit;">
 
                                     <div class="book-card">
-                                        <img src="${pageContext.request.contextPath}/images/${book.image}" class="book-img" alt="${book.title}" />
+                                        <img src="${pageContext.request.contextPath}/images/${book.bimage}" class="book-img" alt="${book.bname}" />
                                         <div class="book-overlay">
-                                            <div class="book-comment">${book.comment}</div>
+                                            <div class="book-comment">${book.bcontent}</div>
                                         </div>
                                     </div>
                                     <div class="carousel-caption d-none d-md-block" style="background: rgba(0,0,0,0.4); border-radius: 5px;">
-                                        <h5>${book.title}</h5>
+                                        <h5>${book.bname}</h5>
                                         <p>${book.author}</p>
                                     </div>
                                 </a>
@@ -112,7 +112,37 @@
             <a href="<%= ctxPath %>/myshop/booklist.go?category=만화책" class="btn btn-outline-warning">만화책 시리즈</a>
         </div>
     </div>
+	
+	<h3>BEST 도서 목록</h3>
+	<div class="book-list">
+	    <c:forEach var="book" items="${bestBooks}" varStatus="status">
+		    <c:if test="${status.index < 5}">
+		    <a href="${pageContext.request.contextPath}/myshop/bookdetail.go?bookseq=${book.bookseq}" style="text-decoration: none; color: inherit;">
+		        <div class="book-item">
+		            <span class="book-title">${book.bname}</span>
+		            <span class="book-author"> - ${book.author}</span>
+		        </div>
+		    </a>
+		    </c:if>
+		</c:forEach>
+	</div>
 
+	<h3>NEW 도서 목록</h3>
+	<div class="book-list">
+	    <c:forEach var="book" items="${newBooks}" varStatus="status">
+		    <c:if test="${status.index < 5}">
+		    <a href="${pageContext.request.contextPath}/myshop/bookdetail.go?bookseq=${book.bookseq}" style="text-decoration: none; color: inherit;">
+		        <div class="book-item">
+		            <span class="book-title">${book.bname}</span>
+		            <span class="book-author"> - ${book.author}</span>
+		        </div>
+		    </a>
+		    </c:if>
+		</c:forEach>
+
+	</div>
+
+	
     <!-- 💬 사용자 리뷰 하이라이트 -->
     <div class="mb-5">
         <h4>💬 사용자 리뷰 하이라이트</h4>
@@ -265,6 +295,40 @@ h4 {
     font-size: 15px;
     line-height: 1.6;
 }
+.book-list {
+    margin-bottom: 40px;
+    padding-left: 0;
+}
+
+.book-item {
+    background-color: #fff;
+    padding: 12px 20px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    box-shadow: 0 3px 7px rgba(0,0,0,0.1);
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease;
+    cursor: default;
+}
+
+.book-item:hover {
+    background-color: #f9f1c9; /* 부드러운 노란 배경으로 하이라이트 */
+}
+
+.book-title {
+    color: #333;
+}
+
+.book-author {
+    color: #666;
+    font-weight: 400;
+    font-style: italic;
+}
+
 </style>
 
 <jsp:include page="footer.jsp" />

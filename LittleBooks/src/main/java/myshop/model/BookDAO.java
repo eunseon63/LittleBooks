@@ -22,6 +22,16 @@ public interface BookDAO {
 	// SPEC 목록을 조회해오기
 	List<SpecVO> getSpecList() throws SQLException;
 
+	// 책 정렬
+	List<BookVO> selectBooksByCategorySorted(String category, String sort) throws SQLException;
 	
+	// 책 정렬
+	List<BookVO> selectAllBooksSorted(String sort) throws SQLException;
+	
+	// 청소년 권장 도서 (메인)
+	List<BookVO> selectBooksBySeqArray(int[] seqArr) throws SQLException;
+
+	// best, new 도서 조회
+	List<BookVO> selectBooksBySpec(int snum) throws SQLException;
 
 }
