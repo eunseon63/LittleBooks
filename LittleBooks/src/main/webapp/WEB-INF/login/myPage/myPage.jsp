@@ -14,9 +14,18 @@
 <!-- Optional JavaScript -->
 <script type="text/javascript" src="<%= ctxPath %>/js/jquery-3.7.1.min.js"></script>
 <script type="text/javascript" src="<%= ctxPath %>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js"></script>
-
+<script type="text/javascript" src="<%= ctxPath%>/js/member/deleteMember.js"></script>
 <link rel="stylesheet" href="<%= ctxPath %>/css/mypage_custom.css" />
-
+<script type="text/javascript">
+  function confirmDelete() {
+    const confirmResult = confirm("정말 삭제하시겠습니까?");
+    if (confirmResult) {
+      // 사용자가 '예'를 눌렀을 때만 탈퇴 페이지로 이동
+      location.href = 'deleteMember.go';
+    }
+    // '아니오' 누르면 아무 동작 없음
+  }
+</script>
 <jsp:include page="../../header1.jsp" />
 
 <br>
@@ -43,7 +52,7 @@
             <button class="btn btn-outline-secondary btn-block" onclick="location.href='orderList.go'">나의 주문 내역</button>
           </li>
           <li class="nav-item">
-            <button class="btn btn-outline-danger btn-block" onclick="location.href='#'">회원 탈퇴</button>
+			<button class="btn btn-outline-danger btn-block" onclick="confirmDelete()">회원 탈퇴</button>
           </li>
         </ul>
       </div>

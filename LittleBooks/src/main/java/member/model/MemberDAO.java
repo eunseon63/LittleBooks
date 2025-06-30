@@ -42,6 +42,12 @@ public interface MemberDAO {
 
 	// 한 명의 회원 정보 
 	MemberVO selectOneMember(String userid) throws SQLException;
+
+	// 회원 로그인 상태
+	public boolean isValidLogin(String userid) throws SQLException;
+	
+	//회원 탈퇴 
+	boolean deleteMember(String userid)throws SQLException;
 	
 }
 
