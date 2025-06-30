@@ -62,13 +62,13 @@ public class BookRegister extends AbstractController {
                 for (Part part : parts) {
                     if (part.getSubmittedFileName() != null && part.getSize() > 0) {
                         String originalFileName = part.getSubmittedFileName();
-                        String newFileName = originalFileName.substring(originalFileName.lastIndexOf("."));
 
-                        part.write(uploadDir + File.separator + newFileName);
+                        // 파일명 그대로 저장
+                        part.write(uploadDir + File.separator + originalFileName);
                         part.delete();
 
                         if ("bimage".equals(part.getName())) {
-                            bimage = newFileName;
+                            bimage = originalFileName;
                         }
                     }
                 }
