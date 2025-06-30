@@ -603,6 +603,7 @@ public class MemberDAO_imple implements MemberDAO {
 		return member;
 		
 	}
+
  
 	// 회원의 개인정보 변경하기
 	@Override
@@ -679,6 +680,76 @@ public class MemberDAO_imple implements MemberDAO {
 	
 	
 	
+
+	
+	// 회원 상태 확인 (status) 
+	
+	@Override
+	public boolean isValidLogin(String userid) throws SQLException {
+	    boolean isValid = false;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " SELECT status "
+	        		+ " FROM tbl_member "
+	        		+ " WHERE userid = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+
+	        rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            int status = rs.getInt("status");
+	            isValid = (status == 1);
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();  // 예외 발생 시 로그 출력
+	    } finally {
+	        close();
+	    }
+
+	    return isValid;
+	}
+	
+	
+	
+	
+	
+	//회원 탈퇴 
+	@Override
+	public boolean deleteMember(String userid) throws SQLException {
+	    boolean isDeleted = false;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " UPDATE tbl_member "
+	        		+ "	SET status = 0 "
+	        		+ " WHERE userid = ? ";
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+
+	        int affectedRows = pstmt.executeUpdate();
+	        if (affectedRows > 0) {
+	            isDeleted = true;
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();  
+	    } finally {
+	        close();
+	    }
+
+	    return isDeleted;
+	}
+
+	
+	
+
+
 
 	
 }

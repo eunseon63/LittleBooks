@@ -12,6 +12,7 @@
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script type="text/javascript" src="<%= ctxPath%>/js/register/Register.js"></script>
 
+<script type="text/javascript" src="<%= ctxPath%>/js/member/deleteMember.js"></script>
 
 <style>
    body {
