@@ -144,7 +144,7 @@ body {
     <div class="left-box">
         <c:choose>
             <c:when test="${not empty book.bimage}">
-                <img src="<c:url value='/images/${book.bimage}' />" alt="책 이미지" />
+                <img src="${pageContext.request.contextPath}/images/${book.bimage}" alt="책 이미지" />
             </c:when>
             <c:otherwise>
                 <div style="width: 360px; height: 360px; display: flex; align-items: center; justify-content: center; border: 1px solid #eee; border-radius: 12px; background: #f9f9f9;">

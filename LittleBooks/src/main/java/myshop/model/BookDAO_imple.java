@@ -232,6 +232,74 @@ public class BookDAO_imple implements BookDAO {
 		
 		return specList;
 	}
+
+	// 책번호 시퀀스 채번
+	@Override
+	public int getBookseq() throws SQLException {
+	    int bnum = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = "SELECT seq_book.NEXTVAL AS bookseq FROM dual";
+
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery(); 
+
+	        if (rs.next()) {
+	            bnum = rs.getInt("bookseq");
+	        }
+
+	    } finally {
+	        close();
+	    }
+
+	    return bnum;
+	}
+
+	// 책 정보를 tbl_book 테이블에 insert
+	@Override
+	public int bookInsert(BookVO bvo) throws SQLException {
+	    int result = 0;
+
+	    String sql = "INSERT INTO tbl_book "
+	               + "(bookseq, bname, bcontent, price, bqty, author, bimage, fk_publishseq, fk_categoryseq, binputdate, fk_snum) "
+	               + "VALUES (seq_book.nextval, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE, ?)";
+
+	    try (Connection conn = ds.getConnection();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+	        pstmt.setString(1, bvo.getBname());
+	        pstmt.setString(2, bvo.getBcontent());
+	        pstmt.setInt(3, bvo.getPrice());
+	        pstmt.setInt(4, bvo.getBqty());
+	        pstmt.setString(5, bvo.getAuthor());
+	        pstmt.setString(6, bvo.getBimage());
+
+	        if (bvo.getFk_publishseq() != 0) {
+	            pstmt.setInt(7, bvo.getFk_publishseq());
+	        } else {
+	            pstmt.setNull(7, java.sql.Types.INTEGER);
+	        }
+
+	        if (bvo.getFk_categoryseq() != 0) {
+	            pstmt.setInt(8, bvo.getFk_categoryseq());
+	        } else {
+	            pstmt.setNull(8, java.sql.Types.INTEGER);
+	        }
+
+	        if (bvo.getFk_snum() != 0) {
+	            pstmt.setInt(9, bvo.getFk_snum());
+	        } else {
+	            pstmt.setNull(9, java.sql.Types.INTEGER);
+	        }
+
+	        result = pstmt.executeUpdate();
+	    }
+
+	    return result;
+	}
+
 	
 }
 
