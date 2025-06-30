@@ -22,6 +22,12 @@ public interface BookDAO {
 	// SPEC 목록을 조회해오기
 	List<SpecVO> getSpecList() throws SQLException;
 
+	// 책번호 시퀀스 채번 (DAO에서 구현)
+	int getBookseq() throws SQLException;
+
+	// 책 정보를 tbl_book 테이블에 insert
+	int bookInsert(BookVO bvo) throws SQLException;
+
 	// 책 정렬
 	List<BookVO> selectBooksByCategorySorted(String category, String sort) throws SQLException;
 	

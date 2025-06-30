@@ -128,13 +128,13 @@
     // 폼 제출용 input 갱신
     const dataTransfer = new DataTransfer();
     dataTransfer.items.add(file);
-    $("input.img_file")[0].files = dataTransfer.files;
+    $("input[name='bimage']")[0].files = dataTransfer.files;
   }
 
   $(function () {
     $("span.error").hide();
 
-    $("input.img_file").on("change", function (e) {
+    $("input[name='bimage']").on("change", function (e) {
       const file = e.target.files[0];
       if (file) updatePreviewAndFileName(file);
     });
@@ -156,7 +156,7 @@
       })
       .on("click", function (e) {
         if (!$(e.target).is("input")) {
-          $("input.img_file").trigger("click");
+          $("input[name='bimage']").trigger("click");
         }
       });
 
@@ -191,14 +191,14 @@
 
 <div class="container-custom" style="margin-top: 100px;">
   <h2 class="page-title">도서등록 [관리자전용]</h2>
-  <form name="bookInputFrm" enctype="multipart/form-data" method="post">
+  <form name="bookInputFrm" enctype="multipart/form-data" method="post" action="bookRegister.go">
     <div class="form-wrapper">
       <!-- 왼쪽: 이미지 미리보기 -->
       <div class="form-left">
         <div id="fileDrop" class="image-preview" title="사진을 클릭하거나 드래그하세요">
           <strong>책 이미지를 드래그하거나 클릭하여 선택하세요</strong>
           <img id="previewImg" alt="미리보기 이미지" />
-          <input type="file" name="bimage" class="infoData img_file" accept="image/jpeg,image/png" style="display: none" />
+          <input type="file" name="bimage" class="infoData" accept="image/jpeg,image/png" style="display: none" />
         </div>
       </div>
 
@@ -209,12 +209,12 @@
             <tr>
               <th class="bookInputName">카테고리<span class="text-danger">*</span></th>
               <td>
-                <select name="fk_cnum" class="form-control infoData">
-                  <option value="">:::선택하세요:::</option>
-                  <c:forEach var="cvo" items="${requestScope.categoryList}">
-                    <option value="${cvo.categoryseq}">${cvo.categoryname}</option>
-                  </c:forEach>
-                </select>
+                <select name="fk_categoryseq" class="form-control infoData">
+				  <option value="">:::선택하세요:::</option>
+				  <c:forEach var="cvo" items="${requestScope.categoryList}">
+				    <option value="${cvo.categoryseq}">${cvo.categoryname}</option>
+				  </c:forEach>
+				</select>
                 <span class="error">필수입력</span>
               </td>
             </tr>
@@ -226,23 +226,35 @@
               </td>
             </tr>
             <tr>
-              <th class="bookInputName">출판사<span class="text-danger">*</span></th>
-              <td>
-                <input type="text" name="bpublisher" class="form-control infoData" />
-                <span class="error">필수입력</span>
-              </td>
-            </tr>
+			  <th class="bookInputName">출판사<span class="text-danger">*</span></th>
+			  <td>
+			    <select name="fk_publishseq" class="form-control infoData" style="max-width: 300px;">
+			      <option value="">:::선택하세요:::</option>
+			      <option value="1">푸른책방</option>
+			      <option value="2">행복출판사</option>
+			      <option value="3">꿈나무출판</option>
+			    </select>
+			    <span class="error">필수입력</span>
+			  </td>
+			</tr>
+			<tr>
+			  <th class="bookInputName">저자<span class="text-danger">*</span></th>
+			  <td>
+			    <input type="text" name="author" class="form-control infoData" />
+			    <span class="error">필수입력</span>
+			  </td>
+			</tr>
             <tr>
               <th class="bookInputName">재고수량<span class="text-danger">*</span></th>
               <td>
-                <input name="bqty" value="1" class="form-control infoData" style="max-width: 100px;" />
+                <input type="number" name="bqty" value="1" class="form-control infoData" style="max-width: 100px;" />
                 <span class="error">필수입력</span>
               </td>
             </tr>
             <tr>
               <th class="bookInputName">가격<span class="text-danger">*</span></th>
               <td>
-                <input type="text" name="price" class="form-control infoData" style="max-width: 200px;" />
+                <input type="number" name="price" class="form-control infoData" style="max-width: 200px;" />
                 <span class="error">필수입력</span>
               </td>
             </tr>
