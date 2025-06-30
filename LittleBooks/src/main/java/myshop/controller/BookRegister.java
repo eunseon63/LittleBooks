@@ -62,10 +62,7 @@ public class BookRegister extends AbstractController {
                 for (Part part : parts) {
                     if (part.getSubmittedFileName() != null && part.getSize() > 0) {
                         String originalFileName = part.getSubmittedFileName();
-                        String ext = originalFileName.substring(originalFileName.lastIndexOf("."));
-
-                        // UUID로 새 파일명 생성하여 한글 문제 방지
-                        String newFileName = UUID.randomUUID().toString() + ext;
+                        String newFileName = originalFileName.substring(originalFileName.lastIndexOf("."));
 
                         part.write(uploadDir + File.separator + newFileName);
                         part.delete();
