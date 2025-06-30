@@ -135,6 +135,7 @@ public class BookDAO_imple implements BookDAO {
 
 	        if (rs.next()) {
 	            book = new BookVO();
+	            book.setFk_snum(rs.getInt("fk_snum"));
 	            book.setBookseq(rs.getInt("bookseq"));
 	            book.setBname(rs.getString("bname"));
 	            book.setAuthor(rs.getString("author"));
@@ -300,6 +301,240 @@ public class BookDAO_imple implements BookDAO {
 	    return result;
 	}
 
+	// 책 목록 정렬 
+	@Override
+	public List<BookVO> selectBooksByCategorySorted(String category, String sort) throws SQLException {
+		List<BookVO> list = new ArrayList<>();
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = "SELECT b.*, c.categoryname " +
+	                     "FROM tbl_book b JOIN tbl_category c ON b.fk_categoryseq = c.categoryseq " +
+	                     "WHERE c.categoryname = ?";
+
+	        if ("new".equals(sort)) {
+	            sql += " ORDER BY b.binputdate DESC";
+	        }
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, category);
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            BookVO book = new BookVO();
+
+	            book.setBookseq(rs.getInt("bookseq"));
+	            book.setBname(rs.getString("bname"));
+	            book.setBcontent(rs.getString("bcontent"));
+	            book.setPrice(rs.getInt("price"));
+	            book.setBqty(rs.getInt("bqty"));
+	            book.setAuthor(rs.getString("author"));
+	            book.setBimage(rs.getString("bimage"));
+	            book.setFk_publishseq(rs.getInt("fk_publishseq"));
+	            book.setFk_categoryseq(rs.getInt("fk_categoryseq"));
+
+	            java.sql.Date binputDate = rs.getDate("binputdate");
+	            if (binputDate != null) {
+	                book.setBinputdate(binputDate.toString());
+	            } else {
+	                book.setBinputdate(null);
+	            }
+
+	            book.setFk_snum(rs.getInt("fk_snum"));
+
+	            CategoryVO cvo = new CategoryVO();
+	            cvo.setCategoryseq(rs.getInt("fk_categoryseq"));
+	            cvo.setCategoryname(rs.getString("categoryname"));
+	            book.setCvo(cvo);
+
+	            SpecVO spvo = new SpecVO();
+	            spvo.setSnum(rs.getInt("fk_snum"));
+	            book.setSpvo(spvo);
+
+	            list.add(book);
+	        }
+
+	    } finally {
+	        close();
+	    }
+
+	    return list;
+
+	}
+
+	// 책 목록 정렬
+	@Override
+	public List<BookVO> selectAllBooksSorted(String sort) throws SQLException {
+			List<BookVO> list = new ArrayList<>();
+
+		    try {
+		        conn = ds.getConnection();
+
+		        String sql = "SELECT b.*, c.categoryname " +
+		                     "FROM tbl_book b JOIN tbl_category c ON b.fk_categoryseq = c.categoryseq";
+
+		        if ("new".equals(sort)) {
+		            sql += " ORDER BY b.binputdate DESC";
+		        }
+
+		        pstmt = conn.prepareStatement(sql);
+		        rs = pstmt.executeQuery();
+
+		        while (rs.next()) {
+		            BookVO book = new BookVO();
+
+		            book.setBookseq(rs.getInt("bookseq"));
+		            book.setBname(rs.getString("bname"));
+		            book.setBcontent(rs.getString("bcontent"));
+		            book.setPrice(rs.getInt("price"));
+		            book.setBqty(rs.getInt("bqty"));
+		            book.setAuthor(rs.getString("author"));
+		            book.setBimage(rs.getString("bimage"));
+		            book.setFk_publishseq(rs.getInt("fk_publishseq"));
+		            book.setFk_categoryseq(rs.getInt("fk_categoryseq"));
+
+		            java.sql.Date binputDate = rs.getDate("binputdate");
+		            if (binputDate != null) {
+		                book.setBinputdate(binputDate.toString());
+		            } else {
+		                book.setBinputdate(null);
+		            }
+
+		            book.setFk_snum(rs.getInt("fk_snum"));
+
+		            CategoryVO cvo = new CategoryVO();
+		            cvo.setCategoryseq(rs.getInt("fk_categoryseq"));
+		            cvo.setCategoryname(rs.getString("categoryname"));
+		            book.setCvo(cvo);
+
+		            SpecVO spvo = new SpecVO();
+		            spvo.setSnum(rs.getInt("fk_snum"));
+		            book.setSpvo(spvo);
+
+		            list.add(book);
+		        }
+
+		    } finally {
+		        close();
+		    }
+
+		    return list;
+	}
+
+	// 청소년 권장 도서 (메인)
+	@Override
+	public List<BookVO> selectBooksBySeqArray(int[] seqArr) throws SQLException {
+		List<BookVO> list = new ArrayList<>();
+
+	    if (seqArr == null || seqArr.length == 0) return list;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        StringBuilder sql = new StringBuilder("SELECT b.*, c.categoryname ")
+	            .append("FROM tbl_book b JOIN tbl_category c ON b.fk_categoryseq = c.categoryseq ")
+	            .append("WHERE b.bookseq IN (");
+
+	        for (int i = 0; i < seqArr.length; i++) {
+	            sql.append("?");
+	            if (i < seqArr.length - 1) sql.append(",");
+	        }
+	        sql.append(")");
+
+	        pstmt = conn.prepareStatement(sql.toString());
+
+	        for (int i = 0; i < seqArr.length; i++) {
+	            pstmt.setInt(i + 1, seqArr[i]);
+	        }
+
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            BookVO book = new BookVO();
+	            book.setBookseq(rs.getInt("bookseq"));
+	            book.setBname(rs.getString("bname"));
+	            book.setBcontent(rs.getString("bcontent"));
+	            book.setPrice(rs.getInt("price"));
+	            book.setBqty(rs.getInt("bqty"));
+	            book.setAuthor(rs.getString("author"));
+	            book.setBimage(rs.getString("bimage"));
+	            book.setFk_publishseq(rs.getInt("fk_publishseq"));
+	            book.setFk_categoryseq(rs.getInt("fk_categoryseq"));
+
+	            java.sql.Date binputDate = rs.getDate("binputdate");
+	            if (binputDate != null) {
+	                book.setBinputdate(binputDate.toString());
+	            }
+
+	            book.setFk_snum(rs.getInt("fk_snum"));
+
+	            CategoryVO cvo = new CategoryVO();
+	            cvo.setCategoryseq(rs.getInt("fk_categoryseq"));
+	            cvo.setCategoryname(rs.getString("categoryname"));
+	            book.setCvo(cvo);
+
+	            SpecVO spvo = new SpecVO();
+	            spvo.setSnum(rs.getInt("fk_snum"));
+	            book.setSpvo(spvo);
+
+	            list.add(book);
+	        }
+	    } finally {
+	        close();
+	    }
+
+	    return list;
+	}
 	
+	// best, new 도서 조회
+	@Override
+	public List<BookVO> selectBooksBySpec(int snum) throws SQLException {
+		List<BookVO> list = new ArrayList<>();
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = "SELECT b.bookseq, b.bname, b.bcontent, b.price, b.bqty, b.author, b.bimage, "
+	                   + "b.fk_publishseq, b.fk_categoryseq, b.binputdate, b.fk_snum, c.categoryname "
+	                   + "FROM tbl_book b JOIN tbl_category c ON b.fk_categoryseq = c.categoryseq "
+	                   + "WHERE b.fk_snum = ? "
+	                   + "ORDER BY b.binputdate DESC";  // 최신순 정렬
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setInt(1, snum);
+
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            BookVO book = new BookVO();
+	            book.setBookseq(rs.getInt("bookseq"));
+	            book.setBname(rs.getString("bname"));
+	            book.setBcontent(rs.getString("bcontent"));
+	            book.setPrice(rs.getInt("price"));
+	            book.setBqty(rs.getInt("bqty"));
+	            book.setAuthor(rs.getString("author"));
+	            book.setBimage(rs.getString("bimage"));
+	            book.setFk_publishseq(rs.getInt("fk_publishseq"));
+	            book.setFk_categoryseq(rs.getInt("fk_categoryseq"));
+	            book.setBinputdate(rs.getString("binputdate"));
+	            book.setFk_snum(rs.getInt("fk_snum"));
+
+	            CategoryVO cvo = new CategoryVO();
+	            cvo.setCategoryseq(rs.getInt("fk_categoryseq"));
+	            cvo.setCategoryname(rs.getString("categoryname"));
+	            book.setCvo(cvo);
+
+	            list.add(book);
+	        }
+	    } finally {
+	        close();
+	    }
+
+	    return list;
+	}
+
+
+
 }
 

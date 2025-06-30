@@ -137,6 +137,14 @@ body {
     color: #f4c900;
     font-size: 18px;
 }
+.book-spec {
+    color: #d00000;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
 </style>
 
 <div class="detail-wrapper">
@@ -156,6 +164,15 @@ body {
 
     <!-- 상세 정보 -->
     <div class="right-box">
+    	<!-- 🔴 스펙 표시 (BEST / NEW 등) -->
+    	<c:choose>
+	        <c:when test="${book.fk_snum == 2}">
+	            <div class="book-spec">BEST(인기)!!</div>
+	        </c:when>
+	        <c:when test="${book.fk_snum == 3}">
+	            <div class="book-spec">NEW(신상)!!</div>
+	        </c:when>
+    	</c:choose>
         <h2>${book.bname}</h2>
         <div class="book-info">
             <div><strong>출판사:</strong>${book.pvo.pname}</div>
