@@ -42,6 +42,10 @@ public interface MemberDAO {
 
 	// 한 명의 회원 정보 
 	MemberVO selectOneMember(String userid) throws SQLException;
+
+	List<MemberVO> getOrderListByUserid(String userid) throws SQLException;
+
+	
 	
 }
 
