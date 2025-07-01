@@ -24,9 +24,10 @@
       <div class="form-group mr-3">
         <select class="form-control mr-2" name="searchType"
                 style="height: 50px; border-radius: 50px 0 0 50px; border: 2px solid #ffcc00;">
-          <option value="">검색대상</option>
-          <option value="bname" ${searchType == 'bname' ? 'selected' : ''}>제목</option>
-          <option value="author" ${searchType == 'author' ? 'selected' : ''}>저자</option>
+          	<option value="">검색대상</option>
+		   <option value="bname">제목</option>
+		   <option value="author">저자</option>
+
         </select>
 
         <input type="text" class="form-control mr-3" name="searchWord"
