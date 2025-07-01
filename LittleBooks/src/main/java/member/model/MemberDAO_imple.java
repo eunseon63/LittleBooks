@@ -196,57 +196,59 @@ public class MemberDAO_imple implements MemberDAO {
 			 rs = pstmt.executeQuery();
 			 
 			 if(rs.next()) {
-				    member = new MemberVO();
-				    
-				    // 먼저 ResultSet에서 모든 값 읽기
-				    String userid = rs.getString("userid");
-				    String name = rs.getString("name");
-				    int point = rs.getInt("point");
-				    String registerday = rs.getString("registerday");
-				    int pwdchangegap = rs.getInt("pwdchangegap");
-				    int lastlogingap = rs.getInt("lastlogingap");
-				    int idle = rs.getInt("idle");
-
-				    String email = aes.decrypt(rs.getString("email"));
-				    String mobile = aes.decrypt(rs.getString("mobile"));
-				    String postcode = rs.getString("postcode");
-				    String address = rs.getString("address");
-				    String detailaddress = rs.getString("detailaddress");
-				    String extraaddress = rs.getString("extraaddress");
-
-				    // member 세팅
-				    member.setUserid(userid);
-				    member.setName(name);
-				    member.setPoint(point);
-				    member.setRegisterday(registerday);
-				    if(pwdchangegap >= 3) {
-				        member.setRequirePwdChange(true);
-				    }
-
-				    member.setEmail(email);
-				    member.setMobile(mobile);
-				    member.setPostcode(postcode);
-				    member.setAddress(address);
-				    member.setDetailaddress(detailaddress);
-				    member.setExtraaddress(extraaddress);
-
-				    if(lastlogingap < 12) {
-				        sql = "insert into tbl_loginhistory(fk_userid) values(?)";
-				        pstmt = conn.prepareStatement(sql);
-				        pstmt.setString(1, userid);
-				        pstmt.executeUpdate();
-				    }
-				    else {
-				        member.setIdle(1);
-
-				        if(idle == 0) {
-				            sql = "update tbl_member set idle = 1 where userid = ?";
-				            pstmt = conn.prepareStatement(sql);
-				            pstmt.setString(1, userid);
-				            pstmt.executeUpdate();
-				        }
-				    }
-				}
+				 
+				 member = new MemberVO();
+				 
+				 member.setUserid(rs.getString("userid"));
+				 member.setName(rs.getString("name"));
+				 member.setPoint(rs.getInt("point"));
+				 member.setRegisterday(rs.getString("registerday"));
+				 
+				 if(rs.getInt("pwdchangegap") >= 3) {
+					 // 마지막으로 암호를 변경한 날짜가 현재시각으로 부터 3개월이 지났으면 true
+					 // 마지막으로 암호를 변경한 날짜가 현재시각으로 부터 3개월이 지나지 않았으면 false
+					 
+					 member.setRequirePwdChange(true); // 로그인시 암호를 변경해라는 alert 를 띄우도록 할 때 사용한다.
+				 }
+				 
+				 member.setEmail(aes.decrypt(rs.getString("email")));
+				 member.setMobile(aes.decrypt(rs.getString("mobile")));
+				 member.setPostcode(rs.getString("postcode"));
+				 member.setAddress(rs.getString("address"));
+				 member.setDetailaddress(rs.getString("detailaddress"));
+				 member.setExtraaddress(rs.getString("extraaddress"));
+				 
+				 
+				 // ==== 휴면이 아닌 회원만 tbl_loginhistory(로그인기록) 테이블에 insert 하기 시작 ==== // 
+				 if( rs.getInt("lastlogingap") < 12 ) {
+					 sql = " insert into tbl_loginhistory(logindate, fk_userid) "
+					 	 + " values(sysdate, ?) ";
+					 
+					 pstmt = conn.prepareStatement(sql);
+					 pstmt.setString(1, paraMap.get("userid"));
+					 
+					 pstmt.executeUpdate();
+				 }
+				// ==== 휴면이 아닌 회원만 tbl_loginhistory(로그인기록) 테이블에 insert 하기 끝 ==== //
+				 
+				 else {
+					 // 마지막으로 로그인 한 날짜시간이 현재시각으로 부터 1년이 지났으면 휴면으로 지정 
+					 member.setIdle(1);
+					 
+					 if(rs.getInt("idle") == 0) {
+					     // === tbl_member 테이블의 idle 컬럼의 값을 1로 변경하기 === //
+						 sql = " update tbl_member set idle = 1 "
+						 	 + " where userid = ? ";
+						 
+						 pstmt = conn.prepareStatement(sql);
+						 pstmt.setString(1, paraMap.get("userid"));
+						 
+						 pstmt.executeUpdate();
+					 }
+					 
+				 }
+				 
+			 }// end of if(rs.next())---------------------------
 
 			 
 			
@@ -608,6 +610,153 @@ public class MemberDAO_imple implements MemberDAO {
 
 	    return null;  // 리스트 반환
 	}
+
+
+
+ 
+	// 회원의 개인정보 변경하기
+	@Override
+	public int updateMember(MemberVO member) throws SQLException {
+		int result = 0;
+
+		try {
+			 conn = ds.getConnection();
+			 
+			 String sql = " update tbl_member set name = ? "
+					    + "                     , passwd = ? "
+					    + "                     , email = ? "
+					    + "                     , mobile = ? "
+					    + "                     , postcode = ? " 
+					    + "                     , address = ? "
+					    + "                     , detailaddress = ? "
+					    + "                     , extraaddress = ? "
+					    + "                     , lastpwdchangedate = sysdate "
+					    + " where userid = ? ";
+			 
+			 pstmt = conn.prepareStatement(sql);
+				
+			 pstmt.setString(1, member.getName());
+			 pstmt.setString(2, Sha256.encrypt(member.getPwd()) ); // 암호를 SHA256 알고리즘으로 단방향 암호화 시킨다.
+			 pstmt.setString(3, aes.encrypt(member.getEmail()) );  // 이메일을 AES256 알고리즘으로 양방향 암호화 시킨다. 
+			 pstmt.setString(4, aes.encrypt(member.getMobile()) ); // 휴대폰번호를 AES256 알고리즘으로 양방향 암호화 시킨다. 
+			 pstmt.setString(5, member.getPostcode());
+			 pstmt.setString(6, member.getAddress());
+			 pstmt.setString(7, member.getDetailaddress());
+			 pstmt.setString(8, member.getExtraaddress());
+			 pstmt.setString(9, member.getUserid());
+			 
+			 result = pstmt.executeUpdate();
+			 
+		} catch(GeneralSecurityException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} finally {
+			close();
+		}
+		
+		return result;
+	}
+
+	// 회원정보 수정시 변경하고자 하는 암호가 현재 사용자가 사용중인지 아닌지 여부 알아오기
+	// 암호 중복검사 (현재 암호와 동일하면 true 를 리턴해주고, 현재 암호와 동일하지 않으면 false 를 리턴한다)
+	@Override
+	public boolean duplicatePwdCheck(Map<String, String> paraMap) throws SQLException{
+		
+		boolean isExists = false;
+		
+		try {
+			  conn = ds.getConnection();
+			  
+			  String sql = " select * "
+			  		     + " from tbl_member "
+			  		     + " where userid = ? and passwd = ? ";
+			  
+			  pstmt = conn.prepareStatement(sql);
+			  pstmt.setString(1, paraMap.get("userid") );
+			  pstmt.setString(2, Sha256.encrypt(paraMap.get("new_pwd")) );
+			  
+			  rs = pstmt.executeQuery();
+			  
+			  isExists = rs.next(); // 행이 있으면 true  (새암호가 현재 사용중인 암호와 같은 경우) 
+			                        // 행이 없으면 false (새암호가 현재 사용중인 암호와 다른 경우) 
+			
+		} finally {
+			close();
+		}
+		
+		return isExists;
+	}
+	
+	
+	
+	
+
+	
+	// 회원 상태 확인 (status) 
+	
+	@Override
+	public boolean isValidLogin(String userid) throws SQLException {
+	    boolean isValid = false;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " SELECT status "
+	        		+ " FROM tbl_member "
+	        		+ " WHERE userid = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+
+	        rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            int status = rs.getInt("status");
+	            isValid = (status == 1);
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();  // 예외 발생 시 로그 출력
+	    } finally {
+	        close();
+	    }
+
+	    return isValid;
+	}
+	
+	
+	
+	
+	
+	//회원 탈퇴 
+	@Override
+	public boolean deleteMember(String userid) throws SQLException {
+	    boolean isDeleted = false;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " UPDATE tbl_member "
+	        		+ "	SET status = 0 "
+	        		+ " WHERE userid = ? ";
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+
+	        int affectedRows = pstmt.executeUpdate();
+	        if (affectedRows > 0) {
+	            isDeleted = true;
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();  
+	    } finally {
+	        close();
+	    }
+
+	    return isDeleted;
+	}
+
+	
+	
 
 
 

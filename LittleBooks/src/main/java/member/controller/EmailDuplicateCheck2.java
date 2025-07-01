@@ -36,7 +36,7 @@ public class EmailDuplicateCheck2 extends AbstractController {
 		boolean isExists = mdao.emailDuplicateCheck(paraMap);
 		// 회원정보 수정시 변경하고자 하는 이메일이 다른 사용자가 현재 사용중인지 아닌지 여부 알아오기
 		JSONObject jsonObj = new JSONObject(); //https://mvnrepository.com/artifact/org.json/json/20240303 에서 bundle 다운 후 webinf lib 폴더에 넣어둬야 import 사용 가능함
-		jsonObj.put("", isExists); // {"isExists":true}또는 {"isExists":false} 으로 만들어 준다.
+		jsonObj.put("isExists", isExists); // {"isExists":true}또는 {"isExists":false} 으로 만들어 준다.
 		
 		String json = jsonObj.toString(); // 문자열 형태인  "{"isExists":true}"또는 "{"isExists":false}" 으로 만들어 준다.
 		System.out.println(">>> 확인용 json =>" + json);

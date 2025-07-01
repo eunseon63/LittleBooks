@@ -43,9 +43,25 @@ public interface MemberDAO {
 	// 한 명의 회원 정보 
 	MemberVO selectOneMember(String userid) throws SQLException;
 
+
 	List<MemberVO> getOrderListByUserid(String userid) throws SQLException;
 
 	
+
+	// 회원의 개인정보 변경하기
+	int updateMember(MemberVO member) throws SQLException;
+
+	// 회원정보 수정시 변경하고자 하는 암호가 현재 사용자가 사용중인지 아닌지 여부 알아오기
+	// 암호 중복검사 (현재 암호와 동일하면 true 를 리턴해주고, 현재 암호와 동일하지 않으면 false 를 리턴한다) 
+	boolean duplicatePwdCheck(Map<String, String> paraMap) throws SQLException;
+
+	// 회원 로그인 상태
+	public boolean isValidLogin(String userid) throws SQLException;
+	
+	//회원 탈퇴 
+	boolean deleteMember(String userid)throws SQLException;
+
+
 	
 }
 
