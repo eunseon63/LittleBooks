@@ -61,4 +61,7 @@ public interface BookDAO {
 	// 장바구니에 담긴 책 가격 총합
 	Map<String, Integer> selectCartSumPrice(String userid) throws SQLException;
 
+	// 장바구니 테이블에서 특정제품을 장바구니에서 비우기
+	int delCart(String cartseq) throws SQLException;
+
 }

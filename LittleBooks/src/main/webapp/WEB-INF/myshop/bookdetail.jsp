@@ -265,7 +265,7 @@ function goCart() {
 
     if(!regExp.test(cqty) || cqty < 1 || cqty > 100){
         swal("수량 오류", "수량은 1에서 100 사이의 숫자만 가능합니다.", "warning");
-        frm.oqty.focus();
+        frm.cqty.focus();
         return false;
     }
 
