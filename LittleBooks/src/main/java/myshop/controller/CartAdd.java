@@ -45,17 +45,17 @@ public class CartAdd extends AbstractController {
 			if("POST".equalsIgnoreCase(method)) {
 				// POST 방식이라면 
 				
-				String bnum = request.getParameter("bnum"); // 제품번호
-				String oqty = request.getParameter("oqty"); // 주문량
+				String fk_bookseq = request.getParameter("fk_bookseq"); // 제품번호
+				String cqty = request.getParameter("cqty"); // 주문량
 				
 				HttpSession session = request.getSession();
 				MemberVO loginuser = (MemberVO) session.getAttribute("loginuser");
-				String userid = loginuser.getUserid(); // 사용자ID
+				String fk_userid = loginuser.getUserid(); // 사용자ID
 				
 				Map<String, String> paraMap = new HashMap<>();
-				paraMap.put("bnum", bnum);
-				paraMap.put("oqty", oqty);
-				paraMap.put("userid", userid);
+				paraMap.put("bookseq", fk_bookseq);
+				paraMap.put("cqty", cqty);
+				paraMap.put("fk_userid", fk_userid);
 				
 				try {
 					int n = bdao.addCart(paraMap); 

@@ -6,6 +6,10 @@
     String ctxPath = request.getContextPath();
 %>
 
+<%
+   boolean isLogin = (session.getAttribute("loginuser") != null);
+%>
+
 <jsp:include page="/WEB-INF/header1.jsp" />
 
 <!-- SweetAlert CSS/JS -->
@@ -257,6 +261,7 @@ function goCart() {
     const frm = document.cartOrderFrm;
     const oqty = frm.oqty.value;
     const regExp = /^[1-9][0-9]*$/;
+    var isLogin = <%= isLogin %>;
 
     if(!regExp.test(oqty) || oqty < 1 || oqty > 100){
         swal("수량 오류", "수량은 1에서 100 사이의 숫자만 가능합니다.", "warning");
@@ -264,17 +269,26 @@ function goCart() {
         return false;
     }
 
-    // 여기서 성공 메시지 띄우고, 확인 후 폼 제출하기
-    swal({
-        title: "장바구니 담기 완료!",
-        text: "선택하신 상품이 장바구니에 추가되었습니다.",
-        type: "success"
-    }, function() {
-        // 확인 누르면 폼 전송
-        frm.method = "post";
-        frm.action = "<%= ctxPath %>/shop/cartAdd.go"; 
-        frm.submit();
-    });
+    if (!isLogin) {
+        swal({
+            title: "로그인이 필요합니다!",
+            text: "장바구니에 담으려면 먼저 로그인해주세요.",
+            type: "warning"
+        }, function() {
+            location.href = "<%= ctxPath %>/login/login.go";
+        });
+    } else {
+        // 로그인 된 경우에만 진행
+        swal({
+            title: "장바구니 담기 완료!",
+            text: "선택하신 상품이 장바구니에 추가되었습니다.",
+            type: "success"
+        }, function() {
+            frm.method = "post";
+            frm.action = "<%= ctxPath %>/shop/cartAdd.go";
+            frm.submit();
+        });
+    }
 }
 </script>
 
@@ -317,7 +331,7 @@ function goCart() {
         <form name="cartOrderFrm">
             <div class="select-box">
                 <label for="spinner">수량 선택</label>
-                <input type="text" id="spinner" name="oqty" value="1" autocomplete="off" />
+                <input type="text" id="spinner" name="cqty" value="1" autocomplete="off" />
             </div>
 
             <div class="price-section">
@@ -328,7 +342,7 @@ function goCart() {
                 <button type="button">결제하기</button>
                 <button type="button" onclick="goCart()">장바구니</button>
             </div>
-            <input type="hidden" name="bnum" value="${book.bookseq}" />
+            <input type="hidden" name="fk_bookseq" value="${book.bookseq}" />
         </form>
     </div>
 </div>

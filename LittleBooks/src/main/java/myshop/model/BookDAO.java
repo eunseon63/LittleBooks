@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import myshop.domain.BookVO;
+import myshop.domain.CartVO;
 import myshop.domain.CategoryVO;
 import myshop.domain.SpecVO;
 
@@ -51,8 +52,13 @@ public interface BookDAO {
 	// best, new 도서 조회
 	List<BookVO> selectBooksBySpec(int snum) throws SQLException;
 
-
 	// 장바구니에 담기
 	int addCart(Map<String, String> paraMap) throws SQLException;
+
+	// 장바구니 목록 조회
+	List<CartVO> selectProductCart(String userid) throws SQLException;
+
+	// 장바구니에 담긴 책 가격 총합
+	Map<String, Integer> selectCartSumPrice(String userid) throws SQLException;
 
 }

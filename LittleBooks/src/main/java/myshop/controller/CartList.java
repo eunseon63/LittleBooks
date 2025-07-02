@@ -46,11 +46,11 @@ public class CartList extends AbstractController {
 			HttpSession session = request.getSession();
 			MemberVO loginuser = (MemberVO) session.getAttribute("loginuser");
 			
-			// List<CartVO> cartList = bdao.selectProductCart(loginuser.getUserid());
-			// Map<String, Integer> sumMap = bdao.selectCartSumPricePoint(loginuser.getUserid());
+			List<CartVO> cartList = bdao.selectProductCart(loginuser.getUserid());
+			Map<String, Integer> sumMap = bdao.selectCartSumPrice(loginuser.getUserid());
 			
-			// request.setAttribute("cartList", cartList);
-			// request.setAttribute("sumMap", sumMap);
+			request.setAttribute("cartList", cartList);
+			request.setAttribute("sumMap", sumMap);
 			
 			super.setRedirect(false);
 			super.setViewPage("/WEB-INF/myshop/cartList.jsp");

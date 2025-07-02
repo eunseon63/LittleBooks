@@ -19,6 +19,8 @@ public class BookVO {
 	private SpecVO spvo;
 	private PublishVO pvo;
 	
+	private int totalPrice;
+	
 	public BookVO(){}
 	
 	public BookVO(int bookseq, String bname, String bcontent, int price, int bqty, String author, String bimage,
@@ -150,6 +152,14 @@ public class BookVO {
 	public void setFilename(String string) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void setTotalPrice(int cqty) {
+		totalPrice = price * cqty;
+	}
+	
+	public int getTotalPrice() {
+		return totalPrice;
 	}
 
 

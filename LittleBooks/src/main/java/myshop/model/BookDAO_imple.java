@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import javax.sql.DataSource;
 import myshop.domain.CategoryVO;
 import myshop.domain.PublishVO;
 import myshop.domain.BookVO;
+import myshop.domain.CartVO;
 import myshop.domain.SpecVO;
 
 public class BookDAO_imple implements BookDAO {
@@ -749,7 +751,7 @@ public class BookDAO_imple implements BookDAO {
 			
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, paraMap.get("userid"));
-			pstmt.setString(2, paraMap.get("bnum"));
+			pstmt.setString(2, paraMap.get("fk_bookseq"));
 			
 			rs = pstmt.executeQuery();
 			
@@ -760,7 +762,7 @@ public class BookDAO_imple implements BookDAO {
 				
 				pstmt = conn.prepareStatement(sql);
 				pstmt.setString(1, paraMap.get("oqty") );
-				pstmt.setInt(2, rs.getInt("cartno") );
+				pstmt.setInt(2, rs.getInt("cartseq") );
 				
 				n = pstmt.executeUpdate();
 			}
@@ -770,9 +772,9 @@ public class BookDAO_imple implements BookDAO {
 					+ " values(seq_cart.nextval, ?, ?, ?) ";
 					
 				pstmt = conn.prepareStatement(sql);
-				pstmt.setString(1, paraMap.get("userid"));
-				pstmt.setInt(2, Integer.parseInt(paraMap.get("bnum")));
-				pstmt.setInt(3, Integer.parseInt(paraMap.get("oqty")));
+				pstmt.setString(1, paraMap.get("fk_userid"));
+				pstmt.setInt(2, Integer.parseInt(paraMap.get("fk_bookseq")));
+				pstmt.setInt(3, Integer.parseInt(paraMap.get("cqty")));
 				
 				n = pstmt.executeUpdate();
 			}
@@ -782,6 +784,107 @@ public class BookDAO_imple implements BookDAO {
 		}
 		
 		return n;
+		
+	}
+
+	// 장바구니 목록 조회
+	@Override
+	public List<CartVO> selectProductCart(String userid) throws SQLException {
+		
+		List<CartVO> cartList = null;
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql =  " SELECT C.cartseq, C.fk_userid, C.fk_bookseq, C.cqty, B.bname, B.bimage, B.price, B.bqty "
+						+ " FROM "
+						+ " (select cartseq, fk_userid, fk_bookseq, cqty "
+						+ "  from tbl_cart "
+						+ "  where fk_userid = ?) C "
+						+ " JOIN tbl_book B "
+						+ " ON C.fk_bookseq = B.bookseq "
+						+ " ORDER BY C.cartseq DESC ";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, userid);
+			
+		    rs = pstmt.executeQuery();
+		    
+		    int cnt = 0;
+		    while(rs.next()) {
+		    	cnt++;
+		    	
+		    	if(cnt == 1) {
+		    		cartList = new ArrayList<>();
+		    	}
+		    	
+		    	int cartseq = rs.getInt("cartseq");
+		    	String fk_userid = rs.getString("fk_userid");
+		    	int fk_bookseq = rs.getInt("fk_bookseq");
+		    	int cqty = rs.getInt("cqty"); // 장바구니에 담긴 수량
+		    	String bname = rs.getString("bname"); // 책 이름
+		    	String bimage = rs.getString("bimage"); // 책 이미지
+		    	int price = rs.getInt("price"); // 책 가격
+		    	int bqty = rs.getInt("bqty"); // 책 재고 수량
+				
+		    	BookVO bvo = new BookVO();
+		    	bvo.setBookseq(fk_bookseq);   // 책 번호
+		    	bvo.setBname(bname);          // 책 이름
+		    	bvo.setBimage(bimage);        // 책 이미지
+		    	bvo.setPrice(price);          // 책 가격
+		    	bvo.setBqty(bqty);            // 책 재고 수량
+
+		    	bvo.setTotalPrice(cqty);
+		    	
+				CartVO cvo = new CartVO();
+				cvo.setCartseq(cartseq);         // 장바구니 번호
+				cvo.setFk_userid(fk_userid);   // 사용자 ID
+				cvo.setFk_bookseq(fk_bookseq); // 책 번호
+				cvo.setCqty(cqty);             // 수량
+				cvo.setBvo(bvo);            // BookVO 객체 주입
+				
+				cartList.add(cvo);
+		    }// end of while(rs.next())-----------------
+			
+		} finally {
+			close();
+		}
+		
+		return cartList;		
+		
+		
+	}
+
+	// 장바구니에 담긴 책 가격 총합
+	@Override
+	public Map<String, Integer> selectCartSumPrice(String userid) throws SQLException {
+
+		Map<String, Integer> sumMap = new HashMap<>();
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " SELECT NVL(SUM(C.cqty * B.price), 0) AS SUMTOTALPRICE "
+					   + " FROM "
+					   + " ( select fk_bookseq, cqty "
+					   + "   from tbl_cart "
+					   + "   where fk_userid = ? ) C "
+					   + " JOIN tbl_book B "
+					   + " ON C.fk_bookseq = B.bookseq ";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, userid);
+			
+			rs = pstmt.executeQuery();
+			rs.next();
+			
+			sumMap.put("SUMTOTALPRICE", rs.getInt("SUMTOTALPRICE"));
+			
+		} finally {
+			close();
+		}
+		
+		return sumMap;
 		
 	}
 
