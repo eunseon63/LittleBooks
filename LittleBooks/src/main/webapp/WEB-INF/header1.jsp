@@ -84,7 +84,7 @@
    	<c:if test="${not empty sessionScope.loginuser and sessionScope.loginuser.userid == 'admin'}"> <%-- 로그인 했을 경우 --%> 
 	    <a class="nav-link" href="<%= ctxPath %>/myshop/bookRegister.go">제품등록</a>
 	    <a class="nav-link" href="<%= ctxPath %>/member/memberList.go">회원목록</a>
-	    <a class="nav-link" href="<%= ctxPath %>/">전체매출확인</a>
+	    <a class="nav-link" href="<%= ctxPath %>/myshop/totalSales.go">전체매출확인</a>
 	    <a class="nav-link" href="<%= ctxPath %>/login/logout.go">로그아웃</a>
     </c:if>
     <a class="nav-link" href="<%= ctxPath %>/search/searchPage.go" style="color: black;" title="검색">

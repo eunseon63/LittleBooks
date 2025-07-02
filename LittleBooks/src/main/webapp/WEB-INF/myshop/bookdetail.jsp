@@ -338,12 +338,16 @@ function goCart() {
                 총 가격: <span id="totalPrice"></span>
             </div>
 
+
             <div class="button-group">
                 <button type="button">결제하기</button>
                 <button type="button" onclick="goCart()">장바구니</button>
             </div>
             <input type="hidden" name="fk_bookseq" value="${book.bookseq}" />
         </form>
+
+    
+
     </div>
 </div>
 
