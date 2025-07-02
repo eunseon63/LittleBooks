@@ -198,7 +198,7 @@ body {
         </div>
 
         <div class="button-group">
-            <button>결제하기</button>
+			<button onclick="location.href='payment.go?bookseq=${book.bookseq}&qty=' + document.getElementById('qtySelect').value">결제하기</button>
             <button>장바구니</button>
         </div>
     </div>

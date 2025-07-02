@@ -135,26 +135,31 @@
     <h3>회원 목록</h3>
 
     <!-- 검색 및 페이지당 보기 -->
-    <form name="member_search_frm" class="form-inline mb-4 text-center">
-        <div class="form-group mr-3">
-            <select class="form-control mr-2" name="searchType">
-                <option value="">검색대상</option>
-                <option value="userid">아이디</option>
-                <option value="name">이름</option>
-                <option value="email">이메일</option>
-            </select>
-            <input type="text" class="form-control mr-2" name="searchWord" placeholder="검색어 입력">
-            <button type="button" class="btn btn-primary" onclick="goSearch()">검색</button>
-        </div>
-
-        <div class="form-group ml-3">
-            <label class="mr-2">페이지당 보기</label>
-            <select class="form-control" name="sizePerPage">
-                <option value="10" selected>10명</option>
-                <option value="5">5명</option>
-            </select>
-        </div>
-    </form>
+	<form name="member_search_frm" class="mb-4">
+  <div class="form-row justify-content-center align-items-center">
+    <div class="col-auto">
+      <select class="form-control" name="searchType">
+        <option value="">검색대상</option>
+        <option value="userid">아이디</option>
+        <option value="name">이름</option>
+        <option value="email">이메일</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <input type="text" class="form-control" name="searchWord" placeholder="검색어 입력">
+    </div>
+    <div class="col-auto">
+      <button type="button" class="btn btn-primary" onclick="goSearch()">검색</button>
+    </div>
+    <div class="col-auto">
+   
+      <select class="form-control" name="sizePerPage">
+        <option value="10" selected>10명</option>
+        <option value="5">5명</option>
+      </select>
+    </div>
+  </div>
+</form>
 
     <!-- 회원 목록 테이블 -->
     <table class="table table-bordered text-center" id="memberTbl">
