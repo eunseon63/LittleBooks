@@ -53,7 +53,7 @@ public class CartAdd extends AbstractController {
 				String fk_userid = loginuser.getUserid(); // 사용자ID
 				
 				Map<String, String> paraMap = new HashMap<>();
-				paraMap.put("bookseq", fk_bookseq);
+				paraMap.put("fk_bookseq", fk_bookseq);
 				paraMap.put("cqty", cqty);
 				paraMap.put("fk_userid", fk_userid);
 				

@@ -259,11 +259,11 @@ function updateTotalPrice(qty) {
 
 function goCart() {
     const frm = document.cartOrderFrm;
-    const oqty = frm.oqty.value;
+    const cqty = frm.cqty.value;
     const regExp = /^[1-9][0-9]*$/;
     var isLogin = <%= isLogin %>;
 
-    if(!regExp.test(oqty) || oqty < 1 || oqty > 100){
+    if(!regExp.test(cqty) || cqty < 1 || cqty > 100){
         swal("수량 오류", "수량은 1에서 100 사이의 숫자만 가능합니다.", "warning");
         frm.oqty.focus();
         return false;
