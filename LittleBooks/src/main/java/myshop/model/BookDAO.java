@@ -64,4 +64,7 @@ public interface BookDAO {
 	// 장바구니 테이블에서 특정제품을 장바구니에서 비우기
 	int delCart(String cartseq) throws SQLException;
 
+	// 장바구니 테이블에서 특정제품의 주문량 변경시키기
+	int updateCart(Map<String, String> paraMap) throws SQLException;
+
 }

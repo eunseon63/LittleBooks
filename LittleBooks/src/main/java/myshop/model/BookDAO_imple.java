@@ -911,6 +911,30 @@ public class BookDAO_imple implements BookDAO {
 		return n;	
 	}
 
+	// 장바구니 테이블에서 특정제품의 주문량 변경시키기
+	@Override
+	public int updateCart(Map<String, String> paraMap) throws SQLException {
+		int n = 0;
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " update tbl_cart set cqty = to_number(?) "
+					   + " where cartseq = to_number(?) ";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, paraMap.get("cqty"));
+			pstmt.setString(2, paraMap.get("cartseq"));
+						
+			n = pstmt.executeUpdate();
+			
+		} finally {
+			close();
+		}
+		
+		return n;			
+	}
+
 
 }
 

@@ -193,6 +193,53 @@ function goDel(cartseq) {
     });
 }
 
+
+// === 장바구니 현재주문수량 수정하기 === //
+function goOqtyEdit(obj) {
+    const index = $('button.updateBtn').index(obj);
+
+    const cartseq = $('input.cartseq').eq(index).val(); // 장바구니 번호
+    const cqty = $('input.cqty').eq(index).val();       // 수정 수량
+    const bqty = $('input.bqty').eq(index).val();       // 재고 수량
+
+    const regExp = /^[0-9]+$/g;
+    const isValid = regExp.test(cqty);
+
+    if (!isValid) {
+        alert("수정하시려는 수량은 0개 이상이어야 합니다.");
+        location.href = "javascript:history.go(0)";
+        return;
+    }
+
+    if (Number(cqty) > Number(bqty)) {
+        alert("주문개수가 잔고개수보다 많습니다.");
+        location.href = "javascript:history.go(0)";
+        return;
+    }
+
+    if (cqty == "0") {
+        goDel(cartseq); // 수정된 부분
+    } else {
+        $.ajax({
+            url: "<%= ctxPath %>/shop/cartEdit.go",
+            type: "post",
+            data: { "cartseq": cartseq, "cqty": cqty },
+            dataType: "json",
+            success: function(json) {
+                if (json.n == 1) {
+                    alert("주문수량이 변경되었습니다.");
+                    location.href = "<%= ctxPath %>/shop/cartList.go";
+                }
+            },
+            error: function(request, status, error) {
+                alert("code: " + request.status + "\n" +
+                      "message: " + request.responseText + "\n" +
+                      "error: " + error);
+            }
+        });
+    }
+}
+
 </script>
 
 <div class="cart-container" style= "margin-top:140px;">
@@ -225,9 +272,10 @@ function goDel(cartseq) {
                             <td><img src="<%= ctxPath %>/images/${cartvo.bvo.bimage}" alt="도서 이미지" /></td>
                             <td>${cartvo.bvo.bname}</td>
                             <td>
-                                <input type="number" name="cqty" value="${cartvo.cqty}" min="1" max="99" />
-                                <input type="hidden" name="bqty" value="${cartvo.bvo.bqty}" />
-                                <input type="hidden" name="cartno" value="${cartvo.cartseq}" />
+                                <input type="number" name="cqty" class="cqty" value="${cartvo.cqty}" min="1" max="99" />
+                                 <button type="button" class="btn btn-outline-secondary btn-sm updateBtn" onclick="goOqtyEdit(this)">수정</button>
+                                <input type="hidden" name="bqty" class="bqty" value="${cartvo.bvo.bqty}" />
+                                <input type="hidden" name="cartseq" class="cartseq" value="${cartvo.cartseq}" />
                             </td>
                             <td><fmt:formatNumber value="${cartvo.bvo.price}" pattern="###,###" /> 원</td>
                             <td><fmt:formatNumber value="${cartvo.bvo.price * cartvo.cqty}" pattern="###,###" /> 원</td>
