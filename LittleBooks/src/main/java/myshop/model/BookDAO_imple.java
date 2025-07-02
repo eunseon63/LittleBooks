@@ -888,6 +888,29 @@ public class BookDAO_imple implements BookDAO {
 		
 	}
 
+	// 장바구니 테이블에서 특정제품을 장바구니에서 비우기
+	@Override
+	public int delCart(String cartseq) throws SQLException {
+		int n = 0;
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " delete from tbl_cart "
+					   + " where cartseq = to_number(?) ";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, cartseq);
+						
+			n = pstmt.executeUpdate();
+			
+		} finally {
+			close();
+		}
+		
+		return n;	
+	}
+
 
 }
 

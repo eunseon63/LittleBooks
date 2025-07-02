@@ -176,10 +176,11 @@ function goDel(cartseq) {
                 dataType: "json",
                 success: function(json) {
                     if (json.n == 1) {
-                        swal("삭제 완료!", "상품이 장바구니에서 삭제되었습니다.", "success")
-                        .then(() => {
-                            location.reload();  // 삭제 후 새로고침
+                        // 여기서 다시 swal을 띄우고, 그 콜백 안에서 새로고침
+                        swal("삭제 완료!", "상품이 장바구니에서 삭제되었습니다.", "success", function() {
+                        	 
                         });
+                        location.href="<%= ctxPath%>/shop/cartList.go";
                     } else {
                         swal("삭제 실패", "삭제할 수 없습니다.", "error");
                     }
@@ -191,9 +192,10 @@ function goDel(cartseq) {
         }
     });
 }
+
 </script>
 
-<div class="cart-container">
+<div class="cart-container" style= "margin-top:140px;">
     <div class="cart-title">
         ${sessionScope.loginuser.name} [${sessionScope.loginuser.userid}]님의 장바구니
     </div>
