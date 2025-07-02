@@ -234,6 +234,141 @@ public class BookDAO_imple implements BookDAO {
 		return specList;
 	}
 
+
+	@Override
+    public List<BookVO> searchBooks(String searchType, String searchWord) throws SQLException {
+        List<BookVO> bookList = new ArrayList<>();
+
+        String column = "bname"; // 기본 검색 기준
+
+        if ("author".equalsIgnoreCase(searchType)) {
+            column = "author";
+        } else if ("publisher".equalsIgnoreCase(searchType)) {
+            column = "fk_publishseq"; // 외래키지만 예시로 사용
+        }
+
+        try {
+            conn = ds.getConnection();
+
+            String sql = "SELECT bookseq, bname, bcontent, price, bqty, author, bimage, "
+                       + "fk_publishseq, fk_categoryseq, fk_snum "
+                       + "FROM tbl_book "
+                       + "WHERE " + column + " LIKE ?";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, "%" + searchWord + "%");
+
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                BookVO bvo = new BookVO();
+                bvo.setBookseq(rs.getInt("bookseq"));
+                bvo.setBname(rs.getString("bname"));
+                bvo.setBcontent(rs.getString("bcontent"));
+                bvo.setPrice(rs.getInt("price"));
+                bvo.setBqty(rs.getInt("bqty"));
+                bvo.setAuthor(rs.getString("author"));
+                bvo.setBimage(rs.getString("bimage"));
+                bvo.setFk_publishseq(rs.getInt("fk_publishseq"));
+                bvo.setFk_categoryseq(rs.getInt("fk_categoryseq"));
+               
+                bvo.setFk_snum(rs.getInt("fk_snum"));
+
+                bookList.add(bvo);
+            }
+
+        } finally {
+            close();
+        }
+
+        return bookList;
+    }
+
+	@Override
+	public int getTotalPage(Map<String, String> paraMap) throws SQLException {
+	    int totalPage = 0;
+
+	    Connection conn = ds.getConnection();
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+
+	    try {
+	        String sql = "SELECT CEIL(COUNT(*) / ?) AS totalPage "
+	                   + "FROM tbl_book "
+	                   + "WHERE 1=1 ";
+
+	        String searchType = paraMap.get("searchType");
+	        String searchWord = paraMap.get("searchWord");
+
+	        if (searchType != null && !searchType.trim().isEmpty() && searchWord != null && !searchWord.trim().isEmpty()) {
+	            sql += "AND " + searchType + " LIKE '%' || ? || '%' ";
+	        }
+
+	        pstmt = conn.prepareStatement(sql);
+
+	        int idx = 1;
+	        pstmt.setInt(idx++, Integer.parseInt(paraMap.get("sizePerPage")));
+
+	        if (searchType != null && !searchType.isBlank() && searchWord != null && !searchWord.isBlank()) {
+	            pstmt.setString(idx++, searchWord);
+	        }
+
+	        rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            totalPage = rs.getInt("totalPage");
+	        }
+
+	    } finally {
+	    	if (rs != null) try { rs.close(); } catch (SQLException e) {}
+	        if (pstmt != null) try { pstmt.close(); } catch (SQLException e) {}
+	        if (conn != null) try { conn.close(); } catch (SQLException e) {} 
+	    }
+
+	    return totalPage;
+	}
+
+
+	@Override
+	public int getTotalBookCount(Map<String, String> paraMap) throws SQLException {
+	    int count = 0;
+
+	    Connection conn = ds.getConnection();
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+
+	    try {
+	        String sql = "SELECT COUNT(*) AS cnt FROM tbl_book WHERE 1=1 ";
+
+	        String searchType = paraMap.get("searchType");
+	        String searchWord = paraMap.get("searchWord");
+
+	        if (searchType != null && !searchType.trim().isEmpty() && searchWord != null && !searchWord.trim().isEmpty()) {
+	            sql += "AND " + searchType + " LIKE '%' || ? || '%' ";
+	        }
+
+	        pstmt = conn.prepareStatement(sql);
+
+	        if (searchType != null && !searchType.isBlank() && searchWord != null && !searchWord.isBlank()) {
+	            pstmt.setString(1, searchWord);
+	        }
+
+	        rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            count = rs.getInt("cnt");
+	        }
+
+	    } finally {
+	        close();
+	    }
+
+	    return count;
+	}
+
+
+
+
 	// 책번호 시퀀스 채번
 	@Override
 	public int getBookseq() throws SQLException {
@@ -486,7 +621,72 @@ public class BookDAO_imple implements BookDAO {
 
 	    return list;
 	}
+
 	
+
+	
+	@Override
+	public List<BookVO> selectBookPaging(Map<String, String> paraMap) throws SQLException {
+	    List<BookVO> bookList = new ArrayList<>();
+
+	    Connection conn = ds.getConnection();
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+
+	    try {
+	        String sql = "SELECT * FROM ( "
+	                   + "SELECT ROWNUM AS rno, B.* FROM ( "
+	                   + "  SELECT BOOKSEQ, BNAME, AUTHOR, BIMAGE, PRICE "
+	                   + "  FROM tbl_book "
+	                   + "  WHERE 1=1 ";
+
+	        String searchType = paraMap.get("searchType");
+	        String searchWord = paraMap.get("searchWord");
+
+	        if (searchType != null && !searchType.trim().isEmpty() && searchWord != null && !searchWord.trim().isEmpty()) {
+	            sql += "AND " + searchType + " LIKE '%' || ? || '%' ";
+	        }
+
+	        sql += "  ORDER BY BINPUTDATE DESC "
+	             + ") B "
+	             + ") "
+	             + "WHERE rno BETWEEN ? AND ?";
+
+	        pstmt = conn.prepareStatement(sql);
+
+	        int idx = 1;
+	        if (searchType != null && !searchType.isBlank() && searchWord != null && !searchWord.isBlank()) {
+	            pstmt.setString(idx++, searchWord);
+	        }
+
+	        int currentShowPageNo = Integer.parseInt(paraMap.get("currentShowPageNo"));
+	        int sizePerPage = Integer.parseInt(paraMap.get("sizePerPage"));
+
+	        int startRno = (currentShowPageNo - 1) * sizePerPage + 1;
+	        int endRno = startRno + sizePerPage - 1;
+
+	        pstmt.setInt(idx++, startRno);
+	        pstmt.setInt(idx++, endRno);
+
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            BookVO bvo = new BookVO();
+	            bvo.setBookseq(rs.getInt("BOOKSEQ"));
+	            bvo.setBname(rs.getString("BNAME"));
+	            bvo.setAuthor(rs.getString("AUTHOR"));
+	            bvo.setBimage(rs.getString("BIMAGE"));
+	            bvo.setPrice(rs.getInt("PRICE"));
+	            bookList.add(bvo);
+	        }
+
+	    } finally {
+	        close();
+	    }
+
+	    return bookList;
+	}
+
 	// best, new 도서 조회
 	@Override
 	public List<BookVO> selectBooksBySpec(int snum) throws SQLException {
@@ -584,7 +784,6 @@ public class BookDAO_imple implements BookDAO {
 		return n;
 		
 	}
-
 
 
 }

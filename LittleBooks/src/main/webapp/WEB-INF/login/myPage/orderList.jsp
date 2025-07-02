@@ -1,5 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <%
     String ctxPath = request.getContextPath();
 %>
@@ -48,47 +50,115 @@
       </div>
     </div>
 
-    <!-- 오른쪽 주문내역 -->
+    <!-- 오른쪽 주문 상세 내역 -->
     <div class="col-md-9">
-      <div class="card shadow-sm rounded-lg p-4">
-        <h4 class="mb-4">나의 주문 내역</h4>
+      <h3 class="mb-4">주문 상세 내역</h3>
 
-        <c:choose>
-          <c:when test="${empty orderList}">
-            <p>주문 내역이 없습니다.</p>
-          </c:when>
-          <c:otherwise>
-            <div class="table-responsive">
-              <table class="table table-bordered text-center">
-                <thead class="thead-light">
-                  <tr>
-                    <th>주문번호</th>
-                    <th>상품명</th>
-                    <th>수량</th>
-                    <th>결제금액</th>
-                    <th>주문일자</th>
-                    <th>주문상태</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <c:forEach var="order" items="${orderList}">
-                    <tr>
-                      <td>${order.orderNo}</td>
-                      <td>${order.productName}</td>
-                      <td>${order.quantity}</td>
-                      <td><fmt:formatNumber value="${order.totalPrice}" type="number"/> 원</td>
-                      <td>${order.orderDate}</td>
-                      <td>${order.status}</td>
-                    </tr>
-                  </c:forEach>
-                </tbody>
-              </table>
-            </div>
-          </c:otherwise>
-        </c:choose>
-      </div>
+      <!-- 주문 상품 목록 -->
+<div class="card mb-4">
+  <div class="card-header bg-light font-weight-bold d-flex align-items-center">
+    <span class="mr-4">&nbsp;&nbsp;&nbsp;선택</span>
+    <span class="mr-4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;주문 상품</span>
+    
+    <div class="d-flex gap-3">
+    	<span style="margin-right: 60px;">&nbsp;&nbsp;코드</span>
+    	<span style="margin-right: 60px;">주문일자</span>
+       <span style="margin-right: 50px;">상품명</span>
+      <span style="margin-right: 60px;">수량</span>
+     <span style="margin-right: 60px;">가격</span>
+    
     </div>
   </div>
+
+  <div class="card-body">
+    <!-- 주문 상품 데이터 영역 -->
+
+
+ 
+ 	  
+        
+         
+  <!-- 첫 번째 책 -->
+<div class="row mb-3 border-bottom pb-2 align-items-center">
+  <div class="col-md-1 text-center">
+    <input type="checkbox" name="productCheckbox" value="만화3" />
+  </div>
+  <div class="col-md-2 text-center">
+    <img src="<%= ctxPath %>/images/만화3.jpg" class="img-fluid" style="max-height: 80px;">
+  </div>
+  <div class="col-md-3 align-self-center">
+    <strong>만화 3</strong>
+  </div>
+  <div class="col-md-2 align-self-center">
+    수량: 2
+  </div>
+  <div class="col-md-2 align-self-center text-right">
+    25,000원
+  </div>
 </div>
+
+<!-- 두 번째 책 -->
+<div class="row mb-3 border-bottom pb-2 align-items-center">
+  <div class="col-md-1 text-center">
+    <input type="checkbox" name="productCheckbox" value="만화4" />
+  </div>
+  <div class="col-md-2 text-center">
+    <img src="<%= ctxPath %>/images/만화4.jpg" class="img-fluid" style="max-height: 80px;">
+  </div>
+  <div class="col-md-3 align-self-center">
+    <strong>만화 4</strong>
+  </div>
+  <div class="col-md-2 align-self-center">
+    수량: 1
+  </div>
+  <div class="col-md-2 align-self-center text-right">
+    15,000원
+  </div>
+</div>
+
+<div class="mb-3">
+  <input type="checkbox" id="checkAll" />
+  <label for="checkAll">전체 선택</label>
+</div>
+
+      
+      
+
+      <!-- 배송정보 -->
+      <div class="card mb-4">
+        <div class="card-header bg-light font-weight-bold">배송 정보</div>
+        <div class="card-body">
+          <p><strong>수령인:</strong> ${deliveryInfo.recipient}</p>
+          <p><strong>연락처:</strong> ${deliveryInfo.phone}</p>
+          <p><strong>주소:</strong> ${deliveryInfo.address}</p>
+          <p><strong>배송 요청사항:</strong> ${deliveryInfo.memo}</p>
+        </div>
+      </div>
+
+      <!-- 주문 요약 -->
+      <div class="card">
+        <div class="card-header bg-light font-weight-bold">결제 요약</div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              총 주문 상품: <strong>${totalQty}개</strong>
+            </div>
+            <div class="col-md-6 text-right">
+              총 결제 금액: 
+              <strong class="text-primary">
+                <fmt:formatNumber value="${totalAmount}" type="currency" currencySymbol="₩" />
+              </strong>
+              
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- col-md-9 끝 -->
+  </div>
+  <!-- row 끝 -->
+</div>
+
 
 <jsp:include page="../../footer.jsp" />

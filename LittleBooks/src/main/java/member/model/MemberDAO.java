@@ -44,6 +44,10 @@ public interface MemberDAO {
 	MemberVO selectOneMember(String userid) throws SQLException;
 
 
+	List<MemberVO> getOrderListByUserid(String userid) throws SQLException;
+
+	
+
 	// 회원의 개인정보 변경하기
 	int updateMember(MemberVO member) throws SQLException;
 
@@ -56,6 +60,7 @@ public interface MemberDAO {
 	
 	//회원 탈퇴 
 	boolean deleteMember(String userid)throws SQLException;
+
 
 	
 }

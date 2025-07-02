@@ -1,5 +1,7 @@
 package myshop.domain;
 
+import java.sql.Date;
+
 public class BookVO {
 	private int bookseq;
 	private String bname;
@@ -119,4 +121,36 @@ public class BookVO {
 	public void setPvo(PublishVO pvo) {
 		this.pvo = pvo;
 	}
+
+	public void setImage(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setPublisher(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setTitle(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setBookid(int int1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setBookname(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setFilename(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }

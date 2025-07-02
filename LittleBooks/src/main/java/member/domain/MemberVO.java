@@ -226,6 +226,11 @@ public class MemberVO {
 		return age;		
 		
 	}// end of public int getAge() {}-------------------
+
+	public void setOrderno(String string) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	
 	

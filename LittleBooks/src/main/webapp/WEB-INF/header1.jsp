@@ -87,7 +87,7 @@
 	    <a class="nav-link" href="<%= ctxPath %>/">전체매출확인</a>
 	    <a class="nav-link" href="<%= ctxPath %>/login/logout.go">로그아웃</a>
     </c:if>
-    <a class="nav-link" href="<%= ctxPath %>/search/search.jsp" style="color: black;" title="검색">
+    <a class="nav-link" href="<%= ctxPath %>/search/searchPage.go" style="color: black;" title="검색">
       <i class="fas fa-search fa-lg"></i>
     </a>
   </div>

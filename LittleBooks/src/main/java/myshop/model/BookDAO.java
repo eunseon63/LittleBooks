@@ -31,6 +31,17 @@ public interface BookDAO {
 	// 책 정렬
 	List<BookVO> selectBooksByCategorySorted(String category, String sort) throws SQLException;
 	
+
+	List<BookVO> searchBooks(String searchType, String searchWord) throws SQLException;
+
+	int getTotalPage(Map<String, String> paraMap) throws SQLException;
+
+	List<myshop.domain.BookVO> selectBookPaging(Map<String, String> paraMap) throws SQLException;
+
+	int getTotalBookCount(Map<String, String> paraMap) throws SQLException;
+
+	
+
 	// 책 정렬
 	List<BookVO> selectAllBooksSorted(String sort) throws SQLException;
 	
@@ -39,6 +50,7 @@ public interface BookDAO {
 
 	// best, new 도서 조회
 	List<BookVO> selectBooksBySpec(int snum) throws SQLException;
+
 
 	// 장바구니에 담기
 	int addCart(Map<String, String> paraMap) throws SQLException;

@@ -604,6 +604,15 @@ public class MemberDAO_imple implements MemberDAO {
 		
 	}
 
+	@Override
+	public List<MemberVO> getOrderListByUserid(String userid) throws SQLException {
+
+
+	    return null;  // 리스트 반환
+	}
+
+
+
  
 	// 회원의 개인정보 변경하기
 	@Override
