@@ -15,6 +15,7 @@ public class IdDuplicateCheck extends AbstractController {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String method= request.getMethod();
+		
 		if("POST".equals(method)){
 			
 			String userid= request.getParameter("userid");
