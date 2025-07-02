@@ -534,6 +534,57 @@ public class BookDAO_imple implements BookDAO {
 	    return list;
 	}
 
+	// 장바구니에 담기
+	@Override
+	public int addCart(Map<String, String> paraMap) throws SQLException {
+
+		int n = 0;
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " select cartseq "
+					   + " from tbl_cart "
+					   + " where fk_userid = ? and fk_bookseq = ? ";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, paraMap.get("userid"));
+			pstmt.setString(2, paraMap.get("bnum"));
+			
+			rs = pstmt.executeQuery();
+			
+			// 있던 제품을 장바구니에 추가로 담음 
+			if(rs.next()) {
+				sql = " update tbl_cart set cqty = cqty + to_number(?) "
+					+ " where cartseq = ? ";
+				
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1, paraMap.get("oqty") );
+				pstmt.setInt(2, rs.getInt("cartno") );
+				
+				n = pstmt.executeUpdate();
+			}
+			// 장바구니에 해당 제품을 처음 담음 
+			else {
+				sql = " insert into tbl_cart(cartseq, fk_userid, fk_bookseq, cqty) "
+					+ " values(seq_cart.nextval, ?, ?, ?) ";
+					
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1, paraMap.get("userid"));
+				pstmt.setInt(2, Integer.parseInt(paraMap.get("bnum")));
+				pstmt.setInt(3, Integer.parseInt(paraMap.get("oqty")));
+				
+				n = pstmt.executeUpdate();
+			}
+			
+		} finally {
+			close();
+		}
+		
+		return n;
+		
+	}
+
 
 
 }

@@ -396,7 +396,7 @@ public class MemberDAO_imple implements MemberDAO {
 			
 			String sql = " SELECT ceil(count(*)/?) "
 					   + " FROM tbl_member "
-					   + " WHERE userid != 'admin' ";
+					   + " WHERE userid != 'admin' AND status = 1 ";
 			
 			String colname = paraMap.get("searchType");
 			String searchWord = paraMap.get("searchWord");
@@ -446,7 +446,7 @@ public class MemberDAO_imple implements MemberDAO {
 			
 			String sql = " SELECT userid, name, email "
 					   + " FROM tbl_member "
-					   + " WHERE userid != 'admin' ";
+					   + " WHERE userid != 'admin' AND status = 1 ";
 			
 			String colname = paraMap.get("searchType");
 			String searchWord = paraMap.get("searchWord");
@@ -517,7 +517,7 @@ public class MemberDAO_imple implements MemberDAO {
 			
 			String sql = " SELECT count(*) "
 					   + " FROM tbl_member "
-					   + " WHERE userid != 'admin' ";
+					   + " WHERE userid != 'admin' AND status = 1 ";
 			
 			String colname = paraMap.get("searchType");
 			String searchWord = paraMap.get("searchWord");
@@ -677,11 +677,6 @@ public class MemberDAO_imple implements MemberDAO {
 		return isExists;
 	}
 	
-	
-	
-	
-
-	
 	// 회원 상태 확인 (status) 
 	
 	@Override
@@ -715,9 +710,6 @@ public class MemberDAO_imple implements MemberDAO {
 	}
 	
 	
-	
-	
-	
 	//회원 탈퇴 
 	@Override
 	public boolean deleteMember(String userid) throws SQLException {
@@ -745,11 +737,6 @@ public class MemberDAO_imple implements MemberDAO {
 
 	    return isDeleted;
 	}
-
-	
-	
-
-
 
 	
 }

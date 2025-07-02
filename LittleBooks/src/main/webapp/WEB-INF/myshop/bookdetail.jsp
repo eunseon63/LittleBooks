@@ -2,7 +2,20 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
+<%
+    String ctxPath = request.getContextPath();
+%>
+
 <jsp:include page="/WEB-INF/header1.jsp" />
+
+<!-- SweetAlert CSS/JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" /> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+
+<!-- jQuery & jQuery UI -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 
 <style>
 body {
@@ -67,12 +80,55 @@ body {
     font-weight: 500;
     margin-right: 8px;
 }
-.select-box select {
-    padding: 10px 16px;
-    font-size: 16px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    margin-top: 5px;
+
+/* 스피너 입력칸 */
+.select-box input {
+    width: 70px;
+    height: 25px;
+    font-size: 14px;
+    padding: 4px 8px;
+    box-sizing: border-box;
+    /* 오른쪽에 버튼 공간 확보 */
+    padding-right: 28px;
+}
+
+/* 스피너 전체 박스 */
+.ui-spinner {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* 스피너 버튼들 공통 */
+.ui-spinner-button {
+    position: absolute;
+    right: 1px;
+    width: 26px !important;
+    height: 14px !important; /* 반반으로 나눔 */
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 14px !important;
+    overflow: hidden !important;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* 위쪽 버튼 */
+.ui-spinner-up {
+    top: 1px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* 아래쪽 버튼 */
+.ui-spinner-down {
+    bottom: 1px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.ui-spinner-button:hover {
+    background-color: #ddb900 !important;
 }
 
 .price-section {
@@ -144,8 +200,83 @@ body {
     margin-bottom: 4px;
     letter-spacing: 0.5px;
 }
-
 </style>
+
+<script>
+$(function(){
+    // jQuery UI 스피너 세팅 (1~100)
+    $("#spinner").spinner({
+        min: 1,
+        max: 100,
+        spin: function(event, ui) {
+            if (ui.value > 100) {
+                $(this).spinner("value", 100);
+                return false;
+            }
+            if (ui.value < 1) {
+                $(this).spinner("value", 1);
+                return false;
+            }
+            updateTotalPrice(ui.value);
+        },
+        change: function(event, ui) {
+            let val = parseInt($(this).val());
+            if (isNaN(val) || val < 1) {
+                $(this).spinner("value", 1);
+                val = 1;
+            } else if (val > 100) {
+                $(this).spinner("value", 100);
+                val = 100;
+            }
+            updateTotalPrice(val);
+        }
+    });
+
+    // 초기 총 가격 계산
+    updateTotalPrice(parseInt($("#spinner").val()));
+
+    // 수량 직접 입력 시에도 총 가격 업데이트
+    $("#spinner").on("input", function() {
+        let val = parseInt($(this).val());
+        if (isNaN(val) || val < 1) {
+            val = 1;
+        } else if (val > 100) {
+            val = 100;
+        }
+        updateTotalPrice(val);
+    });
+});
+
+function updateTotalPrice(qty) {
+    const price = ${book.price};
+    const total = qty * price;
+    $("#totalPrice").text(total.toLocaleString('ko-KR', { style: 'currency', currency: 'KRW' }));
+}
+
+function goCart() {
+    const frm = document.cartOrderFrm;
+    const oqty = frm.oqty.value;
+    const regExp = /^[1-9][0-9]*$/;
+
+    if(!regExp.test(oqty) || oqty < 1 || oqty > 100){
+        swal("수량 오류", "수량은 1에서 100 사이의 숫자만 가능합니다.", "warning");
+        frm.oqty.focus();
+        return false;
+    }
+
+    // 여기서 성공 메시지 띄우고, 확인 후 폼 제출하기
+    swal({
+        title: "장바구니 담기 완료!",
+        text: "선택하신 상품이 장바구니에 추가되었습니다.",
+        type: "success"
+    }, function() {
+        // 확인 누르면 폼 전송
+        frm.method = "post";
+        frm.action = "<%= ctxPath %>/shop/cartAdd.go"; 
+        frm.submit();
+    });
+}
+</script>
 
 <div class="detail-wrapper">
     <!-- 이미지 -->
@@ -164,43 +295,41 @@ body {
 
     <!-- 상세 정보 -->
     <div class="right-box">
-    	<!-- 🔴 스펙 표시 (BEST / NEW 등) -->
-    	<c:choose>
-	        <c:when test="${book.fk_snum == 2}">
-	            <div class="book-spec">BEST(인기)!!</div>
-	        </c:when>
-	        <c:when test="${book.fk_snum == 3}">
-	            <div class="book-spec">NEW(신상)!!</div>
-	        </c:when>
-    	</c:choose>
+        <!-- 스펙 표시 (BEST / NEW 등) -->
+        <c:choose>
+            <c:when test="${book.fk_snum == 2}">
+                <div class="book-spec">BEST(인기)!!</div>
+            </c:when>
+            <c:when test="${book.fk_snum == 3}">
+                <div class="book-spec">NEW(신상)!!</div>
+            </c:when>
+        </c:choose>
+
         <h2>${book.bname}</h2>
         <div class="book-info">
-            <div><strong>출판사:</strong>${book.pvo.pname}</div>
-            <div><strong>저자:</strong>${book.author}</div>
+            <div><strong>출판사:</strong> ${book.pvo.pname}</div>
+            <div><strong>저자:</strong> ${book.author}</div>
             <div><strong>가격:</strong> 
                 <fmt:formatNumber value="${book.price}" type="currency" currencySymbol="₩" />
             </div>
         </div>
 
-        <div class="select-box">
-            <label for="qtySelect">수량 선택</label>
-            <select id="qtySelect" onchange="calcTotalPrice()">
-                <c:forEach var="i" begin="1" end="10">
-                    <option value="${i}">${i}</option>
-                </c:forEach>
-            </select>
-        </div>
+        <form name="cartOrderFrm">
+            <div class="select-box">
+                <label for="spinner">수량 선택</label>
+                <input type="text" id="spinner" name="oqty" value="1" autocomplete="off" />
+            </div>
 
-        <div class="price-section">
-            총 가격: <span id="totalPrice">
-                <fmt:formatNumber value="${book.price}" type="currency" currencySymbol="₩" />
-            </span>
-        </div>
+            <div class="price-section">
+                총 가격: <span id="totalPrice"></span>
+            </div>
 
-        <div class="button-group">
-            <button>결제하기</button>
-            <button>장바구니</button>
-        </div>
+            <div class="button-group">
+                <button type="button">결제하기</button>
+                <button type="button" onclick="goCart()">장바구니</button>
+            </div>
+            <input type="hidden" name="bnum" value="${book.bookseq}" />
+        </form>
     </div>
 </div>
 
@@ -217,14 +346,5 @@ body {
         <p><strong>ID</strong> <span class="star">★★★★★</span><br>아이가 너무 좋아합니다!</p>
     </div>
 </div>
-
-<script>
-function calcTotalPrice() {
-    const qty = parseInt(document.getElementById('qtySelect').value);
-    const price = ${book.price};
-    const total = qty * price;
-    document.getElementById('totalPrice').innerText = '₩' + total.toLocaleString();
-}
-</script>
 
 <jsp:include page="/WEB-INF/footer.jsp" />

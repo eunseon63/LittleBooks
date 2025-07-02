@@ -40,4 +40,7 @@ public interface BookDAO {
 	// best, new 도서 조회
 	List<BookVO> selectBooksBySpec(int snum) throws SQLException;
 
+	// 장바구니에 담기
+	int addCart(Map<String, String> paraMap) throws SQLException;
+
 }
