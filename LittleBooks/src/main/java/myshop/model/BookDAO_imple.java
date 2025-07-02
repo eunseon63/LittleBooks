@@ -750,7 +750,7 @@ public class BookDAO_imple implements BookDAO {
 					   + " where fk_userid = ? and fk_bookseq = ? ";
 			
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, paraMap.get("userid"));
+			pstmt.setString(1, paraMap.get("fk_userid"));
 			pstmt.setString(2, paraMap.get("fk_bookseq"));
 			
 			rs = pstmt.executeQuery();
@@ -761,7 +761,7 @@ public class BookDAO_imple implements BookDAO {
 					+ " where cartseq = ? ";
 				
 				pstmt = conn.prepareStatement(sql);
-				pstmt.setString(1, paraMap.get("oqty") );
+				pstmt.setString(1, paraMap.get("cqty") );
 				pstmt.setInt(2, rs.getInt("cartseq") );
 				
 				n = pstmt.executeUpdate();
