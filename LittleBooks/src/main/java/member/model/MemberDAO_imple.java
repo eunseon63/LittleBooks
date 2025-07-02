@@ -210,7 +210,7 @@ public class MemberDAO_imple implements MemberDAO {
 					 
 					 member.setRequirePwdChange(true); // 로그인시 암호를 변경해라는 alert 를 띄우도록 할 때 사용한다.
 				 }
-				 
+				 member.setIdle(rs.getInt("idle"));
 				 member.setEmail(aes.decrypt(rs.getString("email")));
 				 member.setMobile(aes.decrypt(rs.getString("mobile")));
 				 member.setPostcode(rs.getString("postcode"));
@@ -745,6 +745,68 @@ public class MemberDAO_imple implements MemberDAO {
 
 	    return isDeleted;
 	}
+
+	// 로그인 날짜 구하기
+	@Override
+	public String selectLoginDate(String userid) throws SQLException {
+
+		String loginDate = "";
+		
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " SELECT logindate "
+	        		+ " FROM ( "
+	        		+ "  SELECT logindate, ROWNUM AS rn "
+	        		+ "  FROM ( "
+	        		+ "    SELECT logindate "
+	        		+ "    FROM tbl_loginhistory "
+	        		+ "    WHERE fk_userid = ? "
+	        		+ "    ORDER BY logindate DESC "
+	        		+ "  ) "
+	        		+ "  WHERE ROWNUM <= 2 "
+	        		+ " ) "
+	        		+ " WHERE rn = 2 ";
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+
+	        rs = pstmt.executeQuery();
+	        
+	        if (rs.next()) {
+	        	loginDate = rs.getString("logindate");
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();  
+	    } finally {
+	        close();
+	    }
+		
+		return loginDate;
+	} // end of public String selectLoginDate(String userid) throws SQLException {}------------
+
+	// 휴먼계정 해제하기
+	@Override
+	public int updateIdle(String userid) throws SQLException {
+		
+		int n = 0;
+		
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " update tbl_member "
+	        		+ " set idle = 0 "
+	        		+ " where userid = ? ";
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+
+	        n = pstmt.executeUpdate();
+	        
+	    } finally {
+	        close();
+	    }
+		return n;
+	} // end of public int updateIdle(String userid) throws SQLException {}-----------------
 
 	
 	

@@ -55,7 +55,13 @@ public interface MemberDAO {
 	public boolean isValidLogin(String userid) throws SQLException;
 	
 	//회원 탈퇴 
-	boolean deleteMember(String userid)throws SQLException;
+	boolean deleteMember(String userid) throws SQLException;
+
+	// 로그인 날짜 구하기
+	String selectLoginDate(String userid) throws SQLException;
+
+	// 휴먼계정 해제하기
+	int updateIdle(String userid) throws SQLException;
 
 	
 }
