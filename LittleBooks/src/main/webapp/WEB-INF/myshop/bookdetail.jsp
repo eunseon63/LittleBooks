@@ -204,10 +204,55 @@ body {
     margin-bottom: 4px;
     letter-spacing: 0.5px;
 }
+.review-wrapper {
+    max-width: 900px; /* ✅ 폭 제한 */
+    margin: 40px auto 0 auto; /* ✅ 중앙 정렬 */
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+    font-size: 14px;
+}
+.review-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+.review-card {
+    background: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+}
+.review-card .star {
+    color: #f2b01e;
+    font-size: 14px;
+    margin-left: 4px;
+}
+.review-card .date {
+    font-size: 12px;
+    color: #888;
+    text-align: right;
+}
+.review-input textarea {
+    font-size: 13px;
+    height: 100px;
+    resize: none;
+}
+.review-input .btn-submit {
+    width: 100%;
+    font-size: 14px;
+    padding: 8px 0;
+}
 </style>
 
 <script>
+const isLoggedIn = ${not empty sessionScope.loginuser}; // true or false
+const loginUserid = "${sessionScope.loginuser.userid != null ? sessionScope.loginuser.userid : ''}";
+const bookseq = "<c:out value='${book.bookseq}' default='' />";
+
 $(function(){
+	goReviewListView();
+	
     // jQuery UI 스피너 세팅 (1~100)
     $("#spinner").spinner({
         min: 1,
@@ -249,7 +294,117 @@ $(function(){
         }
         updateTotalPrice(val);
     });
+
+let isOrderOK = false;
+//로그인한 사용자가 해당 책을 구매한 상태인지 확인하는 용도
+//true → 구매한 상태, false → 구매하지 않은 상태
+ 
+ // === 후기 작성 버튼 클릭 이벤트 ===
+ $(document).on('click', '#btnCommentOK', function() {
+        console.log("후기 작성 버튼 클릭됨");
+
+        if (!isLoggedIn) {
+            alert("책 사용 후기를 작성하시려면 먼저 로그인 하셔야 합니다.");
+            return;
+        }
+
+        if (!isOrderOK) {
+            alert("이 책을 구매하셔야만 후기 작성을 하실 수 있습니다.");
+            return;
+        }
+
+        const review_contents = $('textarea[name="contents"]').val().trim();
+
+        if (review_contents === "") {
+            alert("책 사용 후기 내용을 입력하세요!");
+            $('textarea[name="contents"]').val("");
+            return;
+        }
+
+        const queryString = $('form[name="commentFrm"]').serialize();
+
+        $.ajax({
+            url: "<%= ctxPath %>/shop/reviewRegister.go",
+            type: "post",
+            data: queryString,
+            dataType: "json",
+            success: function(json) {
+                console.log(JSON.stringify(json));
+
+                if (json.n === 1) {
+                    goReviewListView(); // 후기 목록 갱신
+                } else if (json.n === -1) {
+                    swal("이미 후기를 작성하셨습니다.\n작성하시려면 기존의 후기를 삭제하고 다시 작성해주세요.");
+                } else {
+                    alert("후기 등록에 실패했습니다.");
+                }
+
+                $('textarea[name="contents"]').val("").focus();
+            },
+            error: function(request, status, error) {
+                alert("code: " + request.status + "\nmessage: " + request.responseText + "\nerror: " + error);
+            }
+        });
+    });
+
+
+//로그인한 사용자가 해당 책을 구매했는지 확인
+$.ajax({
+    url: "<%= ctxPath %>/shop/isOrder.go",
+    type: "get",
+    data: {
+        "fk_bookseq": bookseq,
+        "fk_userid": loginUserid
+    },
+    dataType: "json",
+    async: false,
+    success: function(json) {
+        console.log("~~ 확인용 : " + JSON.stringify(json));
+        isOrderOK = json.isOrder;
+    },
+    error: function(request, status, error) {
+        alert("code: " + request.status + "\nmessage: " + request.responseText + "\nerror: " + error);
+    }
 });
+
+// 특정 책의 리뷰글들을 보여주는 함수 
+function goReviewListView() {
+    $.ajax({
+        url: "<%= ctxPath %>/shop/reviewList.go",
+        type: "get",
+        data: { "fk_bookseq": bookseq },
+        dataType: "json",
+        success: function(json) {
+            let v_html = "";
+
+            if (json.length > 0) {
+                $.each(json, function(index, item) {
+                    let writeuserid = item.fk_userid;
+
+                    v_html += "<div id='review" + index + "'><span class='markColor'>▶</span>&nbsp;" + item.contents + "</div>"
+                            + "<div class='customDisplay'>" + item.name + "</div>"
+                            + "<div class='customDisplay'>" + item.writedate + "</div>";
+
+                    if (!isLoggedIn || loginUserid !== writeuserid) {
+                        v_html += "<div class='customDisplay spacediv'>&nbsp;</div>";
+                    } else {
+                        v_html += "<div class='customDisplay spacediv commentDel' onclick='delMyReview(" + item.review_seq + ")'>후기삭제</div>";
+                        v_html += "<div class='customDisplay spacediv commentUpdate' onclick='updateMyReview(" + index + "," + item.review_seq + ")'>후기수정</div>";
+                    }
+                });
+            } else {
+                v_html += "<div>등록된 책 후기가 없습니다.</div>";
+            }
+
+            $('div#viewComments').html(v_html);
+        },
+        error: function(request, status, error) {
+            alert("code: " + request.status + "\nmessage: " + request.responseText + "\nerror: " + error);
+        }
+    });
+	}
+});
+
 
 function updateTotalPrice(qty) {
     const price = ${book.price};
@@ -353,11 +508,26 @@ function goCart() {
     <p>${book.bcontent}</p>
 </div>
 
-<!-- 리뷰 -->
-<div class="section-box review">
-    <h3>리뷰</h3>
-    <div class="review-card">
-        <p><strong>ID</strong> <span class="star">★★★★★</span><br>아이가 너무 좋아합니다!</p>
+<!-- 리뷰 영역 -->
+<div class="review-wrapper">
+    <div class="review-title">${requestScope.bookVO.bname} 책 사용후기</div>
+
+    <div id="viewComments">
+        <%-- 여기에 Ajax로 리뷰 목록이 들어올 예정 --%>
+    </div>
+
+    <div class="row review-input mt-3">
+        <div class="col-md-10">
+            <form name="commentFrm">
+                <textarea name="contents" class="form-control" placeholder="후기를 작성해주세요."></textarea>
+                <input type="hidden" name="fk_userid" value="${sessionScope.loginuser.userid}" />
+                <input type="hidden" name="fk_bookseq" value="${requestScope.bookVO.bookseq}" />
+                <input type="hidden" name="rating" id="rating" value="5" /> <%-- 기본 별점 5점 --%>
+            </form>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="button" class="btn btn-outline-primary btn-submit" id="btnCommentOK">후기 등록</button>
+        </div>
     </div>
 </div>
 
