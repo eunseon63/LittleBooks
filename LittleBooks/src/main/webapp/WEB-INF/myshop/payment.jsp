@@ -214,7 +214,7 @@ $(function(){
         
         <div class="point">
             사용 가능 포인트 : <span type="text" id="point">${sessionScope.loginuser.point}</span><br />
-            <input type="text" id="usepoint" size="20" placeholder="포인트" value="10" />
+            <input type="text" id="usepoint" size="20" placeholder="포인트"/>
         </div>
         
         
