@@ -7,6 +7,7 @@ import java.util.Map;
 import myshop.domain.BookVO;
 import myshop.domain.CartVO;
 import myshop.domain.CategoryVO;
+import myshop.domain.ReviewVO;
 import myshop.domain.SpecVO;
 
 public interface BookDAO {
@@ -66,5 +67,14 @@ public interface BookDAO {
 
 	// 장바구니 테이블에서 특정제품의 주문량 변경시키기
 	int updateCart(Map<String, String> paraMap) throws SQLException;
+
+	// 로그인한 사용자가 특정 제품을 구매했는지 여부를 알아오는 것. 
+	boolean isOrder(Map<String, String> paraMap) throws SQLException;
+
+	// 특정 사용자가 특정 제품에 대해 상품후기를 입력하기(insert)
+	int addReview(ReviewVO reviewVO) throws SQLException;
+
+	// 특정 제품의 사용후기를 조회하기(select) 
+	List<ReviewVO> reviewList(String fk_bookseq) throws SQLException;
 
 }
