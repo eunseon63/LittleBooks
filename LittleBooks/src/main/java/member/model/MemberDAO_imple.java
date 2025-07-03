@@ -756,18 +756,16 @@ public class MemberDAO_imple implements MemberDAO {
 	    try {
 	        conn = ds.getConnection();
 
-	        String sql = " SELECT logindate "
-	        		+ " FROM ( "
-	        		+ "  SELECT logindate, ROWNUM AS rn "
-	        		+ "  FROM ( "
+	        String sql = "  SELECT logindate "
+	        		+ "  FROM "
+	        		+ "  ( "
 	        		+ "    SELECT logindate "
 	        		+ "    FROM tbl_loginhistory "
 	        		+ "    WHERE fk_userid = ? "
 	        		+ "    ORDER BY logindate DESC "
 	        		+ "  ) "
-	        		+ "  WHERE ROWNUM <= 2 "
-	        		+ " ) "
-	        		+ " WHERE rn = 2 ";
+	        		+ "  WHERE ROWNUM = 1 ";
+
 	        pstmt = conn.prepareStatement(sql);
 	        pstmt.setString(1, userid);
 
@@ -809,5 +807,37 @@ public class MemberDAO_imple implements MemberDAO {
 		return n;
 	} // end of public int updateIdle(String userid) throws SQLException {}-----------------
 
+	// 유저 이름 찾기
+	@Override
+	public String selectName(String userid) throws SQLException {
+		String name = "";
+		
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " select name "
+	        		+ " from tbl_member "
+	        		+ " where userid = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+
+	        rs = pstmt.executeQuery();
+	        
+	        if (rs.next()) {
+	        	name = rs.getString("name");
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();  
+	    } finally {
+	        close();
+	    }
+		
+		return name;
+
+	} // end of public String selectName(String userid) throws SQLException {}-----------------
+
+	
 	
 }

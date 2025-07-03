@@ -57,7 +57,7 @@ $(function () {
 
   <p>안녕하세요!</p>
   <p>
-    <span style="color: red;">${loginuser.name}</span> 회원님은 <strong>LITTLE BOOKS 계정에 1년 이상 로그인하지 않아</strong><br>
+    <span style="color: red;">${requestScope.name}</span> 회원님은 <strong>LITTLE BOOKS 계정에 1년 이상 로그인하지 않아</strong><br>
     관련 법령에 따라 휴면 상태로 전환되었습니다.
   </p>
 
