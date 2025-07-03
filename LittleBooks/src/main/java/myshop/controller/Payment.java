@@ -15,7 +15,8 @@ public class Payment extends AbstractController {
         // 1) bookseq, qty 파라미터 받아오기
         String bookseq = request.getParameter("bookseq");
         String qtyStr = request.getParameter("qty");
-
+       
+        
         // 2) 유효성 검사
         if (bookseq == null || bookseq.trim().isEmpty() || qtyStr == null || qtyStr.trim().isEmpty()) {
             request.setAttribute("message", "잘못된 접근입니다.");
@@ -24,7 +25,8 @@ public class Payment extends AbstractController {
             super.setViewPage("/WEB-INF/msg.jsp");
             return;
         }
-
+        
+        
         int qty = 1;
         try {
             qty = Integer.parseInt(qtyStr);
@@ -45,6 +47,9 @@ public class Payment extends AbstractController {
             return;
         }
 
+
+        System.out.println(book.getBname());
+        
         // 4) 도서 정보 및 수량 request에 저장
         request.setAttribute("book", book);
         request.setAttribute("qty", qty);
