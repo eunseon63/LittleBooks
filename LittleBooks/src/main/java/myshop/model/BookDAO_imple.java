@@ -14,8 +14,10 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import member.domain.MemberVO;
 import myshop.domain.CategoryVO;
 import myshop.domain.PublishVO;
+import myshop.domain.ReviewVO;
 import myshop.domain.BookVO;
 import myshop.domain.CartVO;
 import myshop.domain.SpecVO;
@@ -934,6 +936,103 @@ public class BookDAO_imple implements BookDAO {
 		
 		return n;			
 	}
+
+	// 로그인한 사용자가 특정 제품을 구매했는지 여부를 알아오는 것. 
+	@Override
+	public boolean isOrder(Map<String, String> paraMap) throws SQLException {
+		boolean bool = false;
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " SELECT D.odrseq "
+					+ " FROM tbl_order O "
+					+ " JOIN tbl_orderdetail D ON O.ordercode = D.fk_ordercode "
+					+ " WHERE O.fk_userid = ? "
+					+ "  AND D.fk_bookseq = TO_NUMBER(?) ";
+					
+
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, paraMap.get("fk_userid"));     // 첫 번째 ? = 유저 아이디
+			pstmt.setString(2, paraMap.get("fk_bookseq"));    // 두 번째 ? = 책 번호 (문자지만 SQL에서 TO_NUMBER로 처리)
+
+			
+			rs = pstmt.executeQuery();
+			
+			bool = rs.next();
+					
+		} finally {
+			close();
+		}
+		
+		return bool;
+	}
+
+	// 특정 사용자가 특정 제품에 대해 상품후기를 입력하기(insert)
+	@Override
+	public int addReview(ReviewVO reviewVO) throws SQLException {
+		int n = 0;
+
+	    String sql = "INSERT INTO tbl_review (reviewseq, reviewcomment, rating, writedate, fk_bookseq, fk_userid) "
+	            + "VALUES (seq_review.NEXTVAL, ?, ?, SYSDATE, ?, ?)";
+
+	    try (Connection conn = ds.getConnection();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+	        pstmt.setString(1, reviewVO.getReviewComment());
+	        pstmt.setInt(2, reviewVO.getRating());
+	        pstmt.setInt(3, reviewVO.getFk_bookseq());
+	        pstmt.setString(4, reviewVO.getFk_userid());
+
+	        n = pstmt.executeUpdate();
+	    }
+
+	    return n;
+	}
+
+	// 특정 제품의 사용후기를 조회하기(select) 
+	@Override
+	public List<ReviewVO> reviewList(String fk_bookseq) throws SQLException {
+	    List<ReviewVO> reviewList = new ArrayList<>();
+
+	    if (fk_bookseq == null || fk_bookseq.trim().isEmpty()) {
+	        System.out.println(">> reviewList(): fk_bookseq가 null 또는 빈 문자열임");
+	        return reviewList;
+	    }
+
+	    int bookseq = Integer.parseInt(fk_bookseq);
+
+	    String sql = "SELECT r.reviewseq, r.reviewcomment, r.rating, r.writedate, r.fk_bookseq, r.fk_userid, m.name "
+	               + "FROM tbl_review r JOIN tbl_member m ON r.fk_userid = m.userid "
+	               + "WHERE r.fk_bookseq = ? ORDER BY r.writedate DESC";
+
+	    try (Connection conn = ds.getConnection();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+	        pstmt.setInt(1, bookseq);
+
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            while (rs.next()) {
+	                ReviewVO review = new ReviewVO();
+	                review.setReviewseq(rs.getInt("reviewseq"));
+	                review.setReviewComment(rs.getString("reviewcomment"));
+	                review.setRating(rs.getInt("rating"));
+	                review.setWriteDate(rs.getTimestamp("writedate"));
+	                review.setFk_bookseq(rs.getInt("fk_bookseq"));
+	                review.setFk_userid(rs.getString("fk_userid"));
+
+	                MemberVO member = new MemberVO();
+	                member.setName(rs.getString("name"));
+	                review.setMvo(member);
+
+	                reviewList.add(review);
+	            }
+	        }
+	    }
+
+	    return reviewList;
+	}
+
 
 
 }
