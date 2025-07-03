@@ -33,6 +33,7 @@ public class BookList extends AbstractController {
 	    }
 
 	    // 3) 로그 찍기
+	    /*
 	    System.out.println(">>> [카테고리: " + category + ", 정렬: " + sort + "] 도서 목록 조회 결과 <<<");
 	    for (BookVO book : bookList) {
 	        System.out.println("책제목: " + book.getBname());
@@ -42,6 +43,7 @@ public class BookList extends AbstractController {
 	        System.out.println("입고일자: " + book.getBinputdate());
 	        System.out.println("-----------------------------");
 	    }
+	    */
 
 	    // 4) JSP에 전달
 	    request.setAttribute("bookList", bookList);

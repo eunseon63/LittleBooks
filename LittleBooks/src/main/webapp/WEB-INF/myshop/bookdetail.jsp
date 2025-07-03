@@ -290,6 +290,31 @@ function goCart() {
         });
     }
 }
+
+function goPayment() {
+
+	const frm = document.cartOrderFrm;
+    
+    const qty = frm.qty.value;
+    const bookseq = frm.fk_bookseq.value;
+
+    // 유효성 검사
+    if (!qty || isNaN(qty) || qty < 1 || qty > 100) {
+        swal("수량 오류", "수량은 1~100 사이의 숫자만 가능합니다.", "warning");
+        return;
+    }
+
+    if (!bookseq) {
+        swal("도서 정보 오류", "도서 정보가 없습니다.", "error");
+        return;
+    }
+
+    // URL 이동
+    frm.method = "post";
+    frm.action = "<%= ctxPath %>/myshop/payment.go";
+    frm.submit();
+}
+
 </script>
 
 <div class="detail-wrapper">
@@ -331,7 +356,7 @@ function goCart() {
         <form name="cartOrderFrm">
             <div class="select-box">
                 <label for="spinner">수량 선택</label>
-                <input type="text" id="spinner" name="cqty" value="1" autocomplete="off" />
+                <input type="text" id="spinner" name="qty" value="1" autocomplete="off" />
             </div>
 
             <div class="price-section">
@@ -340,10 +365,10 @@ function goCart() {
 
 
             <div class="button-group">
-                <button type="button">결제하기</button>
+                <button type="button" onclick="goPayment()">결제하기</button>
                 <button type="button" onclick="goCart()">장바구니</button>
             </div>
-            <input type="hidden" name="fk_bookseq" value="${book.bookseq}" />
+            <input type="hidden" name="bookseq" id="fk_bookseq" value="${book.bookseq}" />
         </form>
 
     

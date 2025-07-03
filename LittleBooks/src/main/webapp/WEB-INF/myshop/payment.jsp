@@ -43,14 +43,18 @@ $(document).ready(function() {
 
         let merchant_uid = 'order_' + new Date().getTime(); // 유니크 주문번호
 
-        let amount = Number("${book.price * qty}"); // qty 변수명 맞게 확인 필요
+        // 총 결제 금액 텍스트 가져오기 (예: "₩12,345")
+        let payPriceText = $("#payPrice").text();
+
+        // 숫자만 추출 (₩와 , 제거)
+        let amount = parseInt(payPriceText.replace(/[^\d]/g, ''));
 
         IMP.request_pay({
             pg: 'html5_inicis',
             pay_method: 'card',
             merchant_uid: merchant_uid,
             name: '${book.bname}',
-            amount: amount,
+            amount: 100, // 추후 수정 필요 
             buyer_email: '${sessionScope.loginUser.email}',
             buyer_name: $('#receiverName').val(),
             buyer_tel: $('#receiverPhone').val(),
@@ -88,6 +92,41 @@ $(document).ready(function() {
         });
     });
 });
+
+$(function(){
+	// 포인트 제외한 총 결제 금액 계산
+	
+    const bookPrice = ${book.price};
+    let qty = parseInt(${qty});
+    
+    let totalPrice = bookPrice * qty;
+    
+    const availablePoint = parseInt($("#point").text());
+    
+ 	// 포인트 입력값 유효성 검사 및 계산 함수
+    function updatePayPrice() {
+        let usePoint = parseInt($("#usepoint").val());
+        if (isNaN(usePoint) || usePoint < 0) usePoint = 0;
+        if (usePoint > availablePoint) usePoint = availablePoint;
+
+        let finalPrice = totalPrice - usePoint;
+        if (finalPrice < 0) finalPrice = 0;
+
+        $("#payPrice").text(finalPrice.toLocaleString('ko-KR', { style: 'currency', currency: 'KRW' }));
+        $("#usepoint").val(usePoint);  // 잘못 입력된 경우 바로 수정해줌
+    }
+
+    // 초기 결제 금액 표시
+    updatePayPrice();
+
+    // usepoint 입력값 변경 시 이벤트
+    $("#usepoint").on("input", function() {
+        updatePayPrice();
+    });
+    
+});
+
+
 </script>
 
 <style>
@@ -156,27 +195,34 @@ $(document).ready(function() {
         <div><strong>수량:</strong> ${qty}</div>
 
         <!-- 배송지 입력폼 -->
-        <div><strong>받는 분:</strong> <input type="text" id="receiverName" value="${sessionScope.loginUser.name}" /></div>
-        <div><strong>연락처:</strong> <input type="text" id="receiverPhone" value="${sessionScope.loginUser.mobile}" /></div>
+        <div><strong>받는 분:</strong> <input type="text" id="receiverName" value="${sessionScope.loginuser.name}" /></div>
+        <div><strong>연락처:</strong> <input type="text" id="receiverPhone" value="${sessionScope.loginuser.mobile}" /></div>
 
         <div>
             <strong>우편번호:</strong>
-            <input type="text" id="receiverPostcode" readonly />
+            <input type="text" id="receiverPostcode" value="${sessionScope.loginuser.postcode}" readonly />
             <button type="button" onclick="execDaumPostcode()">주소 검색</button>
         </div>
 
         <div>
             <strong>주소:</strong><br />
-            <input type="text" id="receiverAddress" size="50" placeholder="주소" readonly /><br />
-            <input type="text" id="receiverDetailAddress" size="50" placeholder="상세주소" /><br />
-            <input type="text" id="receiverExtraAddress" size="50" placeholder="참고항목" />
+            <input type="text" id="receiverAddress" size="50" placeholder="주소" value="${sessionScope.loginuser.address}" readonly /><br />
+            <input type="text" id="receiverDetailAddress" size="50" placeholder="상세주소" value="${sessionScope.loginuser.detailaddress}" /><br />
+            <input type="text" id="receiverExtraAddress" size="50" placeholder="참고항목" value="${sessionScope.loginuser.extraaddress}" />
         </div>
 
+        
+        <div class="point">
+            사용 가능 포인트 : <span type="text" id="point">${sessionScope.loginuser.point}</span><br />
+            <input type="text" id="usepoint" size="20" placeholder="포인트" value="10" />
+        </div>
+        
+        
         <!-- 총 결제 금액 -->
         <div class="total-price">
-            총 결제 금액: 
-            <fmt:formatNumber value="${book.price * qty}" type="currency" currencySymbol="₩" />
+            총 결제 금액: <span id="payPrice"></span>
         </div>
+        
     </div>
 
     <div class="pay-buttons">
