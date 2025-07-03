@@ -67,7 +67,8 @@ public interface MemberDAO {
 	// 휴먼계정 해제하기
 	int updateIdle(String userid) throws SQLException;
 
-
+	// 유저 이름 찾기
+	String selectName(String userid) throws SQLException;
 	
 }
 

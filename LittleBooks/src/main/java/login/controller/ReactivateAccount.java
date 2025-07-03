@@ -17,18 +17,21 @@ public class ReactivateAccount extends AbstractController {
 		
 		String method = request.getMethod(); // "GET" 또는 "POST"
 		
-		HttpSession session = request.getSession();
-		MemberVO loginuser = (MemberVO) session.getAttribute("loginuser");
-		String userid = loginuser.getUserid();
 		
 		if(!"POST".equalsIgnoreCase(method)) {
 			
+			HttpSession session = request.getSession();
+			String userid = (String) session.getAttribute("userid");
+			
+			String name = mdao.selectName(userid);
+			System.out.println(name);
 			String loginDate = mdao.selectLoginDate(userid);
 			
 			loginDate = loginDate.substring(0,11);
-			// System.out.println(loginDate);
+			System.out.println(loginDate);
 			
 			request.setAttribute("loginDate", loginDate);
+			request.setAttribute("name", name);
 			
 			super.setRedirect(false);
 			super.setViewPage("/WEB-INF/login/reactivateAccount.jsp");

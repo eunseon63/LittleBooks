@@ -47,6 +47,9 @@ public class LoginSuccess extends AbstractController {
 			
 				if(loginuser.getIdle() == 1) {
 					// 마지막으로 로그인 한 것이 1년 이상 지난 경우 
+					HttpSession session = request.getSession();
+					session.setAttribute("userid", userid);
+					session.setAttribute("pwd", pwd);
 					
 					String message = "로그인을 한지 1년이 지나서 휴면상태로 되었습니다.\\n휴면을 풀어주는 페이지로 이동합니다.";
 					String loc = request.getContextPath()+"/login/reactivateAccount.go";
@@ -54,9 +57,6 @@ public class LoginSuccess extends AbstractController {
 					
 					request.setAttribute("message", message);
 					request.setAttribute("loc", loc);
-					
-					HttpSession session = request.getSession();
-					session.setAttribute("loginuser", loginuser);
 					
 					super.setRedirect(false);
 					super.setViewPage("/WEB-INF/msg.jsp");
