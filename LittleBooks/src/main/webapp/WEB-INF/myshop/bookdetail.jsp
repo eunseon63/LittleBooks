@@ -449,6 +449,8 @@ function goCart() {
 
 <div class="detail-wrapper">
     <!-- 이미지 -->
+    <div class="detail-wrapper">
+    <!-- 이미지 -->
     <div class="left-box">
         <c:choose>
             <c:when test="${not empty book.bimage}">
@@ -461,6 +463,8 @@ function goCart() {
             </c:otherwise>
         </c:choose>
     </div>
+   </div>
+
 
     <!-- 상세 정보 -->
     <div class="right-box">
@@ -517,18 +521,19 @@ function goCart() {
     </div>
 
     <div class="row review-input mt-3">
-        <div class="col-md-10">
-            <form name="commentFrm">
-                <textarea name="contents" class="form-control" placeholder="후기를 작성해주세요."></textarea>
-                <input type="hidden" name="fk_userid" value="${sessionScope.loginuser.userid}" />
-                <input type="hidden" name="fk_bookseq" value="${requestScope.bookVO.bookseq}" />
-                <input type="hidden" name="rating" id="rating" value="5" /> <%-- 기본 별점 5점 --%>
-            </form>
-        </div>
-        <div class="col-md-2 d-grid">
-            <button type="button" class="btn btn-outline-primary btn-submit" id="btnCommentOK">후기 등록</button>
-        </div>
+    <div class="col-md-10">
+        <form name="commentFrm">
+            <textarea name="contents" class="form-control" placeholder="후기를 작성해주세요."></textarea>
+            <input type="hidden" name="fk_userid" value="${sessionScope.loginuser.userid}" />
+            <input type="hidden" name="fk_bookseq" value="${book.bookseq}" />
+            <input type="hidden" name="rating" id="rating" value="5" /> <%-- 기본 별점 5점 --%>
+        </form>
     </div>
+    <div class="col-md-2 d-grid">
+        <button type="button" class="btn btn-outline-primary btn-submit" id="btnCommentOK">후기 등록</button>
+    </div>
+	</div>
+
 </div>
 
 <jsp:include page="/WEB-INF/footer.jsp" />
