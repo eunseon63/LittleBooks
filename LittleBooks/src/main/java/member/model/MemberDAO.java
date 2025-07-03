@@ -69,6 +69,9 @@ public interface MemberDAO {
 
 	// 유저 이름 찾기
 	String selectName(String userid) throws SQLException;
+
+	// 로그인 데이터 업데이트
+	void updateLoginDate(String userid)throws SQLException;
 	
 }
 

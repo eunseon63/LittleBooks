@@ -37,6 +37,8 @@ public class ReactivateAccountEnd extends AbstractController {
 			MemberVO loginuser = mdao.login(paraMap);
 			session.setAttribute("loginuser", loginuser);
 			
+			mdao.updateLoginDate(userid);
+			
 			session.removeAttribute("userid");
 			session.removeAttribute("pwd");
 			

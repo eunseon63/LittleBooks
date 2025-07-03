@@ -838,6 +838,23 @@ public class MemberDAO_imple implements MemberDAO {
 
 	} // end of public String selectName(String userid) throws SQLException {}-----------------
 
-	
+	// 로그인 데이터 업데이트
+	@Override
+	public void updateLoginDate(String userid) throws SQLException {
+		try {
+			  conn = ds.getConnection();
+			 
+			  String sql = " insert into tbl_loginhistory(logindate, fk_userid) "
+					 	 + " values(sysdate, ?) ";
+					 
+			  pstmt = conn.prepareStatement(sql);
+			  pstmt.setString(1, userid);
+			 
+			  pstmt.executeUpdate();
+
+		} finally {
+			  close();
+		}
+	} // end of public void updateLoginDate(String userid) throws SQLException {}----------------
 	
 }
