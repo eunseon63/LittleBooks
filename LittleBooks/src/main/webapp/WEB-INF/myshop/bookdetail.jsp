@@ -447,7 +447,7 @@ function goCart() {
     }
 }
 
-<<<<<<< HEAD
+
 function goPayment() {
 
 	const frm = document.cartOrderFrm;
@@ -471,7 +471,7 @@ function goPayment() {
     frm.action = "<%= ctxPath %>/myshop/payment.go";
     frm.submit();
 }
-=======
+
 // 특정 제품의 제품후기를 삭제하는 함수 
 function delMyReview(reviewseq) {
 	console.log("삭제할 reviewseq:", reviewseq); // 이거 꼭 찍어봐
@@ -502,7 +502,7 @@ function delMyReview(reviewseq) {
    }
    
 }// end of function delMyReview(review_seq)---------------
->>>>>>> refs/heads/seoyeon
+
 
 </script>
 
