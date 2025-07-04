@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import common.controller.AbstractController;
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -19,6 +20,7 @@ import myshop.domain.SpecVO;
 import myshop.model.BookDAO;
 import myshop.model.BookDAO_imple;
 
+@MultipartConfig  // ★ 이 어노테이션을 반드시 선언해야 request.getParts() 사용 가능
 public class BookRegister extends AbstractController {
 
     private BookDAO bdao = null;
@@ -38,6 +40,7 @@ public class BookRegister extends AbstractController {
             String method = request.getMethod();
 
             if (!"POST".equalsIgnoreCase(method)) {
+                // GET 방식: 책 등록 폼 보여주기
                 List<CategoryVO> categoryList = bdao.getCategoryList();
                 List<SpecVO> specList = bdao.getSpecList();
 
@@ -47,14 +50,13 @@ public class BookRegister extends AbstractController {
                 super.setRedirect(false);
                 super.setViewPage("/WEB-INF/myshop/admin/bookRegister.jsp");
             } else {
-                // POST 요청 처리 - 인코딩 설정 추가
+                // POST 방식: 책 등록 처리
                 request.setCharacterEncoding("UTF-8");
 
                 ServletContext svlCtx = session.getServletContext();
                 String uploadDir = svlCtx.getRealPath("/images");
                 File uploadFolder = new File(uploadDir);
-                if (!uploadFolder.exists())
-                    uploadFolder.mkdirs();
+                if (!uploadFolder.exists()) uploadFolder.mkdirs();
 
                 String bimage = null;
 
@@ -63,7 +65,7 @@ public class BookRegister extends AbstractController {
                     if (part.getSubmittedFileName() != null && part.getSize() > 0) {
                         String originalFileName = part.getSubmittedFileName();
 
-                        // 파일명 그대로 저장
+                        // 저장
                         part.write(uploadDir + File.separator + originalFileName);
                         part.delete();
 
@@ -112,6 +114,7 @@ public class BookRegister extends AbstractController {
             }
 
         } else {
+            // 관리자 외 접근 불가
             request.setAttribute("message", "관리자만 접근 가능합니다.");
             request.setAttribute("loc", "javascript:history.back()");
             super.setRedirect(false);

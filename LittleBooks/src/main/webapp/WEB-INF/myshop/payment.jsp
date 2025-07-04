@@ -78,7 +78,8 @@ $(document).ready(function() {
                         receiverDetailAddress: $('#receiverDetailAddress').val(),
                         receiverExtraAddress: $('#receiverExtraAddress').val()
                     },
-                    success: function(res) {
+                    dataType:"json",
+                    success: function(json) {
                         alert("결제가 완료되었습니다.");
                         location.href = "<c:url value='/myshop/orderSuccess.go' />";
                     },

@@ -68,8 +68,8 @@ public class OrderDAO_imple implements OrderDAO {
                 " receiver_name, receiver_phone, postcode, address, detail_address, extra_address) " +
                 " VALUES (?, SYSDATE, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
 
-        String sqlDetail = " INSERT INTO tbl_order_detail " +
-                " (detail_id, fk_ordercode, bookseq, qty, unit_price) " +
+        String sqlDetail = " INSERT INTO TBL_ORDERDETAIL " +
+                " (odrseq, fk_ordercode, fk_bookseq, oqty, odrprice) " +
                 " VALUES (seq_order_detail.NEXTVAL, ?, ?, ?, ?) ";
 
         try {
@@ -114,4 +114,112 @@ public class OrderDAO_imple implements OrderDAO {
 
         return result;
     }
+
+    
+    // user 주문내역 받아오기.	
+	@Override
+	public List<OrderDetailVO> getOrderDetailList(String ordercode, String userid) throws SQLException {
+	    List<OrderDetailVO> detailList = new ArrayList<>();
+
+	    Connection conn = ds.getConnection();
+	    
+	    String sql = 
+	        " SELECT od.odrseq, od.fk_bookseq, od.fk_ordercode, od.oqty, od.odrprice, " +
+	        "       od.deliverstatus, TO_CHAR(od.deliverdate, 'YYYY-MM-DD') AS deliverdate, " +
+	        "       b.bname, b.bimage " +
+	        " FROM tbl_orderdetail od " +
+	        " JOIN tbl_book b ON od.fk_bookseq = b.bookseq " +
+	        " JOIN tbl_order o ON od.fk_ordercode = o.ordercode " +
+	        " WHERE od.fk_ordercode = ? AND o.fk_userid = ?";
+
+	    PreparedStatement pstmt = conn.prepareStatement(sql);
+	    pstmt.setString(1, ordercode);
+	    pstmt.setString(2, userid);
+
+	    ResultSet rs = pstmt.executeQuery();
+	    while (rs.next()) {
+	        OrderDetailVO vo = new OrderDetailVO();
+	        vo.setOdrseq(rs.getInt("odrseq"));
+	        vo.setFk_bookseq(rs.getInt("fk_bookseq"));
+	        vo.setFk_ordercode(rs.getString("fk_ordercode"));
+	        vo.setOqty(rs.getInt("oqty"));
+	        vo.setOdrprice(rs.getInt("odrprice"));
+	        vo.setDeliverstatus(rs.getInt("deliverstatus"));
+	        vo.setDeliverdate(rs.getString("deliverdate"));
+	        vo.setBname(rs.getString("bname"));
+	        vo.setBimage(rs.getString("bimage"));
+	        detailList.add(vo);
+	    }
+
+	    close();
+
+	    return detailList;
+	}
+
+	@Override
+	public OrderVO getOrderInfo(String ordercode, String userid) throws SQLException {
+		
+	    OrderVO vo = null;
+
+	    Connection conn = ds.getConnection();
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+
+	    try {
+	    	String sql = " SELECT receiver_name AS recipient, receiver_phone AS phone, " +
+	                "        postcode || ' ' || address || ' ' || detail_address || ' ' || extra_address AS address, " +
+	                "        '' AS memo " +  // memo 컬럼이 없다면 빈 문자열로 대체
+	                " FROM tbl_order " +
+	                " WHERE ordercode = ? AND fk_userid = ?";
+
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, ordercode);
+	        pstmt.setString(2, userid);
+
+	        rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            vo = new OrderVO();
+	            vo.setRecipient(rs.getString("recipient"));
+	            vo.setPhone(rs.getString("phone"));
+	            vo.setAddress(rs.getString("address"));
+	            vo.setMemo(rs.getString("memo"));
+	        }
+	    } finally {
+	        close(); // 반드시 connection, pstmt, rs 닫아주세요
+	    }
+
+	    return vo;
+	}
+
+	// 유저의 주문 목록 조회
+    @Override
+    public List<OrderVO> getOrderListByUserid(String userid) throws SQLException {
+        List<OrderVO> orderList = new ArrayList<>();
+
+        Connection conn = ds.getConnection();
+        String sql = "SELECT ordercode, orderdate, totalprice, orderstatus FROM tbl_order WHERE fk_userid = ? ORDER BY orderdate DESC";
+
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, userid);
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            OrderVO ovo = new OrderVO();
+            ovo.setOrdercode(rs.getString("ordercode"));
+            ovo.setOrderdate(rs.getString("orderdate"));
+            ovo.setTotalprice(rs.getInt("totalprice"));
+            ovo.setOrderstatus(rs.getInt("orderstatus"));
+            orderList.add(ovo);
+        }
+
+        close();
+        return orderList;
+    }
 }
+
+
+	
+
+
