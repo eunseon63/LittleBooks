@@ -415,13 +415,13 @@ function updateTotalPrice(qty) {
 
 function goCart() {
     const frm = document.cartOrderFrm;
-    const cqty = frm.cqty.value;
+    const cqty = frm.cqty.value; // 여기 qty로 통일
     const regExp = /^[1-9][0-9]*$/;
     var isLogin = <%= isLogin %>;
 
-    if(!regExp.test(cqty) || cqty < 1 || cqty > 100){
+    if (!regExp.test(cqty) || cqty < 1 || cqty > 100) {
         swal("수량 오류", "수량은 1에서 100 사이의 숫자만 가능합니다.", "warning");
-        frm.cqty.focus();
+        frm.qty.focus(); // 여기도 qty로
         return false;
     }
 
@@ -434,7 +434,6 @@ function goCart() {
             location.href = "<%= ctxPath %>/login/login.go";
         });
     } else {
-        // 로그인 된 경우에만 진행
         swal({
             title: "장바구니 담기 완료!",
             text: "선택하신 상품이 장바구니에 추가되었습니다.",
@@ -546,23 +545,22 @@ function delMyReview(reviewseq) {
             </div>
         </div>
 
-        <form name="cartOrderFrm">
-            <div class="select-box">
-                <label for="spinner">수량 선택</label>
-                <input type="text" id="spinner" name="qty" value="1" autocomplete="off" />
-            </div>
-
-            <div class="price-section">
-                총 가격: <span id="totalPrice"></span>
-            </div>
-
-
-            <div class="button-group">
-                <button type="button" onclick="goPayment()">결제하기</button>
-                <button type="button" onclick="goCart()">장바구니</button>
-            </div>
-            <input type="hidden" name="bookseq" id="fk_bookseq" value="${book.bookseq}" />
-        </form>
+     <form name="cartOrderFrm">
+		    <div class="select-box">
+		        <label for="spinner">수량 선택</label>
+		        <input type="text" id="spinner" name="cqty" value="1" autocomplete="off" />
+		    </div>
+		
+		    <div class="price-section">
+		        총 가격: <span id="totalPrice"></span>
+		    </div>
+		
+		    <div class="button-group">
+		        <button type="button" onclick="goPayment()">결제하기</button>
+		        <button type="button" onclick="goCart()">장바구니</button>
+		    </div>
+		    <input type="hidden" name="fk_bookseq" id="fk_bookseq" value="${book.bookseq}" />
+	</form>
 
     
 

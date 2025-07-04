@@ -8,69 +8,152 @@ $(function() {
   $('#name').focus();
   $('#postcode, #address, #extraAddress').attr('readonly', true);
 
-  // 유효성검사용 blur 이벤트 등록
-  $('#name').blur(() => validateRequired('#name', '이름을 입력하세요.'));
-  $('#userid').blur(() => validateRequired('#userid', '아이디를 입력하세요.'));
-  $('#pwd').blur(() => validateRegex('#pwd', /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$/,
-    '비밀번호는 영문자+숫자+특수문자 포함 8~15자입니다.'));
+  // 이벤트 바인딩 - 필드별 유효성 검사
+  $('#name').blur(validateName);
+  $('#userid').blur(validateUserId);
+  $('#pwd').blur(validatePassword);
   $('#pwdcheck').blur(validatePasswordConfirm);
-  $('#email').blur(() => validateRegex('#email', /^[\w.-]+@([\w-]+\.)+[A-Za-z]{2,3}$/,
-    '유효한 이메일 형식이 아닙니다.'));
-  $('#hp2').blur(() => validateRegex('#hp2', /^[1-9]\d{3}$/, '국번 4자리 입력하세요.'));
-  $('#hp3').blur(() => validateRegex('#hp3', /^\d{4}$/, '번호 4자리 입력하세요.'));
-  $('#postcode').blur(() => validateRegex('#postcode', /^\d{5}$/, '우편번호는 5자리 숫자입니다.'));
+  $('#email').blur(validateEmail);
+  $('#hp2').blur(() => checkPattern('#hp2', /^[1-9]\d{3}$/, '국번 4자리 입력하세요.'));
+  $('#hp3').blur(() => checkPattern('#hp3', /^\d{4}$/, '번호 4자리 입력하세요.'));
+  $('#postcode').blur(validatePostcode);
 
   // 우편번호 찾기 & datepicker 초기화
   $('#zipcodeSearch').click(openPostcode);
   initDatepicker();
 
   // 중복확인 버튼 클릭 처리
-  $('#idcheck').click(checkDuplicate.bind(null, 'userid'));
+  $('#idcheck').click(() => checkDuplicate('userid'));
   $('#userid').change(() => idChecked = false);
 
-  $('#emailcheck').click(checkDuplicate.bind(null, 'email'));
+  $('#emailcheck').click(() => checkDuplicate('email'));
   $('#email').change(() => emailChecked = false);
 });
 
-/** 필수 필드 입력 확인 */
-function validateRequired(selector, msg) {
-  const val = $(selector).val().trim();
-  return showErrorIf(!val, selector, msg);
-}
-
-/** 정규식 체크 */
-function validateRegex(selector, regex, msg) {
-  const ok = regex.test($(selector).val().trim());
-  return showErrorIf(!ok, selector, msg);
-}
-
-/** 에러 메시지 표시 처리 */
-function showErrorIf(show, selector, msg) {
-  const span = $(selector).siblings('span.error');
-  if (show) {
-    span.text(msg).show();
+/**
+ * 에러 메시지 표시/숨김 함수
+ * @param {string} selector - input 요소 선택자
+ * @param {string} message - 에러 메시지 (없으면 숨김)
+ * @returns {boolean} - 에러 여부 (true = 정상)
+ */
+function toggleError(selector, message = '') {
+  const $errorSpan = $(selector).siblings('span.error');
+  if (message) {
+    $errorSpan.text(message).show();
     return false;
+  } else {
+    $errorSpan.hide();
+    return true;
   }
-  span.hide();
-  return true;
 }
 
-/** 비밀번호 확인 */
-function validatePasswordConfirm() {
-  const pwd = $('#pwd').val(), confirm = $('#pwdcheck').val();
+/**
+ * 필수 입력 체크
+ * @param {string} selector - input 요소 선택자
+ * @param {string} fieldName - 필드 이름 (메시지용)
+ * @returns {boolean}
+ */
+function checkRequired(selector, fieldName) {
+  const value = $(selector).val().trim();
+  if (!value) {
+    return toggleError(selector, `${fieldName}을(를) 입력하세요.`);
+  }
+  return toggleError(selector);
+}
+
+/**
+ * 정규식 검사
+ * @param {string} selector - input 요소 선택자
+ * @param {RegExp} regex - 정규식 객체
+ * @param {string} errorMsg - 에러 메시지
+ * @returns {boolean}
+ */
+function checkPattern(selector, regex, errorMsg) {
+  const value = $(selector).val().trim();
+  if (!regex.test(value)) {
+    return toggleError(selector, errorMsg);
+  }
+  return toggleError(selector);
+}
+
+/**
+ * 비밀번호 확인 검사
+ * @param {string} pwdSelector - 비밀번호 input 선택자
+ * @param {string} confirmSelector - 비밀번호 확인 input 선택자
+ * @returns {boolean}
+ */
+function checkPasswordMatch(pwdSelector, confirmSelector) {
+  const pwd = $(pwdSelector).val();
+  const confirm = $(confirmSelector).val();
   if (pwd !== confirm) {
-    showErrorIf(true, '#pwdcheck', '비밀번호가 일치하지 않습니다.');
-    $('#pwd, #pwdcheck').val('');
-    $('#pwd').focus();
+    toggleError(confirmSelector, '비밀번호가 일치하지 않습니다.');
+    $(pwdSelector).val('');
+    $(confirmSelector).val('');
+    $(pwdSelector).focus();
     return false;
   }
-  showErrorIf(false, '#pwdcheck');
+  return toggleError(confirmSelector);
+}
+
+// 개별 필드 유효성 검사 함수들
+function validateName() {
+  return checkRequired('#name', '이름');
+}
+
+function validateUserId() {
+  return checkRequired('#userid', '아이디');
+}
+
+function validatePassword() {
+  const regex = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$/;
+  return checkPattern('#pwd', regex, '비밀번호는 영문자+숫자+특수문자 포함 8~15자입니다.');
+}
+
+function validatePasswordConfirm() {
+  return checkPasswordMatch('#pwd', '#pwdcheck');
+}
+
+function validateEmail() {
+  const regex = /^[\w.-]+@([\w-]+\.)+[A-Za-z]{2,3}$/;
+  return checkPattern('#email', regex, '유효한 이메일 형식이 아닙니다.');
+}
+
+function validatePhone() {
+  const hp2Valid = checkPattern('#hp2', /^[1-9]\d{3}$/, '국번 4자리 입력하세요.');
+  const hp3Valid = checkPattern('#hp3', /^\d{4}$/, '번호 4자리 입력하세요.');
+  return hp2Valid && hp3Valid;
+}
+
+function validatePostcode() {
+  return checkPattern('#postcode', /^\d{5}$/, '우편번호는 5자리 숫자입니다.');
+}
+
+function validateAddress() {
+  const addr1 = $('#address').val().trim();
+  const addr2 = $('#detailAddress').val().trim();
+  if (!addr1 || !addr2) {
+    alert('주소를 모두 입력하세요.');
+    return false;
+  }
   return true;
 }
 
-/** 중복 확인 AJAX 요청 */
+function validateBirthdate() {
+  const val = $('#datepicker').val().trim();
+  if (!val) {
+    alert('생년월일을 선택해 주세요.');
+    return false;
+  }
+  return true;
+}
+
+/**
+ * 중복 확인 AJAX 요청
+ * @param {string} type - 'userid' 또는 'email'
+ */
 function checkDuplicate(type) {
-  const sel = `#${type}`, val = $(sel).val().trim();
+  const sel = `#${type}`;
+  const val = $(sel).val().trim();
   if (!val) {
     alert(`${type === 'userid' ? '아이디' : '이메일'}를 입력하세요.`);
     return;
@@ -106,7 +189,9 @@ function handleEmailCheck(json) {
   }
 }
 
-/** Daum postcode API */
+/**
+ * Daum postcode API 사용해서 우편번호 찾기
+ */
 function openPostcode() {
   new daum.Postcode({
     oncomplete: data => {
@@ -121,6 +206,7 @@ function openPostcode() {
       if (data.buildingName && data.apartment === 'Y') {
         extra += (extra ? `, ${data.buildingName}` : data.buildingName);
       }
+
       $('#extraAddress').val(extra ? `(${extra})` : '');
       $('#postcode').val(data.zonecode);
       $('#address').val(addr);
@@ -129,7 +215,9 @@ function openPostcode() {
   }).open();
 }
 
-/** 생년월일 datepicker 초기화 */
+/**
+ * 생년월일 datepicker 초기화
+ */
 function initDatepicker() {
   $('#datepicker').datepicker({
     dateFormat: 'yy-mm-dd',
@@ -143,40 +231,50 @@ function initDatepicker() {
     dayNamesMin: ['일','월','화','수','목','금','토'],
     dayNames: ['일요일','월요일','화요일','수요일','목요일','금요일','토요일']
   }).on('change', function() {
-    showErrorIf(false, '#datepicker');
+    toggleError('#datepicker'); // 에러 숨기기
   }).on('keyup', function() {
-    showErrorIf(true, '#datepicker', '달력으로 선택해 주세요.');
+    toggleError('#datepicker', '달력으로 선택해 주세요.');
     $(this).val('');
   });
 }
 
-/** 가입하기 버튼 클릭 */
+/**
+ * 가입하기 버튼 클릭 시 전체 검증 및 제출
+ */
 function goRegister() {
-  // 필수 입력 검사
-  if (!validateRequired('#name', '이름을 입력하세요.')) return;
-  if (!validateRequired('#userid', '아이디를 입력하세요.')) return;
-  if (!validateRegex('#pwd', /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$/, 
-        '비밀번호는 영문자+숫자+특수문자 포함 8~15자입니다.')) return;
+  if (!validateName()) return;
+  if (!validateUserId()) return;
+  if (!validatePassword()) return;
   if (!validatePasswordConfirm()) return;
-  if (!validateRegex('#email', /^[\w.-]+@([\w-]+\.)+[A-Za-z]{2,3}$/, 
-        '유효한 이메일 형식이 아닙니다.')) return;
-  if (!validateRegex('#hp2', /^[1-9]\d{3}$/, '국번 4자리 입력하세요.')) return;
-  if (!validateRegex('#hp3', /^\d{4}$/, '번호 4자리 입력하세요.')) return;
-  if (!validateRegex('#postcode', /^\d{5}$/, '우편번호는 5자리 숫자입니다.')) return;
+  if (!validateEmail()) return;
+  if (!validatePhone()) return;
+  if (!validatePostcode()) return;
 
-  // 중복확인 플래그 체크
-  if (!idChecked) return alert('아이디 중복확인을 먼저 해주세요.');
-  if (!emailChecked) return alert('이메일 중복확인을 먼저 해주세요.');
-
-  // 주소 및 생년월일 체크
-  if (!$('#address').val().trim() || !$('#detailAddress').val().trim()) {
-    return alert('주소를 모두 입력하세요.');
+  if (!idChecked) {
+    alert('아이디 중복확인을 먼저 해주세요.');
+    return;
   }
-  if (!$('#datepicker').val().trim()) {
-    return alert('생년월일을 선택해 주세요.');
+  if (!emailChecked) {
+    alert('이메일 중복확인을 먼저 해주세요.');
+    return;
   }
 
-  // submit
+  if (!validateAddress()) return;
+  if (!validateBirthdate()) return;
+
+  // 모든 검증 통과 시 폼 제출
   document.registerFrm.method = 'post';
   document.registerFrm.submit();
+}
+
+/**
+ * 폼 초기화 함수 (필요 시 사용)
+ */
+function goReset() {
+  document.registerFrm.reset();
+  $('span.error').hide();
+  $('#idcheckResult, #emailCheckResult').text('');
+  idChecked = false;
+  emailChecked = false;
+  $('#name').focus();
 }

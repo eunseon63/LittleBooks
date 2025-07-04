@@ -741,120 +741,112 @@ public class BookDAO_imple implements BookDAO {
 	// 장바구니에 담기
 	@Override
 	public int addCart(Map<String, String> paraMap) throws SQLException {
+	    int n = 0;
+	    Connection conn = null;
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
 
-		int n = 0;
-		
-		try {
-			conn = ds.getConnection();
-			
-			String sql = " select cartseq "
-					   + " from tbl_cart "
-					   + " where fk_userid = ? and fk_bookseq = ? ";
-			
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, paraMap.get("fk_userid"));
-			pstmt.setString(2, paraMap.get("fk_bookseq"));
-			
-			rs = pstmt.executeQuery();
-			
-			// 있던 제품을 장바구니에 추가로 담음 
-			if(rs.next()) {
-				sql = " update tbl_cart set cqty = cqty + to_number(?) "
-					+ " where cartseq = ? ";
-				
-				pstmt = conn.prepareStatement(sql);
-				pstmt.setString(1, paraMap.get("cqty") );
-				pstmt.setInt(2, rs.getInt("cartseq") );
-				
-				n = pstmt.executeUpdate();
-			}
-			// 장바구니에 해당 제품을 처음 담음 
-			else {
-				sql = " insert into tbl_cart(cartseq, fk_userid, fk_bookseq, cqty) "
-					+ " values(seq_cart.nextval, ?, ?, ?) ";
-					
-				pstmt = conn.prepareStatement(sql);
-				pstmt.setString(1, paraMap.get("fk_userid"));
-				pstmt.setInt(2, Integer.parseInt(paraMap.get("fk_bookseq")));
-				pstmt.setInt(3, Integer.parseInt(paraMap.get("cqty")));
-				
-				n = pstmt.executeUpdate();
-			}
-			
-		} finally {
-			close();
-		}
-		
-		return n;
-		
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = "select cartseq from tbl_cart where fk_userid = ? and fk_bookseq = ?";
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, paraMap.get("fk_userid"));
+	        pstmt.setString(2, paraMap.get("fk_bookseq"));
+	        rs = pstmt.executeQuery();
+
+	        int cqty = Integer.parseInt(paraMap.get("cqty"));
+
+	        if(rs.next()) {
+	            int cartseq = rs.getInt("cartseq");
+	            rs.close();
+	            pstmt.close();
+
+	            sql = "update tbl_cart set cqty = cqty + ? where cartseq = ?";
+	            pstmt = conn.prepareStatement(sql);
+	            pstmt.setInt(1, cqty);
+	            pstmt.setInt(2, cartseq);
+	            n = pstmt.executeUpdate();
+	        } else {
+	            rs.close();
+	            pstmt.close();
+
+	            sql = "insert into tbl_cart(cartseq, fk_userid, fk_bookseq, cqty) values(seq_cart.nextval, ?, ?, ?)";
+	            pstmt = conn.prepareStatement(sql);
+	            pstmt.setString(1, paraMap.get("fk_userid"));
+	            pstmt.setInt(2, Integer.parseInt(paraMap.get("fk_bookseq")));
+	            pstmt.setInt(3, cqty);
+	            n = pstmt.executeUpdate();
+	        }
+
+	    } finally {
+	        if(rs != null) try { rs.close(); } catch(Exception e) {}
+	        if(pstmt != null) try { pstmt.close(); } catch(Exception e) {}
+	        if(conn != null) try { conn.close(); } catch(Exception e) {}
+	    }
+
+	    return n;
 	}
 
 	// 장바구니 목록 조회
 	@Override
 	public List<CartVO> selectProductCart(String userid) throws SQLException {
-		
-		List<CartVO> cartList = null;
-		
-		try {
-			conn = ds.getConnection();
-			
-			String sql =  " SELECT C.cartseq, C.fk_userid, C.fk_bookseq, C.cqty, B.bname, B.bimage, B.price, B.bqty "
-						+ " FROM "
-						+ " (select cartseq, fk_userid, fk_bookseq, cqty "
-						+ "  from tbl_cart "
-						+ "  where fk_userid = ?) C "
-						+ " JOIN tbl_book B "
-						+ " ON C.fk_bookseq = B.bookseq "
-						+ " ORDER BY C.cartseq DESC ";
-			
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, userid);
-			
-		    rs = pstmt.executeQuery();
-		    
-		    int cnt = 0;
-		    while(rs.next()) {
-		    	cnt++;
-		    	
-		    	if(cnt == 1) {
-		    		cartList = new ArrayList<>();
-		    	}
-		    	
-		    	int cartseq = rs.getInt("cartseq");
-		    	String fk_userid = rs.getString("fk_userid");
-		    	int fk_bookseq = rs.getInt("fk_bookseq");
-		    	int cqty = rs.getInt("cqty"); // 장바구니에 담긴 수량
-		    	String bname = rs.getString("bname"); // 책 이름
-		    	String bimage = rs.getString("bimage"); // 책 이미지
-		    	int price = rs.getInt("price"); // 책 가격
-		    	int bqty = rs.getInt("bqty"); // 책 재고 수량
-				
-		    	BookVO bvo = new BookVO();
-		    	bvo.setBookseq(fk_bookseq);   // 책 번호
-		    	bvo.setBname(bname);          // 책 이름
-		    	bvo.setBimage(bimage);        // 책 이미지
-		    	bvo.setPrice(price);          // 책 가격
-		    	bvo.setBqty(bqty);            // 책 재고 수량
+	    
+	    List<CartVO> cartList = new ArrayList<>(); // 빈 리스트로 초기화
+	    
+	    try {
+	        conn = ds.getConnection();
+	        
+	        String sql =  " SELECT C.cartseq, C.fk_userid, C.fk_bookseq, C.cqty, B.bname, B.bimage, B.price, B.bqty "
+	                    + " FROM "
+	                    + " (select cartseq, fk_userid, fk_bookseq, cqty "
+	                    + "  from tbl_cart "
+	                    + "  where fk_userid = ?) C "
+	                    + " JOIN tbl_book B "
+	                    + " ON C.fk_bookseq = B.bookseq "
+	                    + " ORDER BY C.cartseq DESC ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+	        
+	        rs = pstmt.executeQuery();
+	        
+	        while(rs.next()) {
+	            
+	            int cartseq = rs.getInt("cartseq");
+	            String fk_userid = rs.getString("fk_userid");
+	            int fk_bookseq = rs.getInt("fk_bookseq");
+	            int cqty = rs.getInt("cqty"); // 장바구니 수량
+	            String bname = rs.getString("bname");
+	            String bimage = rs.getString("bimage");
+	            int price = rs.getInt("price");
+	            int bqty = rs.getInt("bqty");
+	            
+	            BookVO bvo = new BookVO();
+	            bvo.setBookseq(fk_bookseq);
+	            bvo.setBname(bname);
+	            bvo.setBimage(bimage);
+	            bvo.setPrice(price);
+	            bvo.setBqty(bqty);
 
-		    	bvo.setTotalPrice(cqty);
-		    	
-				CartVO cvo = new CartVO();
-				cvo.setCartseq(cartseq);         // 장바구니 번호
-				cvo.setFk_userid(fk_userid);   // 사용자 ID
-				cvo.setFk_bookseq(fk_bookseq); // 책 번호
-				cvo.setCqty(cqty);             // 수량
-				cvo.setBvo(bvo);            // BookVO 객체 주입
-				
-				cartList.add(cvo);
-		    }// end of while(rs.next())-----------------
-			
-		} finally {
-			close();
-		}
-		
-		return cartList;		
-		
-		
+	            // 총 가격 = 가격 * 수량
+	            bvo.setTotalPrice(price * cqty);
+	            
+	            CartVO cvo = new CartVO();
+	            cvo.setCartseq(cartseq);
+	            cvo.setFk_userid(fk_userid);
+	            cvo.setFk_bookseq(fk_bookseq);
+	            cvo.setCqty(cqty);
+	            cvo.setBvo(bvo);
+	            
+	            cartList.add(cvo);
+	        }
+	        
+	    } finally {
+	        close();
+	    }
+	    
+	    return cartList;
 	}
 
 	// 장바구니에 담긴 책 가격 총합
