@@ -9,6 +9,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import myshop.domain.OrderVO;
+import myshop.domain.BookVO;
 import myshop.domain.OrderDetailVO;
 
 public class OrderDAO_imple implements OrderDAO {
@@ -69,7 +70,7 @@ public class OrderDAO_imple implements OrderDAO {
                 " VALUES (?, SYSDATE, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
 
         String sqlDetail = " INSERT INTO tbl_order_detail " +
-                " (detail_id, fk_ordercode, bookseq, qty, unit_price) " +
+                " (odrseq, fk_ordercode, bookseq, oqty, unit_price) " +
                 " VALUES (seq_order_detail.NEXTVAL, ?, ?, ?, ?) ";
 
         try {
@@ -97,9 +98,9 @@ public class OrderDAO_imple implements OrderDAO {
             pstmt = conn.prepareStatement(sqlDetail);
             for (OrderDetailVO dvo : detailList) {
                 pstmt.setString(1, ovo.getOrdercode());
-                pstmt.setInt(2, dvo.getFkid());
-                pstmt.setInt(3, dvo.getOrderQty());
-                pstmt.setInt(4, dvo.getOrderPrice());
+                pstmt.setString(2, dvo.getOdrseq());
+                pstmt.setInt(3, dvo.getOqty());
+                pstmt.setInt(4, dvo.getOdrprice());
                 pstmt.executeUpdate();
             }
 
@@ -114,4 +115,97 @@ public class OrderDAO_imple implements OrderDAO {
 
         return result;
     }
+
+    // 주문코드를 찾는 함수
+	@Override
+	public String selectOrdercode(String userid) throws SQLException {
+
+		String ordercode = null;
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " select ordercode "
+					+ " from tbl_order "
+					+ " where fk_userid = ? ";
+			
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userid);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+            	ordercode = rs.getString("ordercode");
+            }
+			
+		} finally {
+			close();
+		}
+		
+		return ordercode;
+
+	} // end of public String selectOrdercode(String userid) throws SQLException {}---------------
+
+	// 주문상세 정보 찾는 함수
+	@Override
+	public List<OrderDetailVO> selectAllDetail() throws SQLException {
+	    List<OrderDetailVO> orderDetailList = new ArrayList<>();
+	    
+	    try {
+	        conn = ds.getConnection();
+	        
+	        String sql = "SELECT "
+	                + "    od.fk_ordercode, "
+	                + "    od.deliverdate, "
+	                + "    od.odrseq, "
+	                + "    b.bookseq, "
+	                + "    od.oqty, "
+	                + "    od.odrprice, "
+	                + "    od.deliverstatus, "
+	                + "    b.bname, "
+	                + "    b.price, "
+	                + "	   b.bimage AS bimage, "
+	                + "    b.author "
+	                + " FROM "
+	                + "    tbl_orderdetail od "
+	                + " JOIN "
+	                + "    tbl_book b ON od.fk_bookseq = b.bookseq";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+	        
+	        // 데이터가 있을 경우 반복문 실행
+	        while (rs.next()) {
+	            OrderDetailVO detailVO = new OrderDetailVO();
+	            
+	            // OrderDetailVO에 데이터 세팅
+	            detailVO.setOdrseq(rs.getString("odrseq"));              // 주문 상세 코드
+	            detailVO.setFk_ordercode(rs.getString("fk_ordercode"));  // 주문 코드
+	            detailVO.setFk_bookseq(rs.getInt("bookseq"));            // 책 번호
+	            detailVO.setOqty(rs.getInt("oqty"));                     // 수량
+	            detailVO.setOdrprice(rs.getInt("odrprice"));             // 개별 가격
+	            detailVO.setDeliverdate(rs.getString("deliverdate"));    // 주문 일자
+	            detailVO.setDeliverstatus(rs.getString("deliverstatus"));// 배송 상태
+	            
+	            // 책 정보 추가
+	            BookVO book = new BookVO();
+	            book.setBookseq(rs.getInt("bookseq"));
+	            book.setBname(rs.getString("bname"));
+	            book.setPrice(rs.getInt("price"));
+	            book.setBimage(rs.getString("bimage"));
+	            book.setAuthor(rs.getString("author"));
+	            
+	            // OrderDetailVO에 책 정보 설정
+	            detailVO.setBook(book);
+	            
+	            // 리스트에 추가
+	            orderDetailList.add(detailVO);
+	        }
+	        
+	    } finally {
+	        close();  // 자원 정리
+	    }
+	    
+	    return orderDetailList;
+	} // end of public List<OrderDetailVO> selectAllDetail() throws SQLException {}-----------
+
 }

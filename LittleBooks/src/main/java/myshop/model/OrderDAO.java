@@ -12,4 +12,10 @@ public interface OrderDAO {
 
     // 주문번호 생성용 시퀀스
     String getOrderCode() throws SQLException;
+
+    // 주문코드를 찾는 함수
+	String selectOrdercode(String userid) throws SQLException;
+
+	// 주문상세 정보 찾는 함수
+	List<OrderDetailVO> selectAllDetail() throws SQLException;
 }
