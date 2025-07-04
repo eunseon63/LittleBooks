@@ -275,9 +275,15 @@ body {
 }
 .rating-stars .star {
     font-size: 22px;
-    color: #ddd;
+    color: #ccc; /* 기본 회색으로 더 흐리게 */
     cursor: pointer;
+    transition: color 0.2s ease;
 }
+
+.rating-stars .star.selected {
+    color: #f4c900; /* 진한 노란색 */
+}
+
 .review-stars .star {
     color: #ccc; /* 미선택 별 - 밝은 회색 */
     font-size: 18px;

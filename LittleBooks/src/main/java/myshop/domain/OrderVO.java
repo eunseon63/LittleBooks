@@ -118,4 +118,34 @@ public class OrderVO {
     public void setOrderDetailList(List<OrderDetailVO> orderDetailList) {
         this.orderDetailList = orderDetailList;
     }
+
+	public void setRecipient(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setPhone(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setMemo(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setOrderdate(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setTotalprice(int int1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setOrderstatus(int int1) {
+		// TODO Auto-generated method stub
+		
+	}
 }
