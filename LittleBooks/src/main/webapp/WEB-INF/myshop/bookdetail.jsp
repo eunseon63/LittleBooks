@@ -243,6 +243,52 @@ body {
     font-size: 14px;
     padding: 8px 0;
 }
+.commentDel,
+.commentUpdate {
+    display: inline-block;
+    cursor: pointer;
+    color: #555;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+.commentDel:hover,
+.commentUpdate:hover {
+    background-color: #f4c900;
+    color: #000;
+    font-weight: 600;
+}
+/* 리뷰 내용은 굵게 + 크고 진하게 */
+.review-content {
+    font-size: 15px;
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 6px;
+}
+
+/* 작성자 이름과 날짜는 옅게, 작게 */
+.review-meta {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 12px;
+}
+.rating-stars .star {
+    font-size: 22px;
+    color: #ddd;
+    cursor: pointer;
+}
+.review-stars .star {
+    color: #ccc; /* 미선택 별 - 밝은 회색 */
+    font-size: 18px;
+}
+
+.review-stars .star.selected {
+    color: #f4c900; /* 선택된 별 - 기존보다 약간 더 진한 노란색 */
+    text-shadow: 0 0 2px #caa700; /* 약간 광택 효과 */
+    font-size: 18px;
+}
+
 </style>
 
 <script>
@@ -322,7 +368,7 @@ let isOrderOK = false;
         }
 
         const queryString = $('form[name="commentFrm"]').serialize();
-
+        console.log(queryString); 
         $.ajax({
             url: "<%= ctxPath %>/shop/reviewRegister.go",
             type: "post",
@@ -367,10 +413,24 @@ $.ajax({
     }
 });
 
+// 별 클릭 시 색 채우고 값 설정
+$(document).on("click", ".rating-stars .star", function() {
+    const selectedRating = $(this).data("value");
+    $("#rating").val(selectedRating);
+
+    // 색 초기화 후 선택된 별까지 색 채우기
+    $(".rating-stars .star").removeClass("selected");
+    $(".rating-stars .star").each(function(index) {
+        if (index < selectedRating) {
+            $(this).addClass("selected");
+        }
+    });
+    console.log($('#rating').val());
+});
+
 
 });
 
-//특정 책의 리뷰글들을 보여주는 함수 
 function goReviewListView() {
     $.ajax({
         url: "<%= ctxPath %>/shop/reviewList.go",
@@ -383,17 +443,37 @@ function goReviewListView() {
             if (json.length > 0) {
                 $.each(json, function(index, item) {
                     let writeuserid = item.fk_userid;
+                    let rating = item.rating;  // 서버 JSON 필드명에 맞게 조정 필요
+                    let reviewComment = item.reviewComment || item.contents;
 
-                    v_html += "<div id='review" + index + "'><span class='markColor'>▶</span>&nbsp;" + item.contents + "</div>"
-                            + "<div class='customDisplay'>" + item.name + "</div>"
-                            + "<div class='customDisplay'>" + item.writedate + "</div>";
+                    // 디버깅용 로그 (나중에 삭제 가능)
+                    console.log("리뷰 내용:", reviewComment, "별점:", rating);
 
-                    if (!isLoggedIn || loginUserid !== writeuserid) {
-                        v_html += "<div class='customDisplay spacediv'>&nbsp;</div>";
-                    } else {
-                        v_html += "<div class='customDisplay spacediv commentDel' onclick='delMyReview(" + item.review_seq + ")'>후기삭제</div>";
-                        v_html += "<div class='customDisplay spacediv commentUpdate' onclick='updateMyReview(" + index + "," + item.reviewseq + ")'>후기수정</div>";
+                    v_html += "<div class='review-card' id='review" + index + "'>";
+
+                    v_html += "<div class='review-content'><span class='markColor'>▶</span>&nbsp;" + reviewComment + "</div>";
+                    let ratingNum = parseInt(rating);  // 안전하게 숫자 변환
+                    v_html += "<div class='review-stars'>";
+                    for(let i = 1; i <= 5; i++) {
+                        if(i <= rating) {
+                            v_html += "<span class='star selected'>★</span>";
+                        } else {
+                            v_html += "<span class='star'>★</span>";
+                        }
                     }
+                    v_html += "</div>";
+
+
+                    v_html += "<div class='review-meta'>" + item.name + " | " + item.writedate + "</div>";
+
+                    if (isLoggedIn && loginUserid === writeuserid) {
+                        v_html += "<div class='review-meta'>";
+                        v_html += "<span class='commentDel' onclick='delMyReview(" + item.reviewseq + ")'>후기삭제</span> ";
+                        v_html += "<span class='commentUpdate' onclick='updateMyReview(" + index + "," + item.reviewseq + ")'>후기수정</span>";
+                        v_html += "</div>";
+                    }
+
+                    v_html += "</div>";
                 });
             } else {
                 v_html += "<div>등록된 책 후기가 없습니다.</div>";
@@ -406,6 +486,7 @@ function goReviewListView() {
         }
     });
 }
+
 
 function updateTotalPrice(qty) {
     const price = ${book.price};
@@ -503,7 +584,75 @@ function delMyReview(reviewseq) {
 }// end of function delMyReview(review_seq)---------------
 
 
+//특정 제품의 제품후기를 수정하는 함수 
+function updateMyReview(index, reviewseq) {
+	console.log("삭제할 reviewseq:", reviewseq); // 이거 꼭 찍어봐
+	  const origin_elmt = $('div#review'+index).html(); // 원래의 제품후기 엘리먼트 
+ // alert(origin_elmt);
+ // <span class="markColor">▶</span>&nbsp;단가라상의하복 추천해요~~
+ 
+ // alert($('div#review'+index).text());
+ // ▶ 단가라상의하복 추천해요~~
+ 
+    const review_contents = $('div#review'+index).find('.review-content').text().substring(2).trim();
+
+ // alert(review_contents);
+ // 단가라상의하복 추천해요~~  
+   
+    $("div.commentUpdate").hide(); // "후기수정" 글자 감추기
+    
+ // "후기수정" 을 위한 엘리먼트 만들기 
+	   let v_html = "<textarea id='edit_textarea' style='font-size: 12pt; width: 40%; height: 50px;'>"+review_contents+"</textarea>";
+	   v_html += "<div style='display: inline-block; position: relative; top: -20px; left: 10px;'><button type='button' class='btn btn-sm btn-outline-secondary' id='btnReviewUpdate_OK'>수정완료</button></div>"; 
+	   v_html += "<div style='display: inline-block; position: relative; top: -20px; left: 20px;'><button type='button' class='btn btn-sm btn-outline-secondary' id='btnReviewUpdate_NO'>수정취소</button></div>";
+    
+ // 원래의 제품후기 엘리먼트에 위에서 만든 "후기수정" 을 위한 엘리먼트로 교체하기    
+	  $("div#review"+index).html(v_html);
+ 
+ // 수정취소 버튼 클릭시 
+    $(document).on("click", "button#btnReviewUpdate_NO", function(){
+  	  $("div#review"+index).html(origin_elmt); // 원래의 제품후기 엘리먼트로 복원하기
+  	  $("div.commentUpdate").show(); // "후기수정" 글자 보여주기
+    });
+	   
+ // 수정완료 버튼 클릭시 
+    $(document).on("click", "button#btnReviewUpdate_OK", function(){
+  	  
+    	// 함수 안에서 rating 값을 다시 가져와야 함
+    	const updatedRating = $("#rating").val(); // 또는 별 클릭 시 설정된 요소에서 값을 가져옴
+    	
+  	  $.ajax({
+			   url:"<%= ctxPath%>/shop/reviewUpdate.go",
+			   type:"post",
+			   data:{"review_seq":reviewseq
+				    ,"contents":$('textarea#edit_textarea').val()
+				    ,"rating": updatedRating  // 별점 값을 변수로 받아서 넘겨야 함
+				    },
+			   dataType:"json",
+	 		   success:function(json){ 
+	 			 // console.log(JSON.stringify(json));
+	 			 // {"n":1} 또는 {"n":0}
+	 			 
+	 			    if(json.n == 1) {
+	 			    	goReviewListView(); // 특정 제품의 제품후기글들을 보여주는 함수 호출하기
+	 			    }
+	 			    else {
+	 			    	alert("제품후기 수정이 실패했습니다.");
+	 			    	goReviewListView(); // 특정 제품의 제품후기글들을 보여주는 함수 호출하기
+	 			    }
+	 			 
+	 		   },
+	 		   error: function(request, status, error){
+			       alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
+		       }
+		  });
+  	  
+    });
+	   
+}// end of function updateMyReview(index, review_seq)-------
+
 </script>
+
 
 <div class="detail-wrapper">
     <!-- 이미지 -->
@@ -587,6 +736,13 @@ function delMyReview(reviewseq) {
             <textarea name="contents" class="form-control" placeholder="후기를 작성해주세요."></textarea>
             <input type="hidden" name="fk_userid" value="${sessionScope.loginuser.userid}" />
             <input type="hidden" name="fk_bookseq" value="${book.bookseq}" />
+            <div class="rating-stars mb-2">
+			    <span class="star" data-value="1">★</span>
+			    <span class="star" data-value="2">★</span>
+			    <span class="star" data-value="3">★</span>
+			    <span class="star" data-value="4">★</span>
+			    <span class="star" data-value="5">★</span>
+			</div>
             <input type="hidden" name="rating" id="rating" value="5" /> <%-- 기본 별점 5점 --%>
         </form>
     </div>
