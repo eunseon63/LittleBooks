@@ -367,7 +367,10 @@ $.ajax({
     }
 });
 
-// 특정 책의 리뷰글들을 보여주는 함수 
+
+});
+
+//특정 책의 리뷰글들을 보여주는 함수 
 function goReviewListView() {
     $.ajax({
         url: "<%= ctxPath %>/shop/reviewList.go",
@@ -389,7 +392,7 @@ function goReviewListView() {
                         v_html += "<div class='customDisplay spacediv'>&nbsp;</div>";
                     } else {
                         v_html += "<div class='customDisplay spacediv commentDel' onclick='delMyReview(" + item.review_seq + ")'>후기삭제</div>";
-                        v_html += "<div class='customDisplay spacediv commentUpdate' onclick='updateMyReview(" + index + "," + item.review_seq + ")'>후기수정</div>";
+                        v_html += "<div class='customDisplay spacediv commentUpdate' onclick='updateMyReview(" + index + "," + item.reviewseq + ")'>후기수정</div>";
                     }
                 });
             } else {
@@ -402,9 +405,7 @@ function goReviewListView() {
             alert("code: " + request.status + "\nmessage: " + request.responseText + "\nerror: " + error);
         }
     });
-	}
-});
-
+}
 
 function updateTotalPrice(qty) {
     const price = ${book.price};
@@ -446,6 +447,7 @@ function goCart() {
     }
 }
 
+<<<<<<< HEAD
 function goPayment() {
 
 	const frm = document.cartOrderFrm;
@@ -469,10 +471,44 @@ function goPayment() {
     frm.action = "<%= ctxPath %>/myshop/payment.go";
     frm.submit();
 }
+=======
+// 특정 제품의 제품후기를 삭제하는 함수 
+function delMyReview(reviewseq) {
+	console.log("삭제할 reviewseq:", reviewseq); // 이거 꼭 찍어봐
+   if(confirm("정말로 제품후기를 삭제하시겠습니까?")) {
+      
+      $.ajax({
+          url:"<%= ctxPath%>/shop/reviewDel.go",
+          type:"post",
+          data:{"review_seq":reviewseq},
+          dataType:"json",
+           success:function(json){ 
+            // console.log(JSON.stringify(json));
+            // {"n":1} 또는 {"n":0}
+            
+               if(json.n == 1) {
+                  alert("제품후기 삭제가 성공되었습니다.");
+                  goReviewListView(); // 특정 제품의 제품후기글들을 보여주는 함수 호출하기
+               }
+               else {
+                  alert("제품후기 삭제가 실패했습니다.");
+               }
+            
+           },
+           error: function(request, status, error){
+              alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
+           }
+      });      
+   }
+   
+}// end of function delMyReview(review_seq)---------------
+>>>>>>> refs/heads/seoyeon
 
 </script>
 
 <div class="detail-wrapper">
+    <!-- 이미지 -->
+    <div class="detail-wrapper">
     <!-- 이미지 -->
     <div class="left-box">
         <c:choose>
@@ -486,6 +522,8 @@ function goPayment() {
             </c:otherwise>
         </c:choose>
     </div>
+   </div>
+
 
     <!-- 상세 정보 -->
     <div class="right-box">
@@ -546,18 +584,19 @@ function goPayment() {
     </div>
 
     <div class="row review-input mt-3">
-        <div class="col-md-10">
-            <form name="commentFrm">
-                <textarea name="contents" class="form-control" placeholder="후기를 작성해주세요."></textarea>
-                <input type="hidden" name="fk_userid" value="${sessionScope.loginuser.userid}" />
-                <input type="hidden" name="fk_bookseq" value="${requestScope.bookVO.bookseq}" />
-                <input type="hidden" name="rating" id="rating" value="5" /> <%-- 기본 별점 5점 --%>
-            </form>
-        </div>
-        <div class="col-md-2 d-grid">
-            <button type="button" class="btn btn-outline-primary btn-submit" id="btnCommentOK">후기 등록</button>
-        </div>
+    <div class="col-md-10">
+        <form name="commentFrm">
+            <textarea name="contents" class="form-control" placeholder="후기를 작성해주세요."></textarea>
+            <input type="hidden" name="fk_userid" value="${sessionScope.loginuser.userid}" />
+            <input type="hidden" name="fk_bookseq" value="${book.bookseq}" />
+            <input type="hidden" name="rating" id="rating" value="5" /> <%-- 기본 별점 5점 --%>
+        </form>
     </div>
+    <div class="col-md-2 d-grid">
+        <button type="button" class="btn btn-outline-primary btn-submit" id="btnCommentOK">후기 등록</button>
+    </div>
+	</div>
+
 </div>
 
 <jsp:include page="/WEB-INF/footer.jsp" />
