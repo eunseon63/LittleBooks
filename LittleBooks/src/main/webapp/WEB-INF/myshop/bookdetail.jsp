@@ -437,6 +437,10 @@ $(document).on("click", ".rating-stars .star", function() {
 
 });
 
+
+});
+
+//특정 책의 리뷰글들을 보여주는 함수 
 function goReviewListView() {
     $.ajax({
         url: "<%= ctxPath %>/shop/reviewList.go",
@@ -454,8 +458,7 @@ function goReviewListView() {
 
                     // 디버깅용 로그 (나중에 삭제 가능)
                     console.log("리뷰 내용:", reviewComment, "별점:", rating);
-
-                    v_html += "<div class='review-card' id='review" + index + "'>";
+					 v_html += "<div class='review-card' id='review" + index + "'>";
 
                     v_html += "<div class='review-content'><span class='markColor'>▶</span>&nbsp;" + reviewComment + "</div>";
                     let ratingNum = parseInt(rating);  // 안전하게 숫자 변환
@@ -466,6 +469,12 @@ function goReviewListView() {
                         } else {
                             v_html += "<span class='star'>★</span>";
                         }
+                    if (!isLoggedIn || loginUserid !== writeuserid) {
+                        v_html += "<div class='customDisplay spacediv'>&nbsp;</div>";
+                    } else {
+                        v_html += "<div class='customDisplay spacediv commentDel' onclick='delMyReview(" + item.review_seq + ")'>후기삭제</div>";
+                        v_html += "<div class='customDisplay spacediv commentUpdate' onclick='updateMyReview(" + index + "," + item.reviewseq + ")'>후기수정</div>";
+
                     }
                     v_html += "</div>";
 
@@ -493,11 +502,13 @@ function goReviewListView() {
     });
 }
 
-
 function updateTotalPrice(qty) {
     const price = ${book.price};
     const total = qty * price;
     $("#totalPrice").text(total.toLocaleString('ko-KR', { style: 'currency', currency: 'KRW' }));
+    
+    $("#oqtyHidden").val(qty); // 수량 반영
+    $("#sumTotalHidden").val(qty * ${book.price}); // 총 가격 반영
 }
 
 function goCart() {
@@ -536,12 +547,14 @@ function goCart() {
 
 function goPayment() {
 
+function goOrder() {
+
 	const frm = document.cartOrderFrm;
     
-    const qty = frm.qty.value;
-    const bookseq = frm.fk_bookseq.value;
+    const qty = frm.spinner.value;
+    const bookseq = frm.str_bookseq_join.value;
+    var isLogin = <%= isLogin %>;
 
-    // 유효성 검사
     if (!qty || isNaN(qty) || qty < 1 || qty > 100) {
         swal("수량 오류", "수량은 1~100 사이의 숫자만 가능합니다.", "warning");
         return;
@@ -552,10 +565,20 @@ function goPayment() {
         return;
     }
 
-    // URL 이동
-    frm.method = "post";
-    frm.action = "<%= ctxPath %>/myshop/payment.go";
-    frm.submit();
+    if (!isLogin) {
+        swal({
+            title: "로그인이 필요합니다!",
+            text: "장바구니에 담으려면 먼저 로그인해주세요.",
+            type: "warning"
+        }, function() {
+            location.href = "<%= ctxPath %>/login/login.go";
+        });
+    } 
+    else {
+		frm.method = "post";
+	    frm.action = "<%= ctxPath %>/shop/payment.go";
+	    frm.submit();
+    }
 }
 
 // 특정 제품의 제품후기를 삭제하는 함수 
@@ -657,6 +680,33 @@ function updateMyReview(index, reviewseq) {
 	   
 }// end of function updateMyReview(index, review_seq)-------
 
+function delMyReview(reviewseq) {
+	console.log("삭제할 reviewseq:", reviewseq);
+   if(confirm("정말로 제품후기를 삭제하시겠습니까?")) {
+      
+      $.ajax({
+          url:"<%= ctxPath%>/shop/reviewDel.go",
+          type:"post",
+          data:{"review_seq":reviewseq},
+          dataType:"json",
+           success:function(json){ 
+            
+               if(json.n == 1) {
+                  alert("제품후기 삭제가 성공되었습니다.");
+                  goReviewListView();
+               }
+               else {
+                  alert("제품후기 삭제가 실패했습니다.");
+               }
+            
+           },
+           error: function(request, status, error){
+              alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
+           }
+      });      
+   }
+   
+}
 </script>
 
 
@@ -679,9 +729,7 @@ function updateMyReview(index, reviewseq) {
    </div>
 
 
-    <!-- 상세 정보 -->
     <div class="right-box">
-        <!-- 스펙 표시 (BEST / NEW 등) -->
         <c:choose>
             <c:when test="${book.fk_snum == 2}">
                 <div class="book-spec">BEST(인기)!!</div>
@@ -716,25 +764,42 @@ function updateMyReview(index, reviewseq) {
 		    </div>
 		    <input type="hidden" name="fk_bookseq" id="fk_bookseq" value="${book.bookseq}" />
 	</form>
-
-    
-
+        <form name="cartOrderFrm" method="post" action="<%= ctxPath %>/shop/payment.go">
+		    <div class="select-box">
+		        <label for="spinner">수량 선택</label>
+		        <input type="text" id="spinner" value="1" autocomplete="off" />
+		    </div>
+		
+		    <div class="price-section">
+		        총 가격: <span id="totalPrice"></span>
+		    </div>
+		
+		    <div class="button-group">
+		        <button type="button" onclick="goOrder()">결제하기</button>
+		        <button type="button" onclick="goCart()">장바구니</button>
+		    </div>
+		    <input type="hidden" name="fk_bookseq" id="fk_bookseq" value="${book.bookseq}" />
+			<input type="hidden" name="cqty" id="cqty" value="1" />
+		    <input type="hidden" name="str_bookseq_join" value="${book.bookseq}" />
+		    <input type="hidden" name="str_oqty_join" id="oqtyHidden" value="1" />
+		    <input type="hidden" name="str_price_join" value="${book.price}" />
+		    <input type="hidden" name="sum_totalPrice" id="sumTotalHidden" value="${book.price}" />
+		    <input type="hidden" name="str_cartseq_join" value="0" />
+		</form>
     </div>
 </div>
 
-<!-- 책 설명 -->
 <div class="section-box">
     <h3>책 설명</h3>
     <p>${book.bcontent}</p>
 </div>
 
-<!-- 리뷰 영역 -->
 <div class="review-wrapper">
-    <div class="review-title">${requestScope.bookVO.bname} 책 사용후기</div>
-
+    <h3 class="review-title">책 후기</h3>
     <div id="viewComments">
-        <%-- 여기에 Ajax로 리뷰 목록이 들어올 예정 --%>
+        <!-- 후기는 ajax로 불러옵니다 -->
     </div>
+</div>
 
     <div class="row review-input mt-3">
     <div class="col-md-10">
@@ -757,6 +822,14 @@ function updateMyReview(index, reviewseq) {
     </div>
 	</div>
 
+<div class="section-box review-input">
+    <form name="commentFrm">
+        <h3>책 후기 작성</h3>
+        <input type="hidden" name="fk_bookseq" value="${book.bookseq}" />
+        <input type="hidden" name="fk_userid" value="${sessionScope.loginuser.userid}" />
+        <textarea name="contents" placeholder="책 사용 후기를 작성해주세요." maxlength="500"></textarea>
+        <button type="button" id="btnCommentOK" class="btn-submit">등록</button>
+    </form>
 </div>
 
 <jsp:include page="/WEB-INF/footer.jsp" />
