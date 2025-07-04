@@ -26,7 +26,7 @@
 
 .card {
     width: 230px;
-    height: 370x; 
+    height: 400px; 
     background-color: #fffef5;
     border: 1px solid #f4c900;
     border-radius: 16px;
