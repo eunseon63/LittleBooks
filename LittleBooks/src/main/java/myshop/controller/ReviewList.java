@@ -32,7 +32,9 @@ public class ReviewList extends AbstractController {
             for (ReviewVO reviewVO : reviewList) {
                 JSONObject jsobj = new JSONObject();
 
-                jsobj.put("review_seq", reviewVO.getReviewseq());
+                jsobj.put("reviewseq", reviewVO.getReviewseq());
+                jsobj.put("rating", reviewVO.getRating());  // 이거 꼭 추가!
+
                 jsobj.put("fk_userid", reviewVO.getFk_userid());
                 jsobj.put("name", reviewVO.getMvo() != null ? reviewVO.getMvo().getName() : "");
                 jsobj.put("contents", reviewVO.getReviewComment());
