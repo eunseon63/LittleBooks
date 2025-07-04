@@ -971,26 +971,42 @@ public class BookDAO_imple implements BookDAO {
 	// 특정 사용자가 특정 제품에 대해 상품후기를 입력하기(insert)
 	@Override
 	public int addReview(ReviewVO reviewVO) throws SQLException {
-		int n = 0;
+	    int n = 0;
 
-	    String sql = "INSERT INTO tbl_review (reviewseq, reviewcomment, rating, writedate, fk_bookseq, fk_userid) "
-	            + "VALUES (seq_review.NEXTVAL, ?, ?, SYSDATE, ?, ?)";
-
+	    String sqlCheck = "SELECT COUNT(*) FROM tbl_review WHERE fk_userid = ? AND fk_bookseq = ?";
 	    try (Connection conn = ds.getConnection();
-	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	         PreparedStatement pstmtCheck = conn.prepareStatement(sqlCheck)) {
+	         
+	        pstmtCheck.setString(1, reviewVO.getFk_userid());
+	        pstmtCheck.setInt(2, reviewVO.getFk_bookseq());
+	        
+	        try (ResultSet rs = pstmtCheck.executeQuery()) {
+	            if (rs.next()) {
+	                int count = rs.getInt(1);
+	                if (count > 0) {
+	                    return -1;  // 이미 리뷰가 존재함 (중복)
+	                }
+	            }
+	        }
 
-	        pstmt.setString(1, reviewVO.getReviewComment());
-	        pstmt.setInt(2, reviewVO.getRating());
-	        pstmt.setInt(3, reviewVO.getFk_bookseq());
-	        pstmt.setString(4, reviewVO.getFk_userid());
+	        // 중복 없으면 삽입 진행
+	        String sqlInsert = "INSERT INTO tbl_review (reviewseq, reviewcomment, rating, writedate, fk_bookseq, fk_userid) "
+	                         + "VALUES (seq_review.NEXTVAL, ?, ?, SYSDATE, ?, ?)";
+	        try (PreparedStatement pstmtInsert = conn.prepareStatement(sqlInsert)) {
+	            pstmtInsert.setString(1, reviewVO.getReviewComment());
+	            pstmtInsert.setInt(2, reviewVO.getRating());
+	            pstmtInsert.setInt(3, reviewVO.getFk_bookseq());
+	            pstmtInsert.setString(4, reviewVO.getFk_userid());
 
-	        n = pstmt.executeUpdate();
+	            n = pstmtInsert.executeUpdate();
+	        }
 	    }
 
 	    return n;
 	}
 
-	// 특정 제품의 사용후기를 조회하기(select) 
+
+	// 특정 제품의 사용후기를 조회하기(select)
 	@Override
 	public List<ReviewVO> reviewList(String fk_bookseq) throws SQLException {
 	    List<ReviewVO> reviewList = new ArrayList<>();
@@ -1016,7 +1032,7 @@ public class BookDAO_imple implements BookDAO {
 	                ReviewVO review = new ReviewVO();
 	                review.setReviewseq(rs.getInt("reviewseq"));
 	                review.setReviewComment(rs.getString("reviewcomment"));
-	                review.setRating(rs.getInt("rating"));
+	                review.setRating(rs.getInt("rating")); // 별점 추가
 	                review.setWriteDate(rs.getTimestamp("writedate"));
 	                review.setFk_bookseq(rs.getInt("fk_bookseq"));
 	                review.setFk_userid(rs.getString("fk_userid"));
@@ -1033,6 +1049,48 @@ public class BookDAO_imple implements BookDAO {
 	    return reviewList;
 	}
 
+	// 특정 제품의 사용후기를 삭제하기 
+	@Override
+	public int reviewDel(String reviewseq) throws SQLException {
+	    int n = 0;
+
+	    try (Connection conn = ds.getConnection();
+	         PreparedStatement pstmt = conn.prepareStatement("DELETE FROM tbl_review WHERE reviewseq = ?")) {
+
+	        pstmt.setString(1, reviewseq);
+	        n = pstmt.executeUpdate();
+	    }
+
+	    return n;
+	}
+
+	// 특정 제품의 사용후기를 수정하기(update)
+	@Override
+	public int reviewUpdate(Map<String, String> paraMap) throws SQLException {
+	    int n = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = "UPDATE tbl_review "
+	                   + "SET reviewcomment = ?, "
+	                   + "    rating = ?, "
+	                   + "    writedate = SYSDATE "
+	                   + "WHERE reviewseq = ?";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, paraMap.get("contents"));
+	        pstmt.setInt(2, Integer.parseInt(paraMap.get("rating")));  // rating 파라미터 추가
+	        pstmt.setInt(3, Integer.parseInt(paraMap.get("reviewseq")));
+
+	        n = pstmt.executeUpdate();
+
+	    } finally {
+	        close();
+	    }
+
+	    return n;
+	}
 
 
 }
