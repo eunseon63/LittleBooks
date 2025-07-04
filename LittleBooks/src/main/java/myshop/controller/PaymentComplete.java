@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class PaymentComplete extends AbstractController {
 
+	
+	
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -29,6 +31,9 @@ public class PaymentComplete extends AbstractController {
         String receiverDetailAddress = request.getParameter("receiverDetailAddress");
         String receiverExtraAddress = request.getParameter("receiverExtraAddress");
 	  
+        
+        
+        
         // 결제 완료 응답
         
         JSONObject jsonObj = new JSONObject();
@@ -37,6 +42,9 @@ public class PaymentComplete extends AbstractController {
 
         response.setContentType("application/json; charset=UTF-8");
         response.getWriter().write(jsonObj.toString());
+	
+	
+	
 	}
 
 }
