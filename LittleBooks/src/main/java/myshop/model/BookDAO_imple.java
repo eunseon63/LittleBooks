@@ -1034,6 +1034,210 @@ public class BookDAO_imple implements BookDAO {
 	}
 
 
+	// tbl_orderdetail 시퀀스 번호 채번 
+	@Override
+	public int get_seq_orderdetail() throws SQLException {
+
+		int seq = 0;
+		
+		try {
+			 conn = ds.getConnection();
+				 
+			 String sql = " select seq_orderdetail.nextval AS seq "
+			 		    + " from dual";
+				 
+			 pstmt = conn.prepareStatement(sql);
+				 
+			 rs = pstmt.executeQuery();
+				 
+			 rs.next();
+				 
+			 seq = rs.getInt("seq");
+				 
+			} finally {
+			  close();
+		}
+			
+		return seq;
+		
+	}
+
+
+	// tbl_order 테이블에 insert, tbl_cart delete
+	public int orderAdd(Map<String,Object> paraMap) throws SQLException {
+	    
+	    int result = 0;
+	    
+	    String odrcode = (String) paraMap.get("odrcode");
+	    String userid = (String) paraMap.get("userid");
+	    String usepointStr = (String) paraMap.get("usepoint");
+	    int usepoint = (usepointStr == null || usepointStr.isEmpty()) ? 0 : Integer.parseInt(usepointStr);
+	    String sum_totalPriceStr = (String) paraMap.get("sum_totalPrice");
+	    int totalPrice = Integer.parseInt(sum_totalPriceStr);
+	    
+	    String receiverName = (String) paraMap.get("receiver_name"); // 배송정보가 있다면
+	    String receiverPhone = (String) paraMap.get("receiver_phone");
+	    String postcode = (String) paraMap.get("postcode");
+	    String address = (String) paraMap.get("address");
+	    String detailAddress = (String) paraMap.get("detail_address");
+	    String extraAddress = (String) paraMap.get("extra_address");
+	    String impUid = (String) paraMap.get("imp_uid"); // 결제 고유번호
+	    
+	    String[] pnum_arr = (String[]) paraMap.get("pnum_arr");
+	    String[] oqty_arr = (String[]) paraMap.get("oqty_arr");
+	    String[] totalPrice_arr = (String[]) paraMap.get("totalPrice_arr");
+	    String[] cartseq_arr = (String[]) paraMap.get("cartseq_arr");
+	    
+	    try {
+	        conn = ds.getConnection();
+	        conn.setAutoCommit(false);
+	        
+	        // 1) tbl_order insert
+	        String sqlOrder = "INSERT INTO tbl_order (ORDERCODE, ORDERDATE, USEPOINT, TOTALPRICE, FK_USERID, RECEIVER_NAME, RECEIVER_PHONE, POSTCODE, ADDRESS, DETAIL_ADDRESS, EXTRA_ADDRESS, IMP_UID) " +
+	                          "VALUES (?, SYSDATE, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	        pstmt = conn.prepareStatement(sqlOrder);
+	        pstmt.setString(1, odrcode);
+	        pstmt.setInt(2, usepoint);
+	        pstmt.setInt(3, totalPrice);
+	        pstmt.setString(4, userid);
+	        pstmt.setString(5, receiverName);
+	        pstmt.setString(6, receiverPhone);
+	        pstmt.setString(7, postcode);
+	        pstmt.setString(8, address);
+	        pstmt.setString(9, detailAddress);
+	        pstmt.setString(10, extraAddress);
+	        pstmt.setString(11, impUid);
+	        
+	        pstmt.executeUpdate();
+	        
+	        // 2) tbl_orderdetail insert (여러 건)
+	        String sqlDetail = "INSERT INTO tbl_orderdetail (ODRSEQ, FK_BOOKSEQ, FK_ORDERCODE, OQTY, ODRPRICE, DELIVERSTATUS, DELIVERDATE) " +
+	                           "VALUES (seq_orderdetail.nextval, ?, ?, ?, ?, 0, NULL)";
+	        pstmt = conn.prepareStatement(sqlDetail);
+	        
+	        for (int i=0; i<pnum_arr.length; i++) {
+	            int bookseq = Integer.parseInt(pnum_arr[i]);
+	            int oqty = Integer.parseInt(oqty_arr[i]);
+	            int odrprice = Integer.parseInt(totalPrice_arr[i]);
+	            
+	            pstmt.setInt(1, bookseq);
+	            pstmt.setString(2, odrcode);
+	            pstmt.setInt(3, oqty);
+	            pstmt.setInt(4, odrprice);
+	            
+	            pstmt.addBatch();
+	        }
+	        
+	        pstmt.executeBatch();
+	        pstmt.close();
+	        
+	        // 장바구니에서 삭제 (필요한 경우만)
+	        if (cartseq_arr != null && cartseq_arr.length > 0) {
+	            StringBuilder sb = new StringBuilder();
+	            sb.append("DELETE FROM tbl_cart WHERE cartseq IN (");
+
+	            for (int i = 0; i < cartseq_arr.length; i++) {
+	                sb.append("?");
+	                if (i < cartseq_arr.length - 1) sb.append(", ");
+	            }
+	            sb.append(")");
+
+	            pstmt = conn.prepareStatement(sb.toString());
+	            for (int i = 0; i < cartseq_arr.length; i++) {
+	                pstmt.setInt(i + 1, Integer.parseInt(cartseq_arr[i]));
+	            }
+	            pstmt.executeUpdate();
+	            pstmt.close();
+	        }
+
+	        conn.commit();
+	        result = 1;
+	    } catch(SQLException e) {
+	        if(conn != null) {
+	            conn.rollback();
+	        }
+	        e.printStackTrace();
+	        throw e;
+	    } finally {
+	        if(pstmt != null) pstmt.close();
+	        if(conn != null) conn.close();
+	    }
+	    
+	    return result;
+	}
+
+	// 주문한 책 정보 가져오기 
+	@Override
+	public List<BookVO> getBookList(String bseq) throws SQLException {
+	    List<BookVO> bookList = new ArrayList<>();
+	    
+	    try {
+	        conn = ds.getConnection();
+
+	        // bseq 가 "5,3,7" 같은 문자열이라 가정하고, IN절에 넣기 위해 '5','3','7' 형태로 변환
+	        // 만약 bseq에 이미 쿼리용으로 변환된 문자열이 들어온다면 그대로 쓰면 됨
+	        String[] bseqArr = bseq.split(",");
+	        StringBuilder sb = new StringBuilder();
+	        for (int i = 0; i < bseqArr.length; i++) {
+	            sb.append("?");
+	            if (i < bseqArr.length - 1) sb.append(",");
+	        }
+	        String sql = "SELECT BOOKSEQ, BNAME, BCONTENT, PRICE, BQTY, AUTHOR, BIMAGE, FK_PUBLISHSEQ, FK_CATEGORYSEQ, BINPUTDATE, FK_SNUM " +
+	                     "FROM tbl_book WHERE BOOKSEQ IN (" + sb.toString() + ")";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        
+	        for (int i = 0; i < bseqArr.length; i++) {
+	            pstmt.setInt(i + 1, Integer.parseInt(bseqArr[i].trim()));
+	        }
+	        
+	        rs = pstmt.executeQuery();
+	        
+	        while (rs.next()) {
+	            BookVO book = new BookVO();
+	            book.setBookseq(rs.getInt("BOOKSEQ"));
+	            book.setBname(rs.getString("BNAME"));
+	            book.setBcontent(rs.getString("BCONTENT"));
+	            book.setPrice(rs.getInt("PRICE"));
+	            book.setBqty(rs.getInt("BQTY"));
+	            book.setAuthor(rs.getString("AUTHOR"));
+	            book.setBimage(rs.getString("BIMAGE"));
+	            book.setFk_publishseq(rs.getInt("FK_PUBLISHSEQ"));
+	            book.setFk_categoryseq(rs.getInt("FK_CATEGORYSEQ"));
+	            book.setBinputdate(rs.getDate("BINPUTDATE").toString());
+	            book.setFk_snum(rs.getInt("FK_SNUM"));
+	            
+	            bookList.add(book);
+	        }
+	    } finally {
+	        close(); // BookDAO_imple에 이미 있는 자원 반납 메소드 호출
+	    }
+	    
+	    return bookList;
+	}
+
+	// 사용자 포인트 내역 업데이트 
+	@Override
+	public int updateUserPoint(String userid, int newPoint) throws SQLException {
+	    
+		int result = 0;
+	    String sql = "UPDATE tbl_member SET point = ? WHERE userid = ?";
+	    
+	    try {
+	        conn = ds.getConnection();
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setInt(1, newPoint);
+	        pstmt.setString(2, userid);
+	        
+	        result = pstmt.executeUpdate();
+	    } finally {
+	        if (pstmt != null) pstmt.close();
+	        if (conn != null) conn.close();
+	    }
+	    
+	    return result;
+	    
+	}
 
 }
 

@@ -77,4 +77,15 @@ public interface BookDAO {
 	// 특정 제품의 사용후기를 조회하기(select) 
 	List<ReviewVO> reviewList(String fk_bookseq) throws SQLException;
 
+	// tbl_orderdetail 시퀀스 번호 채번 
+	int get_seq_orderdetail() throws SQLException;
+
+	// tbl_order 테이블에 insert
+	int orderAdd(Map<String, Object> paraMap) throws SQLException;
+
+	// 주문한 책 정보 가져오기 
+	List<BookVO> getBookList(String bseq) throws SQLException;
+
+	// 사용자 포인트 내역 업데이트 
+	int updateUserPoint(String userid, int newPoint) throws SQLException;
 }
