@@ -41,4 +41,54 @@ public class OrderDetailVO {
     public void setOrderPrice(int price) {
         this.price = price;
     }
+
+	public int getOdrprice() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public int getOqty() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public void setOdrseq(int int1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setFk_bookseq(int int1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setOqty(int int1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setOdrprice(int int1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setDeliverstatus(int int1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setDeliverdate(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setBname(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setBimage(String string) {
+		// TODO Auto-generated method stub
+		
+	}
 }
