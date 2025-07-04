@@ -7,6 +7,7 @@ import java.util.Map;
 import myshop.domain.BookVO;
 import myshop.domain.CartVO;
 import myshop.domain.CategoryVO;
+import myshop.domain.OrderVO;
 import myshop.domain.ReviewVO;
 import myshop.domain.SpecVO;
 
@@ -82,5 +83,7 @@ public interface BookDAO {
 
 	// 특정 제품의 사용후기를 수정하기(update)
 	int reviewUpdate(Map<String, String> paraMap) throws SQLException;
+	
+
 
 }

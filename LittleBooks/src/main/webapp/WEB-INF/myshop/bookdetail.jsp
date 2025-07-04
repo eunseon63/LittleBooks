@@ -34,7 +34,7 @@ body {
     display: flex;
     gap: 60px;
     background-color: #fff;
-    padding: 40px;
+    padding: 25px;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
@@ -44,6 +44,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    
 }
 .left-box img {
     width: 100%;
@@ -730,33 +731,32 @@ function updateMyReview(index, reviewseq) {
 
 <!-- 리뷰 영역 -->
 <div class="review-wrapper">
-    <div class="review-title">${requestScope.bookVO.bname} 책 사용후기</div>
+    <div class="review-title">${requestScope.book.bname} 책 사용후기</div>
 
     <div id="viewComments">
         <%-- 여기에 Ajax로 리뷰 목록이 들어올 예정 --%>
     </div>
 
     <div class="row review-input mt-3">
-    <div class="col-md-10">
-        <form name="commentFrm">
-            <textarea name="contents" class="form-control" placeholder="후기를 작성해주세요."></textarea>
-            <input type="hidden" name="fk_userid" value="${sessionScope.loginuser.userid}" />
-            <input type="hidden" name="fk_bookseq" value="${book.bookseq}" />
-            <div class="rating-stars mb-2">
-			    <span class="star" data-value="1">★</span>
-			    <span class="star" data-value="2">★</span>
-			    <span class="star" data-value="3">★</span>
-			    <span class="star" data-value="4">★</span>
-			    <span class="star" data-value="5">★</span>
-			</div>
-            <input type="hidden" name="rating" id="rating" value="5" /> <%-- 기본 별점 5점 --%>
-        </form>
-    </div>
-    <div class="col-md-2 d-grid">
-        <button type="button" class="btn btn-outline-primary btn-submit" id="btnCommentOK">후기 등록</button>
-    </div>
+	    <div class="col-md-10">
+	        <form name="commentFrm">
+	            <textarea name="contents" class="form-control" placeholder="후기를 작성해주세요."></textarea>
+	            <input type="hidden" name="fk_userid" value="${sessionScope.loginuser.userid}" />
+	            <input type="hidden" name="fk_bookseq" value="${book.bookseq}" />
+	            <div class="rating-stars mb-2">
+				    <span class="star" data-value="1">★</span>
+				    <span class="star" data-value="2">★</span>
+				    <span class="star" data-value="3">★</span>
+				    <span class="star" data-value="4">★</span>
+				    <span class="star" data-value="5">★</span>
+				</div>
+	            <input type="hidden" name="rating" id="rating" value="5" /> <%-- 기본 별점 5점 --%>
+	        </form>
+	    </div>
+	    <div class="col-md-2 d-grid">
+	        <button type="button" class="btn btn-outline-primary btn-submit" id="btnCommentOK">후기 등록</button>
+	    </div>
 	</div>
-
 </div>
 
 <jsp:include page="/WEB-INF/footer.jsp" />
