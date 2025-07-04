@@ -77,4 +77,7 @@ public interface BookDAO {
 	// 특정 제품의 사용후기를 조회하기(select) 
 	List<ReviewVO> reviewList(String fk_bookseq) throws SQLException;
 
+	// 특정 제품의 사용후기를 삭제하기 
+	int reviewDel(String review_seq) throws SQLException;
+
 }

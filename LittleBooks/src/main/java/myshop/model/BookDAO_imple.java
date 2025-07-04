@@ -1033,6 +1033,29 @@ public class BookDAO_imple implements BookDAO {
 	    return reviewList;
 	}
 
+	// 특정 제품의 사용후기를 삭제하기 
+	@Override
+	public int reviewDel(String reviewseq) throws SQLException {
+		 int n = 0;
+	      
+	      try {
+	         conn = ds.getConnection();
+	         
+	         String sql = " delete from tbl_review "
+	                  + " where reviewseq = ? ";
+	                  
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setString(1, reviewseq);
+	         
+	         n = pstmt.executeUpdate();
+	         
+	      } finally {
+	         close();
+	      }
+	      
+	      return n;
+	}
+
 
 
 }
