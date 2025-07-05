@@ -87,7 +87,7 @@ $(document).ready(function() {
             alert("포인트는 0 이상만 입력 가능합니다.");
             $("#usepoint").val(0);
             return;
-       }
+        }
 
         if (usepoint > availablePoint) {
             alert("보유 포인트보다 많이 사용할 수 없습니다.");
@@ -104,6 +104,7 @@ $(document).ready(function() {
         sum_totalPrice = originalTotalPrice - usepoint;
         $("#finalPrice").text(sum_totalPrice.toLocaleString() + " 원");
     };
+
 });
 
 // 주소 검색 API
