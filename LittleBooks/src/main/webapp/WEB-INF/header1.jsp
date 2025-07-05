@@ -85,6 +85,7 @@
 	    <a class="nav-link" href="<%= ctxPath %>/myshop/bookRegister.go">제품등록</a>
 	    <a class="nav-link" href="<%= ctxPath %>/member/memberList.go">회원목록</a>
 	    <a class="nav-link" href="<%= ctxPath %>/myshop/totalSales.go">전체매출확인</a>
+	    <a class="nav-link" href="<%= ctxPath %>/myshop/totalOrderList.go">전체주문내역</a>
 	    <a class="nav-link" href="<%= ctxPath %>/login/logout.go">로그아웃</a>
     </c:if>
     <a class="nav-link" href="<%= ctxPath %>/search/searchPage.go" style="color: black;" title="검색">
