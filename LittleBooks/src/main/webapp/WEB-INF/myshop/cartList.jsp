@@ -5,129 +5,14 @@
     String ctxPath = request.getContextPath();
 %>
 
+<!-- Custom CSS -->
+<link rel="stylesheet" type="text/css" href="<%= ctxPath%>/css/cart/cartList.css" />
+
 <jsp:include page="/WEB-INF/header1.jsp" />
 
 <!-- SweetAlert -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
-
-<style>
-body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background-color: #fffdf8;
-    margin: 0;
-    padding: 0;
-}
-
-.cart-container {
-    max-width: 1100px;
-    margin: 80px auto;
-    background-color: #fff;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
-}
-
-.cart-title {
-    font-size: 26px;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 36px;
-    color: #333;
-}
-
-.cart-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.cart-table th, .cart-table td {
-    padding: 18px;
-    text-align: center;
-    vertical-align: middle;
-    border-bottom: 1px solid #eee;
-}
-
-.cart-table th {
-    background-color: #fff9e5;
-    color: #444;
-    font-weight: 600;
-}
-
-.cart-table td img {
-    width: 80px;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-}
-
-input[type="number"] {
-    width: 60px;
-    text-align: center;
-    padding: 4px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-}
-
-.btn-yellow {
-    background-color: #FFD600;
-    color: #222;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 24px;
-    font-weight: 600;
-    transition: background-color 0.2s ease;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-}
-
-.btn-yellow:hover {
-    background-color: #FFC107;
-}
-
-.btn-outline-yellow {
-    background-color: #fff;
-    color: #FFC107;
-    border: 2px solid #FFC107;
-    padding: 9px 22px;
-    font-weight: 600;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.btn-outline-yellow:hover {
-    background-color: #FFC107;
-    color: #fff;
-}
-
-.delete-btn {
-    background-color: transparent;
-    color: #ff5252;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.delete-btn:hover {
-    transform: scale(1.2);
-    color: #d00000;
-}
-
-.total-price-row {
-    background-color: #fffdea;
-    font-weight: bold;
-    font-size: 16px;
-    color: #444;
-}
-
-.actions {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 30px;
-}
-</style>
-
 
 <script>
 const isLoggedIn = ${not empty sessionScope.loginuser ? "true" : "false"};
