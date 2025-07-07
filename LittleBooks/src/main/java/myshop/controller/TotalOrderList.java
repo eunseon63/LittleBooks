@@ -25,9 +25,7 @@ public class TotalOrderList extends AbstractController {
         
         // 전체 주문 상세 내역 가져오기
         List<OrderDetailVO> orderDetailList = odao.selectAllDetail(userid);  // 모든 주문 내역을 조회
-        
-        
-        
+          
         request.setAttribute("orderDetailList", orderDetailList);
         
         super.setRedirect(false);

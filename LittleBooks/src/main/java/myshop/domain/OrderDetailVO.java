@@ -12,6 +12,7 @@ public class OrderDetailVO {
     private String deliverstatus; // 주문상태 
     
     private BookVO book;
+    private OrderVO order;
     private MemberVO member;
 
 	public BookVO getBook() {
@@ -21,7 +22,14 @@ public class OrderDetailVO {
 	public void setBook(BookVO book) {
 		this.book = book;
 	}
-	
+
+	public OrderVO getOrder() {
+		return order;
+	}
+
+	public void setOrder(OrderVO order) {
+		this.order = order;
+	}
 
 	public MemberVO getMember() {
 		return member;
