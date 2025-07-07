@@ -50,7 +50,6 @@
                                 <c:set var="book" value="${youthBooks[j]}" />
                                 <div class="col-md-4">
                                 <a href="${pageContext.request.contextPath}/myshop/bookdetail.go?bookseq=${book.bookseq}" style="text-decoration: none; color: inherit;">
-
                                     <div class="book-card">
                                         <img src="${pageContext.request.contextPath}/images/${book.bimage}" class="book-img" alt="${book.bname}" />
                                         <div class="book-overlay">
@@ -105,7 +104,6 @@
     <div class="mb-5">
         <h4>🗂 카테고리 둘러보기</h4>
         <div class="d-flex flex-wrap gap-2 mt-3">
-
             <a href="<%= ctxPath %>/myshop/booklist.go?category=위인전" class="btn btn-outline-warning">위인전</a>
             <a href="<%= ctxPath %>/myshop/booklist.go?category=전래동화" class="btn btn-outline-warning">전래동화</a>
             <a href="<%= ctxPath %>/myshop/booklist.go?category=세계동화" class="btn btn-outline-warning">세계동화</a>
@@ -139,185 +137,7 @@
 		    </a>
 		    </c:if>
 		</c:forEach>
-
 	</div>
-    
 </div>
-
-<style>
-/* 전체 배경 및 폰트 */
-body {
-    background-color: #fafafa;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
-}
-
-/* 캐러셀 내 책 카드 */
-.book-card {
-    position: relative;
-    overflow: hidden;
-    border-radius: 12px;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-    background-color: #fff;
-}
-
-.book-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 14px 24px rgba(0,0,0,0.15);
-}
-
-.book-img {
-    width: 100%;
-    height: 430px;
-    object-fit: cover;
-    border-radius: 12px;
-}
-
-/* 책 설명 오버레이 */
-.book-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 10px 12px;
-    background: linear-gradient(transparent, rgba(0,0,0,0.7));
-    color: #fff;
-    font-size: 0.9rem;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    border-radius: 0 0 12px 12px;
-}
-
-.book-card:hover .book-overlay {
-    opacity: 1;
-}
-
-/* 캐러셀 캡션 */
-.carousel-caption {
-    background: rgba(0,0,0,0.45);
-    border-radius: 6px;
-    padding: 8px 14px;
-    max-width: 90%;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.carousel-caption h5 {
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin-bottom: 4px;
-    color: #fff;
-}
-
-.carousel-caption p {
-    font-size: 0.9rem;
-    color: #ddd;
-    margin: 0;
-}
-
-/* 아래 추천 도서 박스 */
-.container.mt-5.mb-5 > div {
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    padding: 30px 30px;
-    transition: box-shadow 0.3s ease;
-}
-
-.container.mt-5.mb-5 > div:hover {
-    box-shadow: 0 12px 32px rgba(0,0,0,0.1);
-}
-
-/* 추천 도서 이미지 */
-.container.mt-5.mb-5 img {
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-/* 카테고리 버튼 스타일 */
-.btn-outline-warning {
-    color: #d18e00;
-    border-color: #d18e00;
-    font-weight: 600;
-    transition: all 0.25s ease;
-}
-
-.btn-outline-warning:hover,
-.btn-outline-warning:focus {
-    background-color: #d18e00;
-    color: #fff;
-    border-color: #b07900;
-}
-
-/* 사용자 리뷰 리스트 */
-.list-group-item {
-    font-size: 1rem;
-    line-height: 1.6;
-    background: transparent;
-    border: none;
-    padding-left: 0;
-    padding-right: 0;
-    border-left: 4px solid #f4c900;
-    margin-bottom: 12px;
-    color: #555;
-    font-style: italic;
-    transition: color 0.3s ease;
-}
-
-.list-group-item:hover {
-    color: #222;
-}
-
-/* 제목 스타일 */
-h4 {
-    font-weight: 700;
-    color: #444;
-    margin-bottom: 24px;
-    border-bottom: 2px solid #f4c900;
-    padding-bottom: 8px;
-    letter-spacing: 0.03em;
-}
-
-.list-group-item {
-    font-size: 15px;
-    line-height: 1.6;
-}
-.book-list {
-    margin-bottom: 40px;
-    padding-left: 0;
-}
-
-.book-item {
-    background-color: #fff;
-    padding: 12px 20px;
-    margin-bottom: 12px;
-    border-radius: 8px;
-    box-shadow: 0 3px 7px rgba(0,0,0,0.1);
-    font-size: 1.1rem;
-    font-weight: 600;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background-color 0.2s ease;
-    cursor: default;
-}
-
-.book-item:hover {
-    background-color: #f9f1c9; /* 부드러운 노란 배경으로 하이라이트 */
-}
-
-.book-title {
-    color: #333;
-}
-
-.book-author {
-    color: #666;
-    font-weight: 400;
-    font-style: italic;
-}
-
-</style>
 
 <jsp:include page="footer.jsp" />
