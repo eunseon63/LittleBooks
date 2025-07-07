@@ -15,7 +15,7 @@ public class GoogleMail {
     	
     	// 2. SMTP(Simple Mail Transfer Protocoal) 서버의 계정 설정
    	    //    Google Gmail 과 연결할 경우 Gmail 의 email 주소를 지정 
-    	prop.put("mail.smtp.user", "yhseo0959@gmail.com"); 
+    	prop.put("mail.smtp.user", "630eunsun@gmail.com"); 
     			
 		
     	// 3. SMTP 서버 정보 설정
@@ -52,11 +52,11 @@ public class GoogleMail {
     	MimeMessage msg = new MimeMessage(ses);
 
     	// 제목 설정
-    	String subject = "localhost:9090/MyMVC/index.up 회원님의 비밀번호를 찾기위한 인증코드 발송";
+    	String subject = "Little Books 회원님의 비밀번호를 찾기위한 인증코드 발송";
     	msg.setSubject(subject);
     	        
     	// 보내는 사람의 메일주소
-    	String sender = "yhseo0959@gmail.com";
+    	String sender = "630eunsun@gmail.com";
     	Address fromAddr = new InternetAddress(sender);
     	msg.setFrom(fromAddr);
     	        
@@ -81,7 +81,7 @@ public class GoogleMail {
     	
     	// 2. SMTP(Simple Mail Transfer Protocoal) 서버의 계정 설정
    	    //    Google Gmail 과 연결할 경우 Gmail 의 email 주소를 지정 
-    	prop.put("mail.smtp.user", "yhseo0959@gmail.com"); 
+    	prop.put("mail.smtp.user", "630eunsun@gmail.com"); 
     			
 		
     	// 3. SMTP 서버 정보 설정
@@ -118,11 +118,11 @@ public class GoogleMail {
     	MimeMessage msg = new MimeMessage(ses);
 
     	// 제목 설정
-    	String subject = "localhost:9090/MyMVC/mallHome1.up "+name+"님의 주문이 성공했습니다.";
+    	String subject = "Little Books "+name+"님의 주문이 성공했습니다.";
     	msg.setSubject(subject);
     	        
     	// 보내는 사람의 메일주소
-    	String sender = "yhseo0959@gmail.com";
+    	String sender = "630eunsun@gmail.com";
     	Address fromAddr = new InternetAddress(sender);
     	msg.setFrom(fromAddr);
     	        

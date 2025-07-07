@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import member.domain.MemberVO;
 
+// 마이페이지 요청 
 public class MyPage extends AbstractController {
 
 	@Override

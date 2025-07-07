@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import member.model.MemberDAO;
 import member.model.MemberDAO_imple;
 
+// 비밀번호 변경 처리
 public class PwdUpdate extends AbstractController {
 	
 	private MemberDAO mdao = new MemberDAO_imple();
@@ -20,9 +21,9 @@ public class PwdUpdate extends AbstractController {
 		String userid = request.getParameter("userid");
 		String method = request.getMethod();
 		
-		if("POST".equalsIgnoreCase(method)) {
-			// "암호변경하기" 버튼을 클릭했을 경우
+		if("POST".equalsIgnoreCase(method)) { // POST 방식일 때
 			
+			// 새로운 비밀번호
 			String new_pwd = request.getParameter("pwd");
 			
 			Map<String, String> paraMap = new HashMap<>();
@@ -31,8 +32,11 @@ public class PwdUpdate extends AbstractController {
 			
 			int n = 0;
 			
-			try {		
+			try {	
+				// 비밀번호 변경 시도
 				n = mdao.pwdUpdate(paraMap);
+				// n = 1 : 비밀번호 변경 성공
+				// n = 0 : 비밀번호 변경 실패
 			} catch(SQLException e) {
 				e.printStackTrace();
 			}
@@ -50,11 +54,11 @@ public class PwdUpdate extends AbstractController {
 			
 			request.setAttribute("message", message);
 			request.setAttribute("loc", loc);
-			request.setAttribute("popup_close", true);  // 팝업 닫기용 플래그
+			request.setAttribute("popup_close", true);
 			
 			super.setRedirect(false);
 			super.setViewPage("/WEB-INF/msg.jsp");
-		}// end of if("POST".equalsIgnoreCase(method))----------- 
+		}
 
 	}
 
