@@ -24,7 +24,7 @@ public interface OrderDAO {
 	String selectOrdercode(String userid) throws SQLException;
 
 	// 주문상세 정보 찾는 함수
-	List<OrderDetailVO> selectAllDetail() throws SQLException;
+	List<OrderDetailVO> selectAllDetail(String userid) throws SQLException;
 
 
 }
