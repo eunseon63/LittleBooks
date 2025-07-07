@@ -157,11 +157,13 @@ function goReviewListView() {
         dataType: "json",
         success: function(json) {
             let v_html = "";
-
+            let totalRating = 0;
+            
             if (json.length > 0) {
                 $.each(json, function(index, item) {
                     let writeuserid = item.fk_userid;
-                    let rating = item.rating;  // 서버 JSON 필드명에 맞게 조정 필요
+                    let rating = parseInt(item.rating);  // ⭐️ 숫자로 변환
+                    totalRating += rating;               // ⭐️ 별점 누적
                     let reviewComment = item.reviewComment || item.contents;
 
                     // 디버깅용 로그 (나중에 삭제 가능)
@@ -193,8 +195,13 @@ function goReviewListView() {
 
                     v_html += "</div>";
                 });
+                
+             // ✅ 평균 별점 계산해서 출력
+                const avg = (totalRating / json.length).toFixed(1);
+                $("#avgRating").text(avg);
             } else {
                 v_html += "<div>등록된 책 후기가 없습니다.</div>";
+                $("#avgRating").text("0.0");
             }
 
             $('div#viewComments').html(v_html);
@@ -412,6 +419,11 @@ function updateMyReview(index, reviewseq) {
             <div class="price-section">
                 총 가격: <span id="totalPrice"></span>
             </div>
+            <!-- 평균 별점 출력 -->
+			<div class="average-rating" style="margin-top: 6px; font-size: 16px; color: #333;">
+			    평균 별점: <span id="avgRating" style="color: #f4c900;">0.0</span> / 5
+			</div>
+            
 		    <div class="button-group">
 		        <button type="button" onclick="goOrder()">결제하기</button>
 		        <button type="button" onclick="goCart()">장바구니</button>
