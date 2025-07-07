@@ -56,7 +56,7 @@ public class OrderAdd extends AbstractController {
             return;
         }
 
-        // === 1. 파라미터 받기 ===
+        // 1. 파라미터 받기
         String sum_totalPrice = request.getParameter("sum_totalPrice");
         String str_bookseq_join = request.getParameter("str_bookseq_join");
         String str_oqty_join = request.getParameter("str_oqty_join");
@@ -64,19 +64,18 @@ public class OrderAdd extends AbstractController {
         String str_cartseq_join = request.getParameter("str_cartseq_join");
         String usepoint = request.getParameter("usepoint");
 
-        // 배송 정보
         String receiver_name = request.getParameter("receiver_name");
         String receiver_phone = request.getParameter("receiver_phone");
         String postcode = request.getParameter("receiver_postcode");
         String address = request.getParameter("receiver_address");
         String detail_address = request.getParameter("receiver_detail_address");
         String extra_address = request.getParameter("receiver_extra_address");
-        String imp_uid = request.getParameter("imp_uid"); // 결제 고유번호
+        String imp_uid = request.getParameter("imp_uid");
 
-        // === 2. 주문번호 생성 ===
+        // 2. 주문번호 생성
         String odrcode = getOdrcode();
 
-        // === 3. Map 생성해서 DAO로 전달할 값 준비 ===
+        // 3. Map 데이터 생성
         Map<String, Object> paraMap = new HashMap<>();
         paraMap.put("odrcode", odrcode);
         paraMap.put("userid", loginuser.getUserid());
@@ -90,7 +89,6 @@ public class OrderAdd extends AbstractController {
             paraMap.put("cartseq_arr", str_cartseq_join.split(","));
         }
 
-        // 배송 관련 정보도 추가
         paraMap.put("receiver_name", receiver_name);
         paraMap.put("receiver_phone", receiver_phone);
         paraMap.put("postcode", postcode);
@@ -99,56 +97,65 @@ public class OrderAdd extends AbstractController {
         paraMap.put("extra_address", extra_address);
         paraMap.put("imp_uid", imp_uid);
 
-        // === 4. DAO 호출 ===
+        // 4. 주문 등록
         int isSuccess = bdao.orderAdd(paraMap);
 
-        System.out.println("isSuccess : " + isSuccess);
-        
-        // === 5. 포인트 계산 및 세션 갱신 ===
+        // 5. 포인트 처리 및 메일 발송
         if (isSuccess == 1) {
             int usedPoint = 0;
-            String usePointStr = request.getParameter("usepoint");
-            if (usePointStr != null && !usePointStr.trim().isEmpty()) {
-                usedPoint = Integer.parseInt(usePointStr);
+            if (usepoint != null && !usepoint.trim().isEmpty()) {
+                usedPoint = Integer.parseInt(usepoint);
             }
 
             int totalPriceInt = Integer.parseInt(sum_totalPrice);
             int earnedPoint = (int) (totalPriceInt * 0.1 / 100);
-
             int newPoint = loginuser.getPoint() - usedPoint + earnedPoint;
 
             int updateResult = bdao.updateUserPoint(loginuser.getUserid(), newPoint);
-            
+
             if (updateResult == 1) {
-                // DB 반영 성공 시 세션도 변경
                 loginuser.setPoint(newPoint);
-            GoogleMail mail = new GoogleMail();
 
-            String bseq = str_bookseq_join;
-            List<BookVO> bookList = bdao.getBookList(bseq);
+                // 이메일 전송
+                GoogleMail mail = new GoogleMail();
+                List<BookVO> bookList = bdao.getBookList(str_bookseq_join);
 
-            StringBuilder sb = new StringBuilder();
-            sb.append("주문코드번호 : <span style='color: blue; font-weight: bold;'>" + odrcode + "</span><br><br>");
-            sb.append("<주문상품><br>");
+                StringBuilder sb = new StringBuilder();
+                sb.append("<div style='font-family: Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #000000;'>");
 
-            String[] oqty_arr = str_oqty_join.split(",");
-            for (int i = 0; i < bookList.size(); i++) {
-                sb.append(bookList.get(i).getBname()).append("&nbsp;")
-                  .append(oqty_arr[i]).append("권<br>");
-            }
+                sb.append("<p style='font-size:18px; font-weight:bold; color:#2E86C1;'>주문이 완료되었습니다 🎉</p>");
+                sb.append("<p>안녕하세요 <span style='font-weight:bold;'>").append(loginuser.getName()).append("</span>님,</p>");
+                sb.append("<p>주문해주셔서 감사합니다.<br>아래는 주문하신 내역입니다.</p>");
 
-            sb.append("<br>이용해 주셔서 감사합니다.");
-            String emailContents = sb.toString();
+                sb.append("<p><span style='font-weight:bold;'>주문코드번호:</span> <span style='color: #2874A6;'>")
+                  .append(odrcode).append("</span></p>");
 
-            mail.sendmail_OrderFinish(loginuser.getEmail(), loginuser.getName(), emailContents);
-        
+                sb.append("<table style='border-collapse: collapse; width: 100%; max-width: 600px;'>")
+                  .append("<thead>")
+                  .append("<tr style='background-color: #f2f2f2;'>")
+                  .append("<th style='border: 1px solid #ddd; padding: 8px;'>도서명</th>")
+                  .append("<th style='border: 1px solid #ddd; padding: 8px;'>수량</th>")
+                  .append("</tr>")
+                  .append("</thead><tbody>");
+
+                String[] oqty_arr = str_oqty_join.split(",");
+                for (int i = 0; i < bookList.size(); i++) {
+                    sb.append("<tr>")
+                      .append("<td style='border: 1px solid #ddd; padding: 8px;'>").append(bookList.get(i).getBname()).append("</td>")
+                      .append("<td style='border: 1px solid #ddd; padding: 8px;'>").append(oqty_arr[i]).append("권</td>")
+                      .append("</tr>");
+                }
+
+                sb.append("</tbody></table>");
+                sb.append("<p style='margin-top: 20px;'>📦 배송은 영업일 기준 1~2일 내에 시작됩니다.</p>");
+                sb.append("<p>언제든지 다시 찾아주세요.<br><strong>감사합니다.</strong></p>");
+                sb.append("</div>");
+
+                mail.sendmail_OrderFinish(loginuser.getEmail(), loginuser.getName(), sb.toString());
             }
         }
-        else {
-        	System.out.println();
-        }
 
-        // === 7. 결과 전송 ===
+        // 6. JSON 응답
         response.setContentType("application/json; charset=UTF-8");
         response.getWriter().write("{\"isSuccess\":" + isSuccess + "}");
     }

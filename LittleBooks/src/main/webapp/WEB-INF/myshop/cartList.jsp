@@ -170,9 +170,12 @@ function goDel(cartseq) {
                 dataType: "json",
                 success: function(json) {
                     if (json.n == 1) {
-                        swal("삭제 완료!", "상품이 장바구니에서 삭제되었습니다.", "success", function() {
-                            location.reload();
-                        });
+                        swal("삭제 완료!", "상품이 장바구니에서 삭제되었습니다.", "success");
+
+                        // 해당 항목 DOM에서 제거
+                        $("#cart_" + cartseq).remove();
+
+                        // 만약 장바구니가 비었다면 "비어 있음" 메시지도 갱신 필요 (옵션)
                     } else {
                         swal("삭제 실패", "삭제할 수 없습니다.", "error");
                     }
@@ -184,6 +187,7 @@ function goDel(cartseq) {
         }
     });
 }
+
 
 function goOqtyEdit(obj) {
     const index = $('button.updateBtn').index(obj);
@@ -299,7 +303,7 @@ function goOrder() {
             </thead>
             <tbody>
                 <c:forEach var="cartvo" items="${requestScope.cartList}">
-                    <tr>
+                    <tr id="cart_${cartvo.cartseq}">
                         <td><input type="checkbox" name="bookseq" value="${cartvo.fk_bookseq}" /></td>
                         <td><img src="<%= ctxPath %>/images/${cartvo.bvo.bimage}" alt="도서 이미지" /></td>
                         <td>${cartvo.bvo.bname}</td>

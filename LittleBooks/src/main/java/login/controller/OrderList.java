@@ -10,6 +10,7 @@ import member.domain.MemberVO;
 import member.model.MemberDAO;
 import member.model.MemberDAO_imple;
 
+// 주문 내역 요청
 public class OrderList extends AbstractController {
 
 	MemberDAO pdao = new MemberDAO_imple();
@@ -19,9 +20,8 @@ public class OrderList extends AbstractController {
 		
         HttpSession session = request.getSession();
         MemberVO loginuser = (MemberVO) session.getAttribute("loginuser");
-		
-        
-        if (loginuser == null) {
+	
+        if (loginuser == null) { // 로그인 안 된 경우
             request.setAttribute("message", "로그인 후 이용 가능합니다.");
             request.setAttribute("loc", "login.go");
             super.setRedirect(false);
@@ -30,6 +30,7 @@ public class OrderList extends AbstractController {
         }
 
         String userid = loginuser.getUserid();
+        // 주문내역을 가져와서 orderList에 저장
         List<MemberVO> orderList = pdao.getOrderListByUserid(userid);
 
         request.setAttribute("orderList", orderList);
