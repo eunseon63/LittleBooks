@@ -206,8 +206,11 @@
 <jsp:include page="/WEB-INF/footer.jsp" />
 
 <script>
+//도서 검색 유효성 검사 함수
 function validateBookSearch() {
+  // 검색 대상 (제목/저자) 선택 값 가져오기
   const searchType = document.book_search_frm.searchType.value.trim();
+//검색어 입력 값 가져오기
   const searchWord = document.book_search_frm.searchWord.value.trim();
 
   if (searchType === "") {
@@ -221,7 +224,7 @@ function validateBookSearch() {
     document.book_search_frm.searchWord.focus();
     return false;
   }
-
+  //둘 다 입력되었으면 true 반환 → 폼 정상 제출
   return true;
 }
 </script>
