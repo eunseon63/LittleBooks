@@ -60,9 +60,12 @@ function goDel(cartseq) {
                 dataType: "json",
                 success: function(json) {
                     if (json.n == 1) {
-                        swal("삭제 완료!", "상품이 장바구니에서 삭제되었습니다.", "success", function() {
-                            location.reload();
-                        });
+                        swal("삭제 완료!", "상품이 장바구니에서 삭제되었습니다.", "success");
+
+                        // 해당 항목 DOM에서 제거
+                        $("#cart_" + cartseq).remove();
+
+                        location.reload();
                     } else {
                         swal("삭제 실패", "삭제할 수 없습니다.", "error");
                     }
@@ -73,6 +76,33 @@ function goDel(cartseq) {
             });
         }
     });
+}
+
+function updateTotalSummary() {
+    let totalPrice = 0;
+
+    document.querySelectorAll("tbody tr").forEach(tr => {
+        const isChecked = tr.querySelector("input[name='bookseq']") !== null;
+        if (isChecked) {
+            const qty = parseInt(tr.querySelector("input[name='cqty']").value);
+            const priceText = tr.querySelector("td:nth-child(5)").innerText.replace(/[^0-9]/g, '');
+            const price = parseInt(priceText);
+
+            totalPrice += qty * price;
+        }
+    });
+
+    const totalPriceCell = document.querySelector(".total-price-row td:nth-child(2)");
+    const pointCell = document.querySelector(".total-price-row td:nth-child(3)");
+
+    // 가격 포맷 (3자리마다 콤마 추가)
+    const formattedPrice = totalPrice.toLocaleString();
+    const formattedPoint = Math.floor(totalPrice * 0.01).toLocaleString();
+
+    if (totalPriceCell && pointCell) {
+        totalPriceCell.innerHTML = `총 합계: ${formattedPrice} 원`;
+        pointCell.innerHTML = `예상 적립 포인트: ${formattedPoint} Point`;
+    }
 }
 
 //장바구니 수량 수정 함수
@@ -191,7 +221,7 @@ function goOrder() {
             </thead>
             <tbody>
                 <c:forEach var="cartvo" items="${requestScope.cartList}">
-                    <tr>
+                    <tr id="cart_${cartvo.cartseq}">
                         <td><input type="checkbox" name="bookseq" value="${cartvo.fk_bookseq}" /></td>
                         <td><img src="<%= ctxPath %>/images/${cartvo.bvo.bimage}" alt="도서 이미지" /></td>
                         <td>${cartvo.bvo.bname}</td>
