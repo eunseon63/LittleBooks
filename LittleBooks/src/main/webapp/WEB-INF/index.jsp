@@ -141,17 +141,6 @@
 		</c:forEach>
 
 	</div>
-
-	
-    <!-- 💬 사용자 리뷰 하이라이트 -->
-    <div class="mb-5">
-        <h4>💬 사용자 리뷰 하이라이트</h4>
-        <ul class="list-group mt-3">
-            <li class="list-group-item">"아이와 매일 밤 읽고 있어요!" - 지현맘</li>
-            <li class="list-group-item">"그림도 예쁘고 내용도 감동적이에요." - 책사랑이</li>
-            <li class="list-group-item">"교육용으로 아주 좋아요!" - 강선생</li>
-        </ul>
-    </div>
     
 </div>
 
