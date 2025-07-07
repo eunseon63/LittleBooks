@@ -128,7 +128,10 @@ input[type="number"] {
 }
 </style>
 
+
 <script>
+const isLoggedIn = ${not empty sessionScope.loginuser ? "true" : "false"};
+
 function allCheckBox() {
     const checkboxes = document.querySelectorAll("input[name='bookseq']");
     const all = document.getElementById("allCheckOrNone").checked;
@@ -149,15 +152,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function goOrder() {
-    const checked = document.querySelectorAll("input[name='bookseq']:checked");
-    if (checked.length === 0) {
-        swal("선택 오류", "주문할 상품을 1개 이상 선택해주세요!", "warning");
-        return;
-    }
-    document.forms[0].submit();
-}
-
 function goDel(cartseq) {
     swal({
         title: "삭제 확인",
@@ -176,11 +170,9 @@ function goDel(cartseq) {
                 dataType: "json",
                 success: function(json) {
                     if (json.n == 1) {
-                        // 여기서 다시 swal을 띄우고, 그 콜백 안에서 새로고침
                         swal("삭제 완료!", "상품이 장바구니에서 삭제되었습니다.", "success", function() {
-                        	 
+                            location.reload();
                         });
-                        location.href="<%= ctxPath%>/shop/cartList.go";
                     } else {
                         swal("삭제 실패", "삭제할 수 없습니다.", "error");
                     }
@@ -193,8 +185,6 @@ function goDel(cartseq) {
     });
 }
 
-
-// === 장바구니 현재주문수량 수정하기 === //
 function goOqtyEdit(obj) {
     const index = $('button.updateBtn').index(obj);
 
@@ -203,46 +193,89 @@ function goOqtyEdit(obj) {
     const bqty = $('input.bqty').eq(index).val();       // 재고 수량
 
     const regExp = /^[0-9]+$/g;
-    const isValid = regExp.test(cqty);
-
-    if (!isValid) {
-        alert("수정하시려는 수량은 0개 이상이어야 합니다.");
-        location.href = "javascript:history.go(0)";
+    if (!regExp.test(cqty) || Number(cqty) < 0) {
+        alert("수량은 0 이상의 숫자여야 합니다.");
+        location.reload();
         return;
     }
 
     if (Number(cqty) > Number(bqty)) {
-        alert("주문개수가 잔고개수보다 많습니다.");
-        location.href = "javascript:history.go(0)";
+        alert("주문수량이 재고 수량을 초과했습니다.");
+        location.reload();
         return;
     }
 
-    if (cqty == "0") {
-        goDel(cartseq); // 수정된 부분
+    if (cqty === "0") {
+        goDel(cartseq);
     } else {
         $.ajax({
             url: "<%= ctxPath %>/shop/cartEdit.go",
-            type: "post",
-            data: { "cartseq": cartseq, "cqty": cqty },
+            type: "POST",
+            data: { cartseq: cartseq, cqty: cqty },
             dataType: "json",
             success: function(json) {
                 if (json.n == 1) {
                     alert("주문수량이 변경되었습니다.");
-                    location.href = "<%= ctxPath %>/shop/cartList.go";
+                    location.reload();
+                } else {
+                    alert("수량 변경 실패");
                 }
             },
             error: function(request, status, error) {
-                alert("code: " + request.status + "\n" +
-                      "message: " + request.responseText + "\n" +
-                      "error: " + error);
+                alert("code: " + request.status + "\nmessage: " + request.responseText + "\nerror: " + error);
             }
         });
     }
 }
 
+function goOrder() {
+    if (!isLoggedIn) {
+        swal("로그인 필요", "로그인 후 주문해 주세요.", "warning");
+        location.href = "<%= ctxPath %>/login/login.go";
+        return;
+    }
+
+    const checkedBoxes = document.querySelectorAll("input[name='bookseq']:checked");
+    if (checkedBoxes.length === 0) {
+        swal("선택 오류", "주문할 상품을 1개 이상 선택해주세요!", "warning");
+        return;
+    }
+
+    let bookseqArr = [], oqtyArr = [], priceArr = [], cartseqArr = [], totalPrice = 0;
+
+    for (const checkbox of checkedBoxes) {
+        const tr = checkbox.closest("tr");
+        const bookseq = checkbox.value;
+        const qty = parseInt(tr.querySelector("input[name='cqty']").value);
+        const price = parseInt(tr.querySelector("td:nth-child(5)").innerText.replace(/[^0-9]/g, ''));
+        const cartseq = tr.querySelector("input[name='cartseq']").value;  // 장바구니 번호
+
+        if (isNaN(qty) || qty < 1) {
+            swal("수량 오류", "수량은 1 이상이어야 합니다.", "warning");
+            return;
+        }
+
+        bookseqArr.push(bookseq);
+        oqtyArr.push(qty);
+        priceArr.push(price);
+        cartseqArr.push(cartseq);  // 추가
+        totalPrice += qty * price;
+    }
+
+    // 숨겨진 input에 값 넣기
+    document.querySelector("input[name='str_bookseq_join']").value = bookseqArr.join(",");
+    document.querySelector("input[name='str_oqty_join']").value = oqtyArr.join(",");
+    document.querySelector("input[name='str_price_join']").value = priceArr.join(",");
+    document.querySelector("input[name='str_cartseq_join']").value = cartseqArr.join(",");  // 추가
+    document.querySelector("input[name='sum_totalPrice']").value = totalPrice;
+
+    document.getElementById("orderForm").submit();
+}
+
+
 </script>
 
-<div class="cart-container" style= "margin-top:140px;">
+<div class="cart-container" style="margin-top:140px;">
     <div class="cart-title">
         ${sessionScope.loginuser.name} [${sessionScope.loginuser.userid}]님의 장바구니
     </div>
@@ -252,56 +285,62 @@ function goOqtyEdit(obj) {
     </c:if>
 
     <c:if test="${not empty requestScope.cartList}">
-        <form method="post" action="<%= ctxPath %>/shop/orderAdd.up">
-            <table class="cart-table">
-                <thead>
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="allCheckOrNone" onclick="allCheckBox()" /></th>
+                    <th>도서 이미지</th>
+                    <th>도서명</th>
+                    <th>수량</th>
+                    <th>가격</th>
+                    <th>합계</th>
+                    <th>삭제</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="cartvo" items="${requestScope.cartList}">
                     <tr>
-                        <th><input type="checkbox" id="allCheckOrNone" onclick="allCheckBox()" /></th>
-                        <th>도서 이미지</th>
-                        <th>도서명</th>
-                        <th>수량</th>
-                        <th>가격</th>
-                        <th>합계</th>
-                        <th>삭제</th>
+                        <td><input type="checkbox" name="bookseq" value="${cartvo.fk_bookseq}" /></td>
+                        <td><img src="<%= ctxPath %>/images/${cartvo.bvo.bimage}" alt="도서 이미지" /></td>
+                        <td>${cartvo.bvo.bname}</td>
+                        <td>
+                            <input type="number" name="cqty" class="cqty" value="${cartvo.cqty}" min="1" max="99" />
+                            <button type="button" class="btn btn-outline-secondary btn-sm updateBtn" onclick="goOqtyEdit(this)">수정</button>
+                            <input type="hidden" name="bqty" class="bqty" value="${cartvo.bvo.bqty}" />
+                            <input type="hidden" name="cartseq" class="cartseq" value="${cartvo.cartseq}" />
+                        </td>
+                        <td><fmt:formatNumber value="${cartvo.bvo.price}" pattern="###,###" /> 원</td>
+                        <td><fmt:formatNumber value="${cartvo.bvo.price * cartvo.cqty}" pattern="###,###" /> 원</td>
+                        <td><button type="button" class="delete-btn" onclick="goDel('${cartvo.cartseq}')">🗑</button></td>
                     </tr>
-                </thead>
-                <tbody>
-                    <c:forEach var="cartvo" items="${requestScope.cartList}" varStatus="status">
-                        <tr>
-                            <td><input type="checkbox" name="bookseq" value="${cartvo.fk_bookseq}" /></td>
-                            <td><img src="<%= ctxPath %>/images/${cartvo.bvo.bimage}" alt="도서 이미지" /></td>
-                            <td>${cartvo.bvo.bname}</td>
-                            <td>
-                                <input type="number" name="cqty" class="cqty" value="${cartvo.cqty}" min="1" max="99" />
-                                 <button type="button" class="btn btn-outline-secondary btn-sm updateBtn" onclick="goOqtyEdit(this)">수정</button>
-                                <input type="hidden" name="bqty" class="bqty" value="${cartvo.bvo.bqty}" />
-                                <input type="hidden" name="cartseq" class="cartseq" value="${cartvo.cartseq}" />
-                            </td>
-                            <td><fmt:formatNumber value="${cartvo.bvo.price}" pattern="###,###" /> 원</td>
-                            <td><fmt:formatNumber value="${cartvo.bvo.price * cartvo.cqty}" pattern="###,###" /> 원</td>
-                            <td><button type="button" class="delete-btn" onclick="goDel('${cartvo.cartseq}')">🗑</button></td>
-                        </tr>
-                    </c:forEach>
-                </tbody>
-                <tfoot>
-			    <tr class="total-price-row">
-			    	<td></td>
-			        <td colspan="4" class="text-right" style="font-weight:700; font-size:16px;">
-			            총 합계: <fmt:formatNumber value="${requestScope.sumMap.SUMTOTALPRICE}" pattern="###,###" /> 원
-			        </td>
-			        <td style="font-weight:700; font-size:16px; color:#999999">
-			            예상 적립 포인트: <fmt:formatNumber value="${requestScope.sumMap.SUMTOTALPRICE * 0.01}" pattern="###,###" /> Point
-			        </td>
-			        <td></td>
-			    </tr>
-			</tfoot>
-            </table>
+                </c:forEach>
+            </tbody>
+            <tfoot>
+                <tr class="total-price-row">
+                    <td></td>
+                    <td colspan="4" class="text-right" style="font-weight:700; font-size:16px;">
+                        총 합계: <fmt:formatNumber value="${requestScope.sumMap.SUMTOTALPRICE}" pattern="###,###" /> 원
+                    </td>
+                    <td style="font-weight:700; font-size:16px; color:#999999">
+                        예상 적립 포인트: <fmt:formatNumber value="${requestScope.sumMap.SUMTOTALPRICE * 0.01}" pattern="###,###" /> Point
+                    </td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
 
-            <div class="actions">
-                <button type="button" class="btn-yellow" onclick="goOrder()">주문하기</button>
-                <a href="<%= ctxPath %>/index.go" class="btn-outline-yellow">계속 쇼핑</a>
-            </div>
-        </form>
+        <div class="actions">
+            <button type="button" class="btn-yellow" onclick="goOrder()">주문하기</button>
+            <a href="<%= ctxPath %>/index.go" class="btn-outline-yellow">계속 쇼핑</a>
+            <form id="orderForm" method="post" action="<%= ctxPath %>/shop/payment.go">
+			    <input type="hidden" name="str_bookseq_join" />
+			    <input type="hidden" name="str_oqty_join" />
+			    <input type="hidden" name="str_price_join" />
+			    <input type="hidden" name="sum_totalPrice" />
+			    <input type="hidden" name="str_cartseq_join" />
+			</form>
+
+        </div>
     </c:if>
 </div>
 

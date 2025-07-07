@@ -14,9 +14,17 @@ public interface OrderDAO {
     String getOrderCode() throws SQLException;
 
     // user 주문내역 받아오기
-	List<OrderDetailVO> getOrderDetailList(String ordercode, String userid) throws SQLException;
+	// List<OrderDetailVO> getOrderDetailList(String ordercode, String userid) throws SQLException;
 
 	OrderVO getOrderInfo(String ordercode, String userid) throws SQLException;
 
 	List<OrderVO> getOrderListByUserid(String userid) throws SQLException;
+
+    // 주문코드를 찾는 함수
+	String selectOrdercode(String userid) throws SQLException;
+
+	// 주문상세 정보 찾는 함수
+	List<OrderDetailVO> selectAllDetail() throws SQLException;
+
+
 }
