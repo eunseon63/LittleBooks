@@ -136,18 +136,16 @@ $(function(){
         }
     });
 
-    // 별 클릭 시 색 채우고 값 설정
-    $(document).on("click", ".rating-stars .star", function() {
+ 	// 별 클릭 시 색 채우고 값 설정
+    $(document).on("click", ".rating-stars .star", function () {
         const selectedRating = $(this).data("value");
         $("#rating").val(selectedRating);
 
-        $(".rating-stars .star").removeClass("selected");
-        $(".rating-stars .star").each(function(index) {
-            if (index < selectedRating) {
-                $(this).addClass("selected");
-            }
-        });
+        $(this).siblings().removeClass("selected");
+        $(this).addClass("selected");
+        $(this).prevAll().addClass("selected");
     });
+
 });  // <-- jQuery ready 함수 닫힘
 
 // 특정 책의 리뷰글들을 보여주는 함수 
