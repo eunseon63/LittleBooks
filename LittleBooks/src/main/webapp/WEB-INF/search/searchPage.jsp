@@ -19,7 +19,6 @@
     margin-bottom: 20px;
     color: #333;
 }
-
 .search-box {
     max-width: 600px;
     margin: 0 auto 40px auto;
@@ -27,7 +26,6 @@
     justify-content: center;
     gap: 0;
 }
-
 .search-select {
     height: 45px;
     border: 2px solid #f4c900;
@@ -39,7 +37,6 @@
     cursor: pointer;
     outline: none;
 }
-
 .search-input {
     height: 45px;
     border: 2px solid #f4c900;
@@ -51,7 +48,6 @@
     outline: none;
     background-color: #fffef5;
 }
-
 .search-button {
     height: 45px;
     border: 2px solid #f4c900;
@@ -64,11 +60,9 @@
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
-
 .search-button:hover {
     background-color: #ffcc00;
 }
-
 .container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -79,8 +73,6 @@
     margin: 0 auto;
     max-width: 1000px;
 }
-
-
 .card {
     width: 230px;
     height: 370px;
@@ -129,21 +121,12 @@
     width: 100%;
     height: 100%;
 }
-
 .card-author {
     font-size: 13px;
     color: #666;
     margin-bottom: 5px;
 }
-
-
 </style>
-
-
-
-
-
-
 
 <!-- 도서목록 제목 -->
 <div class="page-title text-center" style="margin-top: 5%;">도서목록</div>
@@ -203,7 +186,6 @@
     </c:otherwise>
 </c:choose>
 
-
   <!-- 추천 도서 영역 -->
 <div class="mt-5 p-4 bg-light border rounded shadow-sm" 
      style="max-width: 900px; margin: 50px auto;">  <%-- max-width 조정 + 중앙 정렬 --%>
@@ -221,12 +203,14 @@
   </a>
 </div>
 
-
 <jsp:include page="/WEB-INF/footer.jsp" />
 
 <script>
+//도서 검색 유효성 검사 함수
 function validateBookSearch() {
+  // 검색 대상 (제목/저자) 선택 값 가져오기
   const searchType = document.book_search_frm.searchType.value.trim();
+//검색어 입력 값 가져오기
   const searchWord = document.book_search_frm.searchWord.value.trim();
 
   if (searchType === "") {
@@ -240,7 +224,7 @@ function validateBookSearch() {
     document.book_search_frm.searchWord.focus();
     return false;
   }
-
+  //둘 다 입력되었으면 true 반환 → 폼 정상 제출
   return true;
 }
 </script>

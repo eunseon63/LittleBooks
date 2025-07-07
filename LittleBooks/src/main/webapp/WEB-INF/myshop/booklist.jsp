@@ -1,97 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%
+    String ctxPath = request.getContextPath();
+%>
+
+<!-- Custom CSS -->
+<link rel="stylesheet" type="text/css" href="<%= ctxPath%>/css/book/bookList.css" />
 
 <jsp:include page="/WEB-INF/header1.jsp" />
-
-<style>
-.page-title {
-    text-align: center;
-    font-size: 28px;
-    font-weight: bold;
-    margin-top: 100px;
-    margin-right: 20px;
-    color: #333;
-}
-
-.container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 25px;
-    padding: 40px;
-    margin-left: 190px;
-    justify-items: center;
-    background-color: #fff;
-}
-
-.card {
-    width: 230px;
-    height: 370x; 
-    background-color: #fffef5;
-    border: 1px solid #f4c900;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.2s ease;
-}
-.card:hover {
-    transform: translateY(-5px);
-}
-.image-box {
-    width: 100%;
-    height: 300px;
-    background-color: #fafafa;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-bottom: 1px solid #eee;
-}
-.image-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.card-body {
-    padding: 13px;
-    text-align: center;
-}
-.card-title {
-    font-size: 14px;
-    font-weight: bold;
-    margin-bottom: 8px;
-    color: #222;
-}
-.card-price {
-    font-size: 16px;
-    color: #666;
-}
-.card-link {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-.sort-box {
-    margin: 20px 0 0 240px;  /* 책 목록과 정렬 위치 맞춤 */
-}
-
-.sort-select {
-    padding: 6px 12px;
-    font-size: 14px;
-    border: 1px solid #f4c900;
-    border-radius: 8px;
-    background-color: #fffef5;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
-
-.sort-select:hover {
-    background-color: #fff9d6;
-}
-
-</style>
 
 <!-- 카테고리 제목 출력 -->
 <c:if test="${not empty bookList}">

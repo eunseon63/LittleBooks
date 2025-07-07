@@ -2,7 +2,9 @@ package myshop.model;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
+import member.domain.MemberVO;
 import myshop.domain.OrderDetailVO;
 import myshop.domain.OrderVO;
 
@@ -24,7 +26,15 @@ public interface OrderDAO {
 	String selectOrdercode(String userid) throws SQLException;
 
 	// 주문상세 정보 찾는 함수
-	List<OrderDetailVO> selectAllDetail() throws SQLException;
+	List<OrderDetailVO> selectAllDetail(String userid) throws SQLException;
+
+	// 주문자 아이디 찾기
+	String selectUserid(String ordercode) throws SQLException;
+	
+	// 주문자 정보 찾기
+	MemberVO selectOrderMember(Map<String, String> paraMap) throws SQLException;
+
+	
 
 
 }

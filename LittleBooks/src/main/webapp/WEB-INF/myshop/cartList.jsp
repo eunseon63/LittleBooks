@@ -5,139 +5,27 @@
     String ctxPath = request.getContextPath();
 %>
 
+<!-- Custom CSS -->
+<link rel="stylesheet" type="text/css" href="<%= ctxPath%>/css/cart/cartList.css" />
+
 <jsp:include page="/WEB-INF/header1.jsp" />
 
 <!-- SweetAlert -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
 
-<style>
-body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background-color: #fffdf8;
-    margin: 0;
-    padding: 0;
-}
-
-.cart-container {
-    max-width: 1100px;
-    margin: 80px auto;
-    background-color: #fff;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
-}
-
-.cart-title {
-    font-size: 26px;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 36px;
-    color: #333;
-}
-
-.cart-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.cart-table th, .cart-table td {
-    padding: 18px;
-    text-align: center;
-    vertical-align: middle;
-    border-bottom: 1px solid #eee;
-}
-
-.cart-table th {
-    background-color: #fff9e5;
-    color: #444;
-    font-weight: 600;
-}
-
-.cart-table td img {
-    width: 80px;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-}
-
-input[type="number"] {
-    width: 60px;
-    text-align: center;
-    padding: 4px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-}
-
-.btn-yellow {
-    background-color: #FFD600;
-    color: #222;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 24px;
-    font-weight: 600;
-    transition: background-color 0.2s ease;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-}
-
-.btn-yellow:hover {
-    background-color: #FFC107;
-}
-
-.btn-outline-yellow {
-    background-color: #fff;
-    color: #FFC107;
-    border: 2px solid #FFC107;
-    padding: 9px 22px;
-    font-weight: 600;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.btn-outline-yellow:hover {
-    background-color: #FFC107;
-    color: #fff;
-}
-
-.delete-btn {
-    background-color: transparent;
-    color: #ff5252;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.delete-btn:hover {
-    transform: scale(1.2);
-    color: #d00000;
-}
-
-.total-price-row {
-    background-color: #fffdea;
-    font-weight: bold;
-    font-size: 16px;
-    color: #444;
-}
-
-.actions {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 30px;
-}
-</style>
-
-
 <script>
+//로그인 여부 확인 (true/false)
 const isLoggedIn = ${not empty sessionScope.loginuser ? "true" : "false"};
 
+//전체 선택/해제 체크박스 기능
 function allCheckBox() {
     const checkboxes = document.querySelectorAll("input[name='bookseq']");
     const all = document.getElementById("allCheckOrNone").checked;
     checkboxes.forEach(chk => chk.checked = all);
 }
 
+//개별 체크박스 변경 시 전체 체크 여부 갱신
 function individualCheckBoxChanged() {
     const allCheckBox = document.getElementById("allCheckOrNone");
     const checkboxes = document.querySelectorAll("input[name='bookseq']");
@@ -145,6 +33,7 @@ function individualCheckBoxChanged() {
     allCheckBox.checked = allChecked;
 }
 
+//DOM이 로드되면 개별 체크박스에 이벤트 바인딩
 document.addEventListener('DOMContentLoaded', function() {
     const checkboxes = document.querySelectorAll("input[name='bookseq']");
     checkboxes.forEach(chk => {
@@ -152,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+//장바구니 항목 삭제 함수
 function goDel(cartseq) {
     swal({
         title: "삭제 확인",
@@ -175,7 +65,7 @@ function goDel(cartseq) {
                         // 해당 항목 DOM에서 제거
                         $("#cart_" + cartseq).remove();
 
-                        // 만약 장바구니가 비었다면 "비어 있음" 메시지도 갱신 필요 (옵션)
+                        location.reload();
                     } else {
                         swal("삭제 실패", "삭제할 수 없습니다.", "error");
                     }
@@ -188,7 +78,34 @@ function goDel(cartseq) {
     });
 }
 
+function updateTotalSummary() {
+    let totalPrice = 0;
 
+    document.querySelectorAll("tbody tr").forEach(tr => {
+        const isChecked = tr.querySelector("input[name='bookseq']") !== null;
+        if (isChecked) {
+            const qty = parseInt(tr.querySelector("input[name='cqty']").value);
+            const priceText = tr.querySelector("td:nth-child(5)").innerText.replace(/[^0-9]/g, '');
+            const price = parseInt(priceText);
+
+            totalPrice += qty * price;
+        }
+    });
+
+    const totalPriceCell = document.querySelector(".total-price-row td:nth-child(2)");
+    const pointCell = document.querySelector(".total-price-row td:nth-child(3)");
+
+    // 가격 포맷 (3자리마다 콤마 추가)
+    const formattedPrice = totalPrice.toLocaleString();
+    const formattedPoint = Math.floor(totalPrice * 0.01).toLocaleString();
+
+    if (totalPriceCell && pointCell) {
+        totalPriceCell.innerHTML = `총 합계: ${formattedPrice} 원`;
+        pointCell.innerHTML = `예상 적립 포인트: ${formattedPoint} Point`;
+    }
+}
+
+//장바구니 수량 수정 함수
 function goOqtyEdit(obj) {
     const index = $('button.updateBtn').index(obj);
 
@@ -232,6 +149,7 @@ function goOqtyEdit(obj) {
     }
 }
 
+//선택한 상품들 주문 요청 함수
 function goOrder() {
     if (!isLoggedIn) {
         swal("로그인 필요", "로그인 후 주문해 주세요.", "warning");

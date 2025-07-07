@@ -9,6 +9,8 @@
 <%
    boolean isLogin = (session.getAttribute("loginuser") != null);
 %>
+<!-- Custom CSS -->
+<link rel="stylesheet" type="text/css" href="<%= ctxPath%>/css/book/bookDetail.css" />
 
 <jsp:include page="/WEB-INF/header1.jsp" />
 
@@ -20,298 +22,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-
-<style>
-body {
-    font-family: 'Noto Sans KR', 'Segoe UI', sans-serif;
-    background-color: #fefefe;
-    color: #333;
-}
-
-.detail-wrapper {
-    max-width: 1100px;
-    margin: 100px auto 60px;
-    display: flex;
-    gap: 60px;
-    background-color: #fff;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
-
-.left-box {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.left-box img {
-    width: 100%;
-    max-width: 360px;
-    border: 1px solid #eee;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    background: #fff;
-}
-
-.right-box {
-    flex: 1.4;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-}
-
-.right-box h2 {
-    font-size: 30px;
-    font-weight: 700;
-    margin-bottom: 6px;
-    color: #222;
-}
-
-.book-info {
-    font-size: 15px;
-    line-height: 1.8;
-}
-.book-info div {
-    margin-bottom: 4px;
-}
-.book-info strong {
-    color: #555;
-    margin-right: 6px;
-}
-
-.select-box label {
-    font-weight: 500;
-    margin-right: 8px;
-}
-
-/* 스피너 입력칸 */
-.select-box input {
-    width: 70px;
-    height: 25px;
-    font-size: 14px;
-    padding: 4px 8px;
-    box-sizing: border-box;
-    /* 오른쪽에 버튼 공간 확보 */
-    padding-right: 28px;
-}
-
-/* 스피너 전체 박스 */
-.ui-spinner {
-    position: relative;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-/* 스피너 버튼들 공통 */
-.ui-spinner-button {
-    position: absolute;
-    right: 1px;
-    width: 26px !important;
-    height: 14px !important; /* 반반으로 나눔 */
-    padding: 0 !important;
-    margin: 0 !important;
-    line-height: 14px !important;
-    overflow: hidden !important;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-/* 위쪽 버튼 */
-.ui-spinner-up {
-    top: 1px;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-/* 아래쪽 버튼 */
-.ui-spinner-down {
-    bottom: 1px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-}
-
-.ui-spinner-button:hover {
-    background-color: #ddb900 !important;
-}
-
-.price-section {
-    font-size: 18px;
-    font-weight: bold;
-    color: #222;
-    margin-top: 10px;
-}
-
-.button-group {
-    display: flex;
-    gap: 14px;
-    margin-top: 20px;
-}
-.button-group button {
-    padding: 12px 26px;
-    font-size: 16px;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    background-color: #f4c900;
-    color: #222;
-    cursor: pointer;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-    transition: all 0.2s ease;
-}
-.button-group button:hover {
-    background-color: #ddb900;
-}
-
-.section-box {
-    max-width: 1000px;
-    margin: 40px auto;
-    background-color: #fffef3;
-    border-radius: 12px;
-    padding: 30px 40px;
-    border: 1px solid #f4c900;
-}
-
-.section-box h3 {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 16px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    color: #111;
-}
-
-.section-box p {
-    font-size: 16px;
-    line-height: 1.8;
-}
-
-.review-card {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    border: 1px solid #eee;
-    margin-top: 12px;
-}
-.review-card .star {
-    color: #f4c900;
-    font-size: 18px;
-}
-.book-spec {
-    color: #d00000;
-    font-weight: bold;
-    font-size: 14px;
-    margin-bottom: 4px;
-    letter-spacing: 0.5px;
-}
-.review-wrapper {
-    max-width: 900px; /* ✅ 폭 제한 */
-    margin: 40px auto 0 auto; /* ✅ 중앙 정렬 */
-    border-top: 1px solid #ddd;
-    padding-top: 20px;
-    font-size: 14px;
-}
-.review-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 15px;
-}
-.review-card {
-    background: #f9f9f9;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 12px;
-}
-.review-card .star {
-    color: #f2b01e;
-    font-size: 14px;
-    margin-left: 4px;
-}
-.review-card .date {
-    font-size: 12px;
-    color: #888;
-    text-align: right;
-}
-.review-input textarea {
-    font-size: 13px;
-    height: 100px;
-    resize: none;
-}
-.review-input .btn-submit {
-    width: 100%;
-    font-size: 14px;
-    padding: 8px 0;
-}
-.commentDel,
-.commentUpdate {
-    display: inline-block;
-    cursor: pointer;
-    color: #555;
-    padding: 2px 4px;
-    border-radius: 3px;
-    transition: background-color 0.2s ease;
-}
-
-.commentDel:hover,
-.commentUpdate:hover {
-    background-color: #f4c900;
-    color: #000;
-    font-weight: 600;
-}
-/* 리뷰 내용은 굵게 + 크고 진하게 */
-.review-content {
-    font-size: 15px;
-    font-weight: 500;
-    color: #222;
-    margin-bottom: 6px;
-}
-
-/* 작성자 이름과 날짜는 옅게, 작게 */
-.review-meta {
-    font-size: 12px;
-    color: #888;
-    margin-bottom: 12px;
-}
-.rating-stars .star {
-    font-size: 22px;
-    color: #ccc; /* 기본 회색으로 더 흐리게 */
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-
-.rating-stars .star.selected {
-    color: #f4c900; /* 진한 노란색 */
-}
-
-.review-stars .star {
-    color: #ccc; /* 미선택 별 - 밝은 회색 */
-    font-size: 18px;
-}
-
-.review-stars .star.selected {
-    color: #f4c900; /* 선택된 별 - 기존보다 약간 더 진한 노란색 */
-    text-shadow: 0 0 2px #caa700; /* 약간 광택 효과 */
-    font-size: 18px;
-}
-
-.review-input .btn-submit {
-    position: relative; /* position을 relative로 해주고 */
-    z-index: 10;        /* 버튼 z-index를 별보다 높게 설정 */
-}
-
-.rating-stars {
-    position: relative;
-    z-index: 1;         /* 별은 낮은 z-index로 */
-}
-
-#btnReviewUpdate_OK, #btnReviewUpdate_NO {
-    position: relative;
-    z-index: 10;
-    cursor: pointer;
-}
-
-</style>
 
 <script>
 const isLoggedIn = ${not empty sessionScope.loginuser ? 'true' : 'false'};
@@ -426,18 +136,16 @@ $(function(){
         }
     });
 
-    // 별 클릭 시 색 채우고 값 설정
-    $(document).on("click", ".rating-stars .star", function() {
+ 	// 별 클릭 시 색 채우고 값 설정
+    $(document).on("click", ".rating-stars .star", function () {
         const selectedRating = $(this).data("value");
         $("#rating").val(selectedRating);
 
-        $(".rating-stars .star").removeClass("selected");
-        $(".rating-stars .star").each(function(index) {
-            if (index < selectedRating) {
-                $(this).addClass("selected");
-            }
-        });
+        $(this).siblings().removeClass("selected");
+        $(this).addClass("selected");
+        $(this).prevAll().addClass("selected");
     });
+
 });  // <-- jQuery ready 함수 닫힘
 
 // 특정 책의 리뷰글들을 보여주는 함수 
@@ -497,7 +205,7 @@ function goReviewListView() {
     });
 }
 
-
+//수량에 따라 총 가격을 계산하여 화면에 표시하고 폼 값에도 반영하는 함수
 function updateTotalPrice(qty) {
     const price = ${book.price};
     const total = qty * price;
@@ -506,6 +214,7 @@ function updateTotalPrice(qty) {
     $("input[name='cqty']").val(qty); // 수량 반영
 }
 
+//장바구니에 현재 선택한 상품을 추가하는 함수
 function goCart() {
     const frm = document.cartOrderFrm;
     const cqty = frm.cqty.value;
@@ -538,6 +247,7 @@ function goCart() {
     }
 }
 
+//상품을 즉시 결제 페이지로 보내는 함수
 function goOrder() {
     const frm = document.cartOrderFrm;
     const qty = parseInt(frm.cqty.value);
@@ -661,7 +371,6 @@ function updateMyReview(index, reviewseq) {
 
 </script>
 
-
 <div class="detail-wrapper">
     <div class="left-box">
         <c:choose>
@@ -715,9 +424,7 @@ function updateMyReview(index, reviewseq) {
 		    <input type="hidden" name="sum_totalPrice" id="sumTotalHidden" value="${book.price}" />
 		    <input type="hidden" name="str_cartseq_join" value="0" />
 		</form>
-
-        
-        
+    
     </div>
 </div>
 
@@ -729,33 +436,32 @@ function updateMyReview(index, reviewseq) {
 
 <!-- 리뷰 영역 -->
 <div class="review-wrapper">
-    <div class="review-title">${requestScope.bookVO.bname} 책 사용후기</div>
+    <div class="review-title">${requestScope.book.bname} 책 사용후기</div>
 
     <div id="viewComments">
         <%-- 여기에 Ajax로 리뷰 목록이 들어올 예정 --%>
     </div>
 
     <div class="row review-input mt-3">
-    <div class="col-md-10">
-        <form name="commentFrm">
-            <textarea name="contents" class="form-control" placeholder="후기를 작성해주세요."></textarea>
-            <input type="hidden" name="fk_userid" value="${sessionScope.loginuser.userid}" />
-            <input type="hidden" name="fk_bookseq" value="${book.bookseq}" />
-            <div class="rating-stars mb-2">
-			    <span class="star" data-value="1">★</span>
-			    <span class="star" data-value="2">★</span>
-			    <span class="star" data-value="3">★</span>
-			    <span class="star" data-value="4">★</span>
-			    <span class="star" data-value="5">★</span>
-			</div>
-            <input type="hidden" name="rating" id="rating" value="5" /> <%-- 기본 별점 5점 --%>
-        </form>
-    </div>
-    <div class="col-md-2 d-grid">
-        <button type="button" class="btn btn-outline-primary btn-submit" id="btnCommentOK">후기 등록</button>
-    </div>
+	    <div class="col-md-10">
+	        <form name="commentFrm">
+	            <textarea name="contents" class="form-control" placeholder="후기를 작성해주세요."></textarea>
+	            <input type="hidden" name="fk_userid" value="${sessionScope.loginuser.userid}" />
+	            <input type="hidden" name="fk_bookseq" value="${book.bookseq}" />
+	            <div class="rating-stars mb-2">
+				    <span class="star" data-value="1">★</span>
+				    <span class="star" data-value="2">★</span>
+				    <span class="star" data-value="3">★</span>
+				    <span class="star" data-value="4">★</span>
+				    <span class="star" data-value="5">★</span>
+				</div>
+	            <input type="hidden" name="rating" id="rating" value="5" /> <%-- 기본 별점 5점 --%>
+	        </form>
+	    </div>
+	    <div class="col-md-2 d-grid">
+	        <button type="button" class="btn btn-outline-primary btn-submit" id="btnCommentOK">후기 등록</button>
+	    </div>
 	</div>
-
 </div>
 
 <jsp:include page="/WEB-INF/footer.jsp" />

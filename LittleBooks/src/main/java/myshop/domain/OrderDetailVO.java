@@ -1,5 +1,7 @@
 package myshop.domain;
 
+import member.domain.MemberVO;
+
 public class OrderDetailVO {
 	private String odrseq; 		  // 주문상세코드
     private String fk_ordercode;  // 주문번호 (외래키)
@@ -9,7 +11,9 @@ public class OrderDetailVO {
     private String deliverdate;   // 주문날짜
     private String deliverstatus; // 주문상태 
     
-    private BookVO book; 
+    private BookVO book;
+    private OrderVO order;
+    private MemberVO member;
 
 	public BookVO getBook() {
 		return book;
@@ -17,6 +21,22 @@ public class OrderDetailVO {
 
 	public void setBook(BookVO book) {
 		this.book = book;
+	}
+
+	public OrderVO getOrder() {
+		return order;
+	}
+
+	public void setOrder(OrderVO order) {
+		this.order = order;
+	}
+
+	public MemberVO getMember() {
+		return member;
+	}
+
+	public void setMember(MemberVO member) {
+		this.member = member;
 	}
 
 	public String getOdrseq() {

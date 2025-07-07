@@ -7,6 +7,7 @@ import java.util.Map;
 import myshop.domain.BookVO;
 import myshop.domain.CartVO;
 import myshop.domain.CategoryVO;
+import myshop.domain.OrderVO;
 import myshop.domain.ReviewVO;
 import myshop.domain.SpecVO;
 
@@ -85,7 +86,6 @@ public interface BookDAO {
 
 	// tbl_orderdetail 시퀀스 번호 채번 
 	int get_seq_orderdetail() throws SQLException;
-
 	// tbl_order 테이블에 insert
 	int orderAdd(Map<String, Object> paraMap) throws SQLException;
 

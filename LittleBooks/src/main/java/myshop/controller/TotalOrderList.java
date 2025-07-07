@@ -21,10 +21,11 @@ public class TotalOrderList extends AbstractController {
         HttpSession session = request.getSession();
         MemberVO loginuser = (MemberVO) session.getAttribute("loginuser");
         
-        // 전체 주문 상세 내역 가져오기
-        List<OrderDetailVO> orderDetailList = odao.selectAllDetail();  // 관리자는 모든 주문 내역을 조회
+        String userid = loginuser.getUserid();
         
-        // 주문 상세 정보가 있으면
+        // 전체 주문 상세 내역 가져오기
+        List<OrderDetailVO> orderDetailList = odao.selectAllDetail(userid);  // 모든 주문 내역을 조회
+          
         request.setAttribute("orderDetailList", orderDetailList);
         
         super.setRedirect(false);

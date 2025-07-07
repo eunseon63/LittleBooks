@@ -7,13 +7,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import member.domain.MemberVO;
-import member.model.MemberDAO;
-import member.model.MemberDAO_imple;
+import myshop.domain.OrderDetailVO;
+import myshop.model.OrderDAO;
+import myshop.model.OrderDAO_imple;
 
 // 주문 내역 요청
 public class OrderList extends AbstractController {
 
-	MemberDAO pdao = new MemberDAO_imple();
+	OrderDAO odao = new OrderDAO_imple();
 	
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -30,10 +31,26 @@ public class OrderList extends AbstractController {
         }
 
         String userid = loginuser.getUserid();
-        // 주문내역을 가져와서 orderList에 저장
-        List<MemberVO> orderList = pdao.getOrderListByUserid(userid);
+        
+        // 전체 주문 상세 내역 가져오기
+        List<OrderDetailVO> orderDetailList = odao.selectAllDetail(userid);
+        // System.out.println(orderDetailList);
+        
+        
+        int totalQty = 0;      // 총 수량
+        int totalPrice = 0;    // 총 금액
 
-        request.setAttribute("orderList", orderList);
+        for (OrderDetailVO od : orderDetailList) {
+            totalQty += od.getOqty();                            // 수량
+            totalPrice += od.getOqty() * od.getOdrprice();      // 수량 * 단가
+        }
+
+        request.setAttribute("totalQty", totalQty);
+        request.setAttribute("totalPrice", totalPrice);
+        // 주문 상세 정보가 있으면
+        request.setAttribute("orderDetailList", orderDetailList);
+        
+        super.setRedirect(false);
 		super.setViewPage("/WEB-INF/login/myPage/orderList.jsp");
 	}
 

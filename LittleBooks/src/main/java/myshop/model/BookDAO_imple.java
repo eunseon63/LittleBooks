@@ -16,6 +16,7 @@ import javax.sql.DataSource;
 
 import member.domain.MemberVO;
 import myshop.domain.CategoryVO;
+import myshop.domain.OrderVO;
 import myshop.domain.PublishVO;
 import myshop.domain.ReviewVO;
 import myshop.domain.BookVO;
@@ -1287,6 +1288,7 @@ public class BookDAO_imple implements BookDAO {
 	    return result;
 	    
 	}
+
 
 }
 
