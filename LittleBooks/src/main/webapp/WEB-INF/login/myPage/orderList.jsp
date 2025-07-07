@@ -46,10 +46,8 @@
 
 <jsp:include page="../../header1.jsp" />
 
-<br>
-<br>
-<br>
-<br>
+
+
 <br><br><br>
 
 <div class="container mt-5 mb-5">

@@ -18,7 +18,7 @@ $(document).ready(function() {
     const str_price_join = "<c:out value='${str_price_join}' default='' />";
     const str_cartseq_join = "<c:out value='${str_cartseq_join}' default='' />";
     
-    let sum_totalPrice = parseInt("<c:out value='${sum_totalPrice}' default='0' />", 10);
+    let sum_totalPrice = ${sum_totalPrice}; 
     const originalTotalPrice = sum_totalPrice;
 
     $("#payBtn").click(function() {
@@ -34,7 +34,7 @@ $(document).ready(function() {
             pay_method: 'card',
             merchant_uid: merchant_uid,
             name: "장바구니 외 " + (<c:out value="${fn:length(bookList)-1}" default="0" />) + "건",
-            amount: 100, //sum_totalPrice, 100원으로 임시 설정 
+            amount: sum_totalPrice, //sum_totalPrice, 100원으로 임시 설정 
             buyer_email: '<c:out value="${sessionScope.loginuser.email}" default=""/>',
             buyer_name: $('#receiver_name').val(),
             buyer_tel: $('#receiver_phone').val(),
