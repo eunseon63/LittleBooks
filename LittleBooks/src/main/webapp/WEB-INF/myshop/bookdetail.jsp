@@ -136,14 +136,10 @@ $(function(){
         }
     });
 
-
- 	// 별 클릭 시 색 채우고 값 설정
-    $(document).on("click", ".rating-stars .star", function () {
-
     // 별 클릭 시 색 채우고 값 설정
     $(document).on("click", ".rating-stars .star", function() {
     	if ($(this).hasClass("readonly")) return; // ⭐ 클릭 막기
-
+    	
         const selectedRating = $(this).data("value");
         $("#rating").val(selectedRating);
 
