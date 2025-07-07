@@ -251,66 +251,71 @@ public class OrderDAO_imple implements OrderDAO {
 
 	// 주문상세 정보 찾는 함수
 	@Override
-	public List<OrderDetailVO> selectAllDetail() throws SQLException {
+	public List<OrderDetailVO> selectAllDetail(String userid) throws SQLException {
 	    List<OrderDetailVO> orderDetailList = new ArrayList<>();
-	    
+
 	    try {
 	        conn = ds.getConnection();
-	        
+
 	        String sql = "SELECT "
 	                + "    od.fk_ordercode, "
 	                + "    od.deliverdate, "
 	                + "    od.odrseq, "
-	                + "    b.bookseq, "
+	                + "    od.fk_bookseq AS bookseq, "
 	                + "    od.oqty, "
 	                + "    od.odrprice, "
 	                + "    od.deliverstatus, "
 	                + "    b.bname, "
 	                + "    b.price, "
-	                + "	   b.bimage AS bimage, "
+	                + "    b.bimage, "
 	                + "    b.author "
-	                + " FROM "
-	                + "    tbl_orderdetail od "
-	                + " JOIN "
-	                + "    tbl_book b ON od.fk_bookseq = b.bookseq";
-	        
+	                + "FROM tbl_orderdetail od "
+	                + "JOIN tbl_order o ON od.fk_ordercode = o.ordercode "
+	                + "JOIN tbl_book b ON od.fk_bookseq = b.bookseq "
+	                + "JOIN tbl_member m ON o.fk_userid = m.userid ";
+
+	        if (!"admin".equals(userid)) {
+	            sql += "WHERE m.userid = ? ";
+	        }
+
 	        pstmt = conn.prepareStatement(sql);
+
+	        if (!"admin".equals(userid)) {
+	            pstmt.setString(1, userid);
+	        }
+
 	        rs = pstmt.executeQuery();
-	        
-	        // 데이터가 있을 경우 반복문 실행
+
 	        while (rs.next()) {
 	            OrderDetailVO detailVO = new OrderDetailVO();
-	            
-	            // OrderDetailVO에 데이터 세팅
-	            detailVO.setOdrseq(rs.getString("odrseq"));              // 주문 상세 코드
-	            detailVO.setFk_ordercode(rs.getString("fk_ordercode"));  // 주문 코드
-	            detailVO.setFk_bookseq(rs.getInt("bookseq"));            // 책 번호
-	            detailVO.setOqty(rs.getInt("oqty"));                     // 수량
-	            detailVO.setOdrprice(rs.getInt("odrprice"));             // 개별 가격
-	            detailVO.setDeliverdate(rs.getString("deliverdate"));    // 주문 일자
-	            detailVO.setDeliverstatus(rs.getString("deliverstatus"));// 배송 상태
-	            
-	            // 책 정보 추가
+
+	            detailVO.setOdrseq(rs.getString("odrseq"));
+	            detailVO.setFk_ordercode(rs.getString("fk_ordercode"));
+	            detailVO.setFk_bookseq(rs.getInt("bookseq"));
+	            detailVO.setOqty(rs.getInt("oqty"));
+	            detailVO.setOdrprice(rs.getInt("odrprice"));
+	            detailVO.setDeliverdate(rs.getString("deliverdate"));
+	            detailVO.setDeliverstatus(rs.getString("deliverstatus"));
+
 	            BookVO book = new BookVO();
 	            book.setBookseq(rs.getInt("bookseq"));
 	            book.setBname(rs.getString("bname"));
 	            book.setPrice(rs.getInt("price"));
 	            book.setBimage(rs.getString("bimage"));
 	            book.setAuthor(rs.getString("author"));
-	            
-	            // OrderDetailVO에 책 정보 설정
+
 	            detailVO.setBook(book);
-	            
-	            // 리스트에 추가
+
 	            orderDetailList.add(detailVO);
 	        }
-	        
+
 	    } finally {
-	        close();  // 자원 정리
+	        close();
 	    }
-	    
+
 	    return orderDetailList;
-	} // end of public List<OrderDetailVO> selectAllDetail() throws SQLException {}-----------
+	} // end of public List<OrderDetailVO> selectAllDetail(String userid) throws SQLException {}-----------
+
 	
 }
 

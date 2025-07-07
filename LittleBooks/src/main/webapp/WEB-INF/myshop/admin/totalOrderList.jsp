@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
@@ -9,17 +8,90 @@
 
 <jsp:include page="../../header1.jsp" />
 
-<div class="container" style="margin-top: 7%;">
-    
-    <!-- 상단 제목 영역 -->
-    <div style="margin: 5% auto;">
-        <h3 class="text-center">주문내역 전체 목록</h3>
-    </div>
+<style>
+    body {
+        font-family: 'Helvetica Neue', sans-serif;
+    }
 
-    <!-- 주문 목록 테이블 -->
+    .container {
+        padding: 60px 50px;
+    }
+
+    h3 {
+        color: #333;
+        font-weight: bold;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .table thead {
+        background-color: #fff9db;
+    }
+
+    .table th,
+    .table td {
+        vertical-align: middle;
+        font-size: 0.95rem;
+    }
+
+    #orderTbl tr.orderInfo:hover {
+        background-color: #fffde7;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    .product-info {
+        text-align: left;
+    }
+
+    .product-info img {
+        width: 70px;
+        height: auto;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
+
+    .product-details {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .text-muted.small {
+        font-size: 0.85rem;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+    }
+</style>
+
+<script type="text/javascript">
+	$(function () {
+        // 회원 상세 정보 페이지 열기
+		$('table#orderTbl tr.orderInfo').click(e => {
+		    const userid = $(this).find("td.userid").text().trim();
+
+		    if (!userid) {
+		        alert("회원 ID를 찾을 수 없습니다.");
+		        return;
+		    }
+
+		    const popupUrl = "<%= ctxPath %>/shop/memberOneDetail.go?userid=" + encodeURIComponent(userid);
+		    const popupOptions = "width=800,height=600,scrollbars=yes,resizable=no";
+
+		    window.open(popupUrl, "memberDetailPopup", popupOptions);
+		}); // end of $('table#orderTbl tr.orderInfo').click(e => {})-------------------
+	});
+	
+</script>
+
+<div class="container mt-5">
+    <h3>주문내역 전체 목록</h3>
+
     <div class="table-responsive shadow-sm rounded">
-        <table class="table table-hover table-striped align-middle text-center">
-            <thead class="table-warning">
+        <table class="table table-bordered text-center" id="orderTbl">
+            <thead>
                 <tr>
                     <th>주문코드</th>
                     <th>주문일자</th>
@@ -33,17 +105,16 @@
             <tbody>
                 <c:if test="${not empty requestScope.orderDetailList}">
                     <c:forEach var="orderDetail" items="${requestScope.orderDetailList}">
-                        <tr>
+                        <tr class="orderInfo">
                             <td>${orderDetail.fk_ordercode}</td>
                             <td>${orderDetail.deliverdate}</td>
-                            <td class="text-start">
-                                <div class="d-flex align-items-center gap-3">
-                                    <img src="<%= ctxPath%>/images/${orderDetail.book.bimage}"
-                                         alt="${orderDetail.book.bname}"
-                                         class="rounded border"
-                                         style="width: 70px; height: auto;" />
-                                    <div>
-                                        <div class="fw-semibold">${orderDetail.book.bname}</div>
+                            <td class="product-info">
+                                <div class="d-flex align-items-start gap-3">
+                                    <img src="<%= ctxPath %>/images/${orderDetail.book.bimage}"
+                                         alt="${orderDetail.book.bname}" class="mr-3" />
+                                    <div class="product-details">
+                                        <div class="text-muted small">번호: ${orderDetail.book.bookseq}</div>
+                                        <div class="text-muted small">제목: ${orderDetail.book.bname}</div>
                                         <div class="text-muted small">저자: ${orderDetail.book.author}</div>
                                         <div class="text-muted small">
                                             가격: <fmt:formatNumber value="${orderDetail.book.price}" type="currency" currencySymbol="₩" />
@@ -56,7 +127,7 @@
                                 <fmt:formatNumber value="${orderDetail.odrprice * orderDetail.oqty}" type="currency" currencySymbol="₩" />
                             </td>
                             <td>
-                                <fmt:formatNumber value="${orderDetail.odrprice * orderDetail.oqty * 0.1}" type="number" />p
+                                <fmt:formatNumber value="${orderDetail.odrprice * orderDetail.oqty * 0.1}" type="number" maxFractionDigits="0" groupingUsed="false" />p
                             </td>
                             <td>
                                 <span class="badge px-3 py-2 ${orderDetail.deliverstatus == '1' ? 'bg-warning text-dark' : 'bg-success'}">
