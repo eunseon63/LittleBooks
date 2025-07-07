@@ -277,6 +277,7 @@ body {
 
 .rating-stars .star.selected {
     color: #f4c900; /* 진한 노란색 */
+    text-shadow: 0 0 4px #ffde5a;
 }
 
 .review-stars .star {

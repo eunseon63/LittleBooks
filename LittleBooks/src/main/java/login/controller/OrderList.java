@@ -11,6 +11,7 @@ import myshop.domain.OrderDetailVO;
 import myshop.model.OrderDAO;
 import myshop.model.OrderDAO_imple;
 
+// 주문 내역 요청
 public class OrderList extends AbstractController {
 
 	OrderDAO odao = new OrderDAO_imple();
@@ -20,9 +21,8 @@ public class OrderList extends AbstractController {
 		
         HttpSession session = request.getSession();
         MemberVO loginuser = (MemberVO) session.getAttribute("loginuser");
-		
-        
-        if (loginuser == null) {
+	
+        if (loginuser == null) { // 로그인 안 된 경우
             request.setAttribute("message", "로그인 후 이용 가능합니다.");
             request.setAttribute("loc", "login.go");
             super.setRedirect(false);

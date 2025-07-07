@@ -4,6 +4,7 @@ import common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+// 휴면계정 처리
 public class DormantPage extends AbstractController {
 
 	@Override
