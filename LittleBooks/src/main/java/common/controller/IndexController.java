@@ -16,7 +16,6 @@ public class IndexController extends AbstractController {
 		
 		// 청소년 권장 도서 bookseq 배열로 불러오기
         int[] youthSeqArr = {162, 183, 165, 169, 159, 164};
-        
 
         BookDAO dao = new BookDAO_imple();
         List<BookVO> youthBooks = dao.selectBooksBySeqArray(youthSeqArr);
