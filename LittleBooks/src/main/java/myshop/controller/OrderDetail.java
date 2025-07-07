@@ -29,6 +29,7 @@ public class OrderDetail extends AbstractController {
 
         OrderDAO dao = new OrderDAO_imple();
 
+
         // 1. 전체 주문 목록
         List<OrderVO> orderList = dao.getOrderListByUserid(userid);
         request.setAttribute("orderList", orderList);
@@ -39,6 +40,26 @@ public class OrderDetail extends AbstractController {
         if (ordercode != null && !ordercode.trim().isEmpty()) {
             List<OrderDetailVO> detailList = dao.getOrderDetailList(ordercode, userid);
             OrderVO deliveryInfo = dao.getOrderInfo(ordercode, userid);
+
+//	    if (ordercode != null && !ordercode.trim().isEmpty()) {
+//	        // 상세 주문 데이터 세팅
+//	        //List<OrderDetailVO> detailList = dao.getOrderDetailList(ordercode, userid);
+//	        OrderVO deliveryInfo = dao.getOrderInfo(ordercode, userid);
+//
+//	        int totalAmount = 0;
+//	        int totalQty = 0;
+//	        for (OrderDetailVO vo : detailList) {
+//	            totalAmount += vo.getOdrprice();
+//	            totalQty += vo.getOqty();
+//	        }
+//
+//	        request.setAttribute("selectedOrdercode", ordercode);
+//	        request.setAttribute("detailList", detailList);
+//	        request.setAttribute("deliveryInfo", deliveryInfo);
+//	        request.setAttribute("totalAmount", totalAmount);
+//	        request.setAttribute("totalQty", totalQty);
+//	    }
+
 
             int totalAmount = 0;            int totalQty = 0;
             for (OrderDetailVO vo : detailList) {

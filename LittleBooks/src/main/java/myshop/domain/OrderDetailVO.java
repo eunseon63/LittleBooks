@@ -1,115 +1,99 @@
+
+
 package myshop.domain;
 
+import member.domain.MemberVO;
+
 public class OrderDetailVO {
-
-    private int odrseq;             // 주문상세 시퀀스 (PK)
-    private String fk_ordercode;    // 주문코드 (FK)
-    private int fk_bookseq;         // 책 번호 (FK)
-    private int oqty;               // 주문 수량
-    private int odrprice;           // 주문 가격 (수량 단위 가격 * 수량 아님, 개별 단가)
-
-    private int deliverstatus;      // 배송 상태
-    private String deliverdate;     // 배송 날짜 (문자열 YYYY-MM-DD)
+	private String odrseq; 		  // 주문상세코드
+    private String fk_ordercode;  // 주문번호 (외래키)
+    private int fk_bookseq;       // 주문한 책 번호 (bookseq)
+    private int oqty;             // 수량
+    private int odrprice;         // 개별 가격 (책당 가격, 수량 아님!)
+    private String deliverdate;   // 주문날짜
+    private String deliverstatus; // 주문상태 
     
-    private String bname;           // 책 이름 (조인 결과)
-    private String bimage;          // 책 이미지 파일명 (조인 결과)
+    private BookVO book;
+    private MemberVO member;
 
-    // getter / setter
+	public BookVO getBook() {
+		return book;
+	}
 
-    public int getOdrseq() {
-        return odrseq;
-    }
+	public void setBook(BookVO book) {
+		this.book = book;
+	}
+	
 
-    public void setOdrseq(int odrseq) {
-        this.odrseq = odrseq;
-    }
+	public MemberVO getMember() {
+		return member;
+	}
 
-    public String getFk_ordercode() {
-        return fk_ordercode;
-    }
+	public void setMember(MemberVO member) {
+		this.member = member;
+	}
 
-    public void setFk_ordercode(String fk_ordercode) {
-        this.fk_ordercode = fk_ordercode;
-    }
+	public String getOdrseq() {
+		return odrseq;
+	}
 
-    public int getFk_bookseq() {
-        return fk_bookseq;
-    }
+	public void setOdrseq(String odrseq) {
+		this.odrseq = odrseq;
+	}
 
-    public void setFk_bookseq(int fk_bookseq) {
-        this.fk_bookseq = fk_bookseq;
-    }
+	public String getFk_ordercode() {
+		return fk_ordercode;
+	}
 
-    public int getOqty() {
-        return oqty;
-    }
+	public void setFk_ordercode(String fk_ordercode) {
+		this.fk_ordercode = fk_ordercode;
+	}
 
-    public void setOqty(int oqty) {
-        this.oqty = oqty;
-    }
+	public int getFk_bookseq() {
+		return fk_bookseq;
+	}
 
-    public int getOdrprice() {
-        return odrprice;
-    }
+	public void setFk_bookseq(int fk_bookseq) {
+		this.fk_bookseq = fk_bookseq;
+	}
 
-    public void setOdrprice(int odrprice) {
-        this.odrprice = odrprice;
-    }
+	public int getOqty() {
+		return oqty;
+	}
 
-    public int getDeliverstatus() {
-        return deliverstatus;
-    }
+	public void setOqty(int oqty) {
+		this.oqty = oqty;
+	}
 
-    public void setDeliverstatus(int deliverstatus) {
-        this.deliverstatus = deliverstatus;
-    }
+	public int getOdrprice() {
+		return odrprice;
+	}
 
-    public String getDeliverdate() {
-        return deliverdate;
-    }
+	public void setOdrprice(int odrprice) {
+		this.odrprice = odrprice;
+	}
 
-    public void setDeliverdate(String deliverdate) {
-        this.deliverdate = deliverdate;
-    }
+	public String getDeliverdate() {
+		return deliverdate;
+	}
 
-    public String getBname() {
-        return bname;
-    }
+	public void setDeliverdate(String deliverdate) {
+		this.deliverdate = deliverdate;
+	}
 
-    public void setBname(String bname) {
-        this.bname = bname;
-    }
+	public String getDeliverstatus() {
+		return deliverstatus;
+	}
 
-    public String getBimage() {
-        return bimage;
-    }
+	public void setDeliverstatus(String deliverstatus) {
+		this.deliverstatus = deliverstatus;
+	}
 
-    public void setBimage(String bimage) {
-        this.bimage = bimage;
-    }
-
-    // 기존 DAO에서 쓰던 메서드명에 맞춘 메서드 추가 (호환용)
-    public int getFkid() {
-        return getFk_bookseq();
-    }
-
-    public void setFkid(int fk_bookseq) {
-        setFk_bookseq(fk_bookseq);
-    }
-
-    public int getOrderQty() {
-        return getOqty();
-    }
-
-    public void setOrderQty(int oqty) {
-        setOqty(oqty);
-    }
-
-    public int getOrderPrice() {
-        return getOdrprice();
-    }
-
-    public void setOrderPrice(int odrprice) {
-        setOdrprice(odrprice);
-    }
+	public int getBookseq() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	
 }
+
