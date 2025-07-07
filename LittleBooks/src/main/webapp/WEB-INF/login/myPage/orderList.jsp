@@ -19,10 +19,6 @@
 
 <jsp:include page="../../header1.jsp" />
 
-<br>
-<br>
-<br>
-<br>
 <br><br><br>
 
 <div class="container mt-5 mb-5">
@@ -101,7 +97,7 @@
 			    <div class="col-md-2 text-center">
 			      <div>포인트</div>
 			      <div class="font-weight-bold">
-			        <fmt:formatNumber value="${item.odrprice * item.oqty * 0.1}" type="number" maxFractionDigits="0" groupingUsed="false" />p
+			        <fmt:formatNumber value="${item.odrprice * item.oqty * 0.01}" type="number" maxFractionDigits="0" groupingUsed="false" />p
 			      </div>
 			    </div>
 			
