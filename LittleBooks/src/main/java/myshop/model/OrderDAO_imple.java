@@ -1,5 +1,7 @@
 package myshop.model;
 
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
 import java.sql.*;
 import java.util.*;
 
@@ -8,7 +10,10 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import member.domain.MemberVO;
 import myshop.domain.OrderVO;
+import util.security.AES256;
+import util.security.SecretMyKey;
 import myshop.domain.BookVO;
 import myshop.domain.OrderDetailVO;
 
@@ -18,14 +23,23 @@ public class OrderDAO_imple implements OrderDAO {
     private Connection conn;
     private PreparedStatement pstmt;
     private ResultSet rs;
+    
+    private AES256 aes;
 
     public OrderDAO_imple() {
         try {
-            Context ctx = new InitialContext();
-            ds = (DataSource) ctx.lookup("java:comp/env/jdbc/semiproject");
+			Context initContext = new InitialContext();
+		    Context envContext  = (Context)initContext.lookup("java:/comp/env");
+		    ds = (DataSource)envContext.lookup("jdbc/semiproject");
+		    
+		    aes = new AES256(SecretMyKey.KEY);
+		    // SecretMyKey.KEY 은 우리가 만든 암호화/복호화 키이다.
+		    
         } catch (NamingException e) {
             e.printStackTrace();
-        }
+        } catch(UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
     }
 
     private void close() {
@@ -315,6 +329,72 @@ public class OrderDAO_imple implements OrderDAO {
 
 	    return orderDetailList;
 	} // end of public List<OrderDetailVO> selectAllDetail(String userid) throws SQLException {}-----------
+	
+	// 주문자 아이디 찾기
+	@Override
+	public String selectUserid(String ordercode) throws SQLException {
+		String userid = null;
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " select fk_userid "
+					+ " from tbl_order "
+					+ " where ordercode = ? ";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, ordercode);
+			
+			rs = pstmt.executeQuery();
+			
+			if (rs.next()) {
+				userid = rs.getString("fk_userid");
+			}
+		} finally {
+			close();
+		}
+		
+		return userid;
+	}
+
+	// 주문자 정보 찾기
+	@Override
+	public MemberVO selectOrderMember(Map<String, String> paraMap) throws SQLException {
+	    MemberVO member = null;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " SELECT m.userid, m.name, m.email, m.mobile, m.postcode, m.address, m.detailaddress, m.extraaddress " +
+	                     " FROM tbl_order o " +
+	                     " JOIN tbl_member m ON o.fk_userid = m.userid " +
+	                     " WHERE o.ordercode = ? AND o.fk_userid = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, paraMap.get("ordercode"));
+	        pstmt.setString(2, paraMap.get("userid"));
+
+	        rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            member = new MemberVO();
+	            member.setUserid(rs.getString("userid"));
+	            member.setName(rs.getString("name"));
+	            member.setEmail(aes.decrypt(rs.getString("email")));
+	            member.setMobile(aes.decrypt(rs.getString("mobile")));
+	            member.setPostcode(rs.getString("postcode"));
+	            member.setAddress(rs.getString("address"));
+	            member.setDetailaddress(rs.getString("detailaddress"));
+	            member.setExtraaddress(rs.getString("extraaddress"));
+	        }
+	    } catch(GeneralSecurityException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} finally {
+			close();
+		}
+
+	    return member;
+	}
 
 	
 }

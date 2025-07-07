@@ -68,23 +68,18 @@
 
 <script type="text/javascript">
 	$(function () {
-        // 회원 상세 정보 페이지 열기
-		$('table#orderTbl tr.orderInfo').click(e => {
-		    const userid = $(this).find("td.userid").text().trim();
+        // 행 클릭 시 bookseq 기반 팝업 열기
+		$('table#orderTbl tr.orderInfo').click(function () {
+		    const ordercode = $(this).data("ordercode"); // data-bookseq 값 읽기
 
-		    if (!userid) {
-		        alert("회원 ID를 찾을 수 없습니다.");
-		        return;
-		    }
-
-		    const popupUrl = "<%= ctxPath %>/shop/memberOneDetail.go?userid=" + encodeURIComponent(userid);
+		    const popupUrl = "<%= ctxPath %>/myshop/userOrderDetail.go?ordercode=" + encodeURIComponent(ordercode);
 		    const popupOptions = "width=800,height=600,scrollbars=yes,resizable=no";
 
 		    window.open(popupUrl, "memberDetailPopup", popupOptions);
-		}); // end of $('table#orderTbl tr.orderInfo').click(e => {})-------------------
+		});
 	});
-	
 </script>
+
 
 <div class="container mt-5">
     <h3>주문내역 전체 목록</h3>
@@ -105,7 +100,7 @@
             <tbody>
                 <c:if test="${not empty requestScope.orderDetailList}">
                     <c:forEach var="orderDetail" items="${requestScope.orderDetailList}">
-                        <tr class="orderInfo">
+                        <tr class="orderInfo" data-ordercode="${orderDetail.fk_ordercode}">
                             <td>${orderDetail.fk_ordercode}</td>
                             <td>${orderDetail.deliverdate}</td>
                             <td class="product-info">
