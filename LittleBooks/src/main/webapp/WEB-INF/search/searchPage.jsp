@@ -74,8 +74,8 @@
     max-width: 1000px;
 }
 .card {
-    width: 230px;
-    height: 370px;
+    width: 240px;
+    height: 400px;
     background-color: #fffef5;
     border: 1px solid #f4c900;
     border-radius: 16px;
