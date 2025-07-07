@@ -207,7 +207,7 @@ function goReviewListView() {
     });
 }
 
-
+//수량에 따라 총 가격을 계산하여 화면에 표시하고 폼 값에도 반영하는 함수
 function updateTotalPrice(qty) {
     const price = ${book.price};
     const total = qty * price;
@@ -216,6 +216,7 @@ function updateTotalPrice(qty) {
     $("input[name='cqty']").val(qty); // 수량 반영
 }
 
+//장바구니에 현재 선택한 상품을 추가하는 함수
 function goCart() {
     const frm = document.cartOrderFrm;
     const cqty = frm.cqty.value;
@@ -248,6 +249,7 @@ function goCart() {
     }
 }
 
+//상품을 즉시 결제 페이지로 보내는 함수
 function goOrder() {
     const frm = document.cartOrderFrm;
     const qty = parseInt(frm.cqty.value);
@@ -371,7 +373,6 @@ function updateMyReview(index, reviewseq) {
 
 </script>
 
-
 <div class="detail-wrapper">
     <div class="left-box">
         <c:choose>
@@ -425,9 +426,7 @@ function updateMyReview(index, reviewseq) {
 		    <input type="hidden" name="sum_totalPrice" id="sumTotalHidden" value="${book.price}" />
 		    <input type="hidden" name="str_cartseq_join" value="0" />
 		</form>
-
-        
-        
+    
     </div>
 </div>
 

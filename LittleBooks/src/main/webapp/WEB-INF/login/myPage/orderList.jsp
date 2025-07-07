@@ -18,15 +18,11 @@
 <body>
 
 <jsp:include page="../../header1.jsp" />
-<<<<<<< HEAD
 <br>
 <br>
 <br>
-=======
 
-<br><br><br>
-
->>>>>>> branch 'main' of https://github.com/eunseon63/LittleBooks.git
+<br>
 <div class="container mt-5 mb-5">
   <div class="row">
 

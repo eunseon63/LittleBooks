@@ -21,15 +21,17 @@
 
 <script type="text/javascript">
 $(function() {
+	// "비밀번호 찾기" 버튼 클릭 시 goFind() 실행
 	$('button#btnPwdFind').click(function(){
 		goFind();
 	});
 	
+	// "암호 변경하기" 버튼 클릭 시 goUpdate() 실행
 	$('button#btnUpdate').click(function(){
 		goUpdate();
 	});
 	
-	
+	// 이메일 입력창에서 Enter 키 입력 시 goFind() 실행
 	$('input:text[name="email"]').bind('keyup', function(e){
 		if(e.keyCode == 13) {
 		   goFind();
@@ -38,6 +40,7 @@ $(function() {
 }); // end of $(function(){})------------------------------
 
 // Function Declaration
+// 입력된 아이디와 이메일을 통해 비밀번호 찾기 팝업을 여는 함수
 function goFind() {
 	const userid = $('input:text[name="userid"]').val().trim();
 	const email = $('input:text[name="email"]').val();
@@ -57,12 +60,14 @@ function goFind() {
     // 새 창 열기
     const popup = window.open("", "pwdFindPopup", "width=500,height=400,left=300,top=150,resizable=no,scrollbars=no");
 	
+ // 비밀번호 찾기 요청 전송
     frm.action = "<%= ctxPath %>/login/pwdFindSuccess.go";
     frm.method = "post";
     frm.target = "pwdFindPopup"; // 이 창에 폼 제출
     frm.submit();
 }; // end of function goFind()-------------------
 
+//새 비밀번호를 입력하고 서버에 전송하여 비밀번호를 변경하는 함수
 function goUpdate() {
     const pwd = $('#pwd').val().trim();
     const pwd2 = $('#pwd2').val().trim();
@@ -76,6 +81,7 @@ function goUpdate() {
         return;
     }
     
+ // 비밀번호 변경 요청 전송
     const frm = document.pwdUpdateEndFrm;
     frm.action = "<%= ctxPath %>/login/pwdUpdate.go";
     frm.method = "post";

@@ -15,14 +15,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
 
 <script>
+//로그인 여부 확인 (true/false)
 const isLoggedIn = ${not empty sessionScope.loginuser ? "true" : "false"};
 
+//전체 선택/해제 체크박스 기능
 function allCheckBox() {
     const checkboxes = document.querySelectorAll("input[name='bookseq']");
     const all = document.getElementById("allCheckOrNone").checked;
     checkboxes.forEach(chk => chk.checked = all);
 }
 
+//개별 체크박스 변경 시 전체 체크 여부 갱신
 function individualCheckBoxChanged() {
     const allCheckBox = document.getElementById("allCheckOrNone");
     const checkboxes = document.querySelectorAll("input[name='bookseq']");
@@ -30,6 +33,7 @@ function individualCheckBoxChanged() {
     allCheckBox.checked = allChecked;
 }
 
+//DOM이 로드되면 개별 체크박스에 이벤트 바인딩
 document.addEventListener('DOMContentLoaded', function() {
     const checkboxes = document.querySelectorAll("input[name='bookseq']");
     checkboxes.forEach(chk => {
@@ -37,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+//장바구니 항목 삭제 함수
 function goDel(cartseq) {
     swal({
         title: "삭제 확인",
@@ -70,6 +75,7 @@ function goDel(cartseq) {
     });
 }
 
+//장바구니 수량 수정 함수
 function goOqtyEdit(obj) {
     const index = $('button.updateBtn').index(obj);
 
@@ -113,6 +119,7 @@ function goOqtyEdit(obj) {
     }
 }
 
+//선택한 상품들 주문 요청 함수
 function goOrder() {
     if (!isLoggedIn) {
         swal("로그인 필요", "로그인 후 주문해 주세요.", "warning");
