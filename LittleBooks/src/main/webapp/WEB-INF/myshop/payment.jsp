@@ -22,10 +22,10 @@ $(document).ready(function() {
     const originalTotalPrice = sum_totalPrice;
 
     $("#payBtn").click(function() {
-    	if (!$("#receiver_name").val() || !$("#receiver_phone").val() || !$("#receiver_postcode").val() || !$("#receiver_detail_address").val()) {
-    	    alert("배송지 정보를 모두 입력해주세요.");
-    	    return;
-    	}
+       if (!$("#receiver_name").val() || !$("#receiver_phone").val() || !$("#receiver_postcode").val() || !$("#receiver_detail_address").val()) {
+           alert("배송지 정보를 모두 입력해주세요.");
+           return;
+       }
 
         const merchant_uid = 'order_' + new Date().getTime();
 
@@ -247,20 +247,20 @@ input#receiver_address {
 
 
     <div class="payment-form-group">
-	    <label for="receiver_name">받는 분:</label>
-	    <input type="text" id="receiver_name" name="receiver_name" value="<c:out value='${sessionScope.loginuser.name}' />" />
-	</div>
-	
-	<div class="payment-form-group">
-	    <label for="receiver_phone">연락처:</label>
-	    <input type="text" id="receiver_phone" name="receiver_phone" value="<c:out value='${sessionScope.loginuser.mobile}' />" />
-	</div>
-	
-	<div class="payment-form-group">
-	    <label for="receiver_postcode">우편번호:</label>
-	    <input type="text" id="receiver_postcode" name="receiver_postcode" value="<c:out value='${sessionScope.loginuser.postcode}' />" readonly />
-	    <button type="button" onclick="execDaumPostcode()">주소 검색</button>
-	</div>
+       <label for="receiver_name">받는 분:</label>
+       <input type="text" id="receiver_name" name="receiver_name" value="<c:out value='${sessionScope.loginuser.name}' />" />
+   </div>
+   
+   <div class="payment-form-group">
+       <label for="receiver_phone">연락처:</label>
+       <input type="text" id="receiver_phone" name="receiver_phone" value="<c:out value='${sessionScope.loginuser.mobile}' />" />
+   </div>
+   
+   <div class="payment-form-group">
+       <label for="receiver_postcode">우편번호:</label>
+       <input type="text" id="receiver_postcode" name="receiver_postcode" value="<c:out value='${sessionScope.loginuser.postcode}' />" readonly />
+       <button type="button" onclick="execDaumPostcode()">주소 검색</button>
+   </div>
 
     <div class="payment-form-group">
         <label for="receiver_address">주소:</label>
@@ -305,21 +305,21 @@ input#receiver_address {
     </table>
     
     <div class="payment-form-group point">
-	    <label>사용 가능 포인트:</label>
-	    <span id="availablePoint"><c:out value='${sessionScope.loginuser.point}' default='0' /></span> P
-	</div>
-	
-	<div class="payment-form-group">
-	    <label for="usedPoint">사용 포인트:</label>
-	    <input type="number" id="usepoint" value="0" placeholder="0" min="0" style="width:150px;" oninput="applyPoint()" />
-	</div>
-	
-	<div class="payment-form-group">
-	    <label>최종 결제금액:</label>
-	    <span id="finalPrice" style="font-weight:bold; color:#d00000;">
-	        <fmt:formatNumber value="${sum_totalPrice}" pattern="###,###" /> 원
-	    </span>
-	</div>
+       <label>사용 가능 포인트:</label>
+       <span id="availablePoint"><c:out value='${sessionScope.loginuser.point}' default='0' /></span> P
+   </div>
+   
+   <div class="payment-form-group">
+       <label for="usedPoint">사용 포인트:</label>
+       <input type="number" id="usepoint" value="0" placeholder="0" min="0" style="width:150px;" oninput="applyPoint()" />
+   </div>
+   
+   <div class="payment-form-group">
+       <label>최종 결제금액:</label>
+       <span id="finalPrice" style="font-weight:bold; color:#d00000;">
+           <fmt:formatNumber value="${sum_totalPrice}" pattern="###,###" /> 원
+       </span>
+   </div>
 
     <div class="pay-buttons">
         <button type="button" id="payBtn">결제 진행</button>
