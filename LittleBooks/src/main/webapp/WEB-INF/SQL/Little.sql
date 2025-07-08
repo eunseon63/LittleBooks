@@ -171,7 +171,7 @@ from tbl_book;
  from TBL_BOOK
  
 select *
- from TBL_Member
+ from TBL_Member;
  
  desc  TBL_BOOK;
  

@@ -97,7 +97,7 @@
 	    	
 	        console.log(checkedValues);
 	        
-	        if (checkedValues === "") {
+	        if (checkedValues === "" || checkedValues == null) {
 	        	alert('체크박스를 클릭하세요');
 	        	return;
 	        }
