@@ -355,7 +355,7 @@ public class OrderDAO_imple implements OrderDAO {
 		}
 		
 		return userid;
-	}
+	} // end of public String selectUserid(String ordercode) throws SQLException {}-------------------
 
 	// 주문자 정보 찾기
 	@Override
@@ -394,7 +394,60 @@ public class OrderDAO_imple implements OrderDAO {
 		}
 
 	    return member;
-	}
+	} // end of public MemberVO selectOrderMember(Map<String, String> paraMap) throws SQLException {]-----------
+
+	// 주문번호로 전화번호 찾기
+	@Override
+	public String selectMobile(String userid) throws SQLException {
+		String mobile = null;
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " select mobile "
+					+ " from tbl_member join tbl_order "
+					+ " on userid = fk_userid "
+					+ " where userid = ? ";
+			
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+			
+	        rs = pstmt.executeQuery();
+	        
+	        if (rs.next()) {
+	        	mobile = aes.decrypt(rs.getString("mobile"));
+	        }
+			
+		} catch(GeneralSecurityException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} finally {
+			close();
+		}
+		return mobile;
+	} // end of public String selectMobile(String userid) throws SQLException {}-------------------
+
+	// 배송상태 업데이트
+	@Override
+	public void updateDeliverstatus(String ordercode) throws SQLException {
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " update tbl_orderdetail "
+					+ " set deliverstatus = 1 "
+					+ " where fk_ordercode = ? ";
+
+			
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, ordercode);
+			
+	        pstmt.executeUpdate();
+			
+		} finally {
+			close();
+		}
+		
+	} // end of public int updateDeliverstatus(String ordercode) throws SQLException {}-----------------
 
 	
 }

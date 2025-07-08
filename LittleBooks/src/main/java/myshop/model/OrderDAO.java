@@ -34,7 +34,10 @@ public interface OrderDAO {
 	// 주문자 정보 찾기
 	MemberVO selectOrderMember(Map<String, String> paraMap) throws SQLException;
 
-	
+	// 전화번호 찾기
+	String selectMobile(String userid) throws SQLException;
 
+	// 배송상태 변경
+	void updateDeliverstatus(String ordercode) throws SQLException;
 
 }
