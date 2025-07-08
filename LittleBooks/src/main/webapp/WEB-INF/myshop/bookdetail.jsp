@@ -212,14 +212,17 @@ function goReviewListView() {
     });
 }
 
-//수량에 따라 총 가격을 계산하여 화면에 표시하고 폼 값에도 반영하는 함수
+// 도서구매 총합을 구하는 함수
 function updateTotalPrice(qty) {
     const price = ${book.price};
     const total = qty * price;
     $("#totalPrice").text(total.toLocaleString('ko-KR', { style: 'currency', currency: 'KRW' }));
     
-    $("input[name='cqty']").val(qty); // 수량 반영
+    $("input[name='cqty']").val(qty);       // 수량 반영
+    $("#oqtyHidden").val(qty);             // str_oqty_join 값도 업데이트
+    $("#sumTotalHidden").val(total);       // sum_totalPrice 도 업데이트
 }
+
 
 //장바구니에 현재 선택한 상품을 추가하는 함수
 function goCart() {

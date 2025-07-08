@@ -18,14 +18,14 @@ $(document).ready(function() {
     const str_price_join = "<c:out value='${str_price_join}' default='' />";
     const str_cartseq_join = "<c:out value='${str_cartseq_join}' default='' />";
     
-    let sum_totalPrice = ${sum_totalPrice}; 
+    let sum_totalPrice = parseInt("<c:out value='${sum_totalPrice}' default='0' />", 10);
     const originalTotalPrice = sum_totalPrice;
 
     $("#payBtn").click(function() {
-    	if (!$("#receiver_name").val() || !$("#receiver_phone").val() || !$("#receiver_postcode").val() || !$("#receiver_detail_address").val()) {
-    	    alert("배송지 정보를 모두 입력해주세요.");
-    	    return;
-    	}
+       if (!$("#receiver_name").val() || !$("#receiver_phone").val() || !$("#receiver_postcode").val() || !$("#receiver_detail_address").val()) {
+           alert("배송지 정보를 모두 입력해주세요.");
+           return;
+       }
 
         const merchant_uid = 'order_' + new Date().getTime();
 
@@ -34,7 +34,7 @@ $(document).ready(function() {
             pay_method: 'card',
             merchant_uid: merchant_uid,
             name: "장바구니 외 " + (<c:out value="${fn:length(bookList)-1}" default="0" />) + "건",
-            amount: sum_totalPrice, //sum_totalPrice, 100원으로 임시 설정 
+            amount: 100, //sum_totalPrice, 100원으로 임시 설정 
             buyer_email: '<c:out value="${sessionScope.loginuser.email}" default=""/>',
             buyer_name: $('#receiver_name').val(),
             buyer_tel: $('#receiver_phone').val(),
@@ -247,20 +247,20 @@ input#receiver_address {
 
 
     <div class="payment-form-group">
-	    <label for="receiver_name">받는 분:</label>
-	    <input type="text" id="receiver_name" name="receiver_name" value="<c:out value='${sessionScope.loginuser.name}' />" />
-	</div>
-	
-	<div class="payment-form-group">
-	    <label for="receiver_phone">연락처:</label>
-	    <input type="text" id="receiver_phone" name="receiver_phone" value="<c:out value='${sessionScope.loginuser.mobile}' />" />
-	</div>
-	
-	<div class="payment-form-group">
-	    <label for="receiver_postcode">우편번호:</label>
-	    <input type="text" id="receiver_postcode" name="receiver_postcode" value="<c:out value='${sessionScope.loginuser.postcode}' />" readonly />
-	    <button type="button" onclick="execDaumPostcode()">주소 검색</button>
-	</div>
+       <label for="receiver_name">받는 분:</label>
+       <input type="text" id="receiver_name" name="receiver_name" value="<c:out value='${sessionScope.loginuser.name}' />" />
+   </div>
+   
+   <div class="payment-form-group">
+       <label for="receiver_phone">연락처:</label>
+       <input type="text" id="receiver_phone" name="receiver_phone" value="<c:out value='${sessionScope.loginuser.mobile}' />" />
+   </div>
+   
+   <div class="payment-form-group">
+       <label for="receiver_postcode">우편번호:</label>
+       <input type="text" id="receiver_postcode" name="receiver_postcode" value="<c:out value='${sessionScope.loginuser.postcode}' />" readonly />
+       <button type="button" onclick="execDaumPostcode()">주소 검색</button>
+   </div>
 
     <div class="payment-form-group">
         <label for="receiver_address">주소:</label>
@@ -305,21 +305,21 @@ input#receiver_address {
     </table>
     
     <div class="payment-form-group point">
-	    <label>사용 가능 포인트:</label>
-	    <span id="availablePoint"><c:out value='${sessionScope.loginuser.point}' default='0' /></span> P
-	</div>
-	
-	<div class="payment-form-group">
-	    <label for="usedPoint">사용 포인트:</label>
-	    <input type="number" id="usepoint" value="0" placeholder="0" min="0" style="width:150px;" oninput="applyPoint()" />
-	</div>
-	
-	<div class="payment-form-group">
-	    <label>최종 결제금액:</label>
-	    <span id="finalPrice" style="font-weight:bold; color:#d00000;">
-	        <fmt:formatNumber value="${sum_totalPrice}" pattern="###,###" /> 원
-	    </span>
-	</div>
+       <label>사용 가능 포인트:</label>
+       <span id="availablePoint"><c:out value='${sessionScope.loginuser.point}' default='0' /></span> P
+   </div>
+   
+   <div class="payment-form-group">
+       <label for="usedPoint">사용 포인트:</label>
+       <input type="number" id="usepoint" value="0" placeholder="0" min="0" style="width:150px;" oninput="applyPoint()" />
+   </div>
+   
+   <div class="payment-form-group">
+       <label>최종 결제금액:</label>
+       <span id="finalPrice" style="font-weight:bold; color:#d00000;">
+           <fmt:formatNumber value="${sum_totalPrice}" pattern="###,###" /> 원
+       </span>
+   </div>
 
     <div class="pay-buttons">
         <button type="button" id="payBtn">결제 진행</button>
