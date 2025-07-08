@@ -15,6 +15,7 @@ import myshop.domain.OrderVO;
 import util.security.AES256;
 import util.security.SecretMyKey;
 import myshop.domain.BookVO;
+import myshop.domain.CategoryVO;
 import myshop.domain.OrderDetailVO;
 
 public class OrderDAO_imple implements OrderDAO {
@@ -23,7 +24,6 @@ public class OrderDAO_imple implements OrderDAO {
     private Connection conn;
     private PreparedStatement pstmt;
     private ResultSet rs;
-    
     private AES256 aes;
 
     public OrderDAO_imple() {
@@ -234,34 +234,6 @@ public class OrderDAO_imple implements OrderDAO {
         return orderList;
     }
     
-    // 주문코드를 찾는 함수
-   @Override
-   public String selectOrdercode(String userid) throws SQLException {
-
-      String ordercode = null;
-      
-      try {
-         conn = ds.getConnection();
-         
-         String sql = " select ordercode "
-               + " from tbl_order "
-               + " where fk_userid = ? ";
-         
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, userid);
-            rs = pstmt.executeQuery();
-            
-            if (rs.next()) {
-               ordercode = rs.getString("ordercode");
-            }
-         
-      } finally {
-         close();
-      }
-      
-      return ordercode;
-
-   } // end of public String selectOrdercode(String userid) throws SQLException {}---------------
 
    // 주문상세 정보 찾는 함수
    @Override
@@ -397,11 +369,156 @@ public class OrderDAO_imple implements OrderDAO {
    }
 
 
+    // 주문코드를 찾는 함수
+	@Override
+	public String selectOrdercode(String userid) throws SQLException {
 
-   
+		String ordercode = null;
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " select ordercode "
+					+ " from tbl_order "
+					+ " where fk_userid = ? ";
+			
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userid);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+            	ordercode = rs.getString("ordercode");
+            }
+			
+		} finally {
+			close();
+		}
+		
+		return ordercode;
+
+	} // end of public String selectOrdercode(String userid) throws SQLException {}---------------
+
+	// 주문상세 정보 찾는 함수
+	@Override
+	public List<OrderDetailVO> selectAllDetail() throws SQLException {
+	    List<OrderDetailVO> orderDetailList = new ArrayList<>();
+	    
+	    try {
+	        conn = ds.getConnection();
+	        
+	        String sql = "SELECT "
+	                + "    od.fk_ordercode, "
+	                + "    od.deliverdate, "
+	                + "    od.odrseq, "
+	                + "    b.bookseq, "
+	                + "    od.oqty, "
+	                + "    od.odrprice, "
+	                + "    od.deliverstatus, "
+	                + "    b.bname, "
+	                + "    b.price, "
+	                + "	   b.bimage AS bimage, "
+	                + "    b.author "
+	                + " FROM "
+	                + "    tbl_orderdetail od "
+	                + " JOIN "
+	                + "    tbl_book b ON od.fk_bookseq = b.bookseq";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+	        
+	        // 데이터가 있을 경우 반복문 실행
+	        while (rs.next()) {
+	            OrderDetailVO detailVO = new OrderDetailVO();
+	            
+	            // OrderDetailVO에 데이터 세팅
+	            detailVO.setOdrseq(rs.getString("odrseq"));              // 주문 상세 코드
+	            detailVO.setFk_ordercode(rs.getString("fk_ordercode"));  // 주문 코드
+	            detailVO.setFk_bookseq(rs.getInt("bookseq"));            // 책 번호
+	            detailVO.setOqty(rs.getInt("oqty"));                     // 수량
+	            detailVO.setOdrprice(rs.getInt("odrprice"));             // 개별 가격
+	            detailVO.setDeliverdate(rs.getString("deliverdate"));    // 주문 일자
+	            detailVO.setDeliverstatus(rs.getString("deliverstatus"));// 배송 상태
+	            
+	            // 책 정보 추가
+	            BookVO book = new BookVO();
+	            book.setBookseq(rs.getInt("bookseq"));
+	            book.setBname(rs.getString("bname"));
+	            book.setPrice(rs.getInt("price"));
+	            book.setBimage(rs.getString("bimage"));
+	            book.setAuthor(rs.getString("author"));
+	            
+	            // OrderDetailVO에 책 정보 설정
+	            detailVO.setBook(book);
+	            
+	            // 리스트에 추가
+	            orderDetailList.add(detailVO);
+	        }
+	        
+	    } finally {
+	        close();  // 자원 정리
+	    }
+	    
+	    return orderDetailList;
+	} // end of public List<OrderDetailVO> selectAllDetail() throws SQLException {}-----------
+	
+	// 판매량순정렬
+	@Override
+	public List<BookVO> selectBooksOrderBySales(int categorySeq) throws SQLException {
+	    List<BookVO> list = new ArrayList<>();
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = "SELECT b.bookseq, b.bname, b.bcontent, b.price, b.bqty, b.author, b.bimage, " +
+	                     "b.fk_publishseq, b.fk_categoryseq, b.binputdate, b.fk_snum, c.categoryname, " +
+	                     "NVL(SUM(od.oqty), 0) AS total_sales " +
+	                     "FROM tbl_book b " +
+	                     "JOIN tbl_category c ON b.fk_categoryseq = c.categoryseq " +
+	                     "LEFT JOIN tbl_orderdetail od ON b.bookseq = od.fk_bookseq " +
+	                     "WHERE (? = 0 OR b.fk_categoryseq = ?) " +  // 0이면 전체 카테고리
+	                     "GROUP BY b.bookseq, b.bname, b.bcontent, b.price, b.bqty, b.author, b.bimage, " +
+	                     "b.fk_publishseq, b.fk_categoryseq, b.binputdate, b.fk_snum, c.categoryname " +
+	                     "ORDER BY total_sales DESC";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setInt(1, categorySeq);
+	        pstmt.setInt(2, categorySeq);
+
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            BookVO book = new BookVO();
+	            book.setBookseq(rs.getInt("bookseq"));
+	            book.setBname(rs.getString("bname"));
+	            book.setBcontent(rs.getString("bcontent"));
+	            book.setPrice(rs.getInt("price"));
+	            book.setBqty(rs.getInt("bqty"));
+	            book.setAuthor(rs.getString("author"));
+	            book.setBimage(rs.getString("bimage"));
+	            book.setFk_publishseq(rs.getInt("fk_publishseq"));
+	            book.setFk_categoryseq(rs.getInt("fk_categoryseq"));
+	            book.setBinputdate(rs.getString("binputdate"));
+	            book.setFk_snum(rs.getInt("fk_snum"));
+
+	            CategoryVO cvo = new CategoryVO();
+	            cvo.setCategoryseq(rs.getInt("fk_categoryseq"));
+	            cvo.setCategoryname(rs.getString("categoryname"));
+	            book.setCvo(cvo);
+
+	            // 판매량 저장할 필드가 BookVO에 있다면 세팅
+	            book.setTotalSales(rs.getInt("total_sales"));
+
+	            list.add(book);
+	        }
+
+	    } finally {
+	        close();
+	    }
+
+	    return list;
+	}
+
+    
 }
-
-
-   
 
 

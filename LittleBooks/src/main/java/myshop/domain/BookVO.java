@@ -20,6 +20,7 @@ public class BookVO {
 	private PublishVO pvo;
 	
 	private int totalPrice;
+	private int totalSales;  // 판매량 필드
 	
 	public BookVO(){}
 	
@@ -161,6 +162,13 @@ public class BookVO {
 	public int getTotalPrice() {
 		return totalPrice;
 	}
+	
+	public int getTotalSales() {
+	    return totalSales;
+	}
 
+	public void setTotalSales(int totalSales) {
+	    this.totalSales = totalSales;
+	}
 
 }
