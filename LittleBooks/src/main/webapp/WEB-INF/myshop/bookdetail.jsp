@@ -136,8 +136,10 @@ $(function(){
         }
     });
 
- 	// 별 클릭 시 색 채우고 값 설정
-    $(document).on("click", ".rating-stars .star", function () {
+    // 별 클릭 시 색 채우고 값 설정
+    $(document).on("click", ".rating-stars .star", function() {
+    	if ($(this).hasClass("readonly")) return; // ⭐ 클릭 막기
+    	
         const selectedRating = $(this).data("value");
         $("#rating").val(selectedRating);
 
@@ -176,9 +178,9 @@ function goReviewListView() {
                     v_html += "<div class='rating-stars' style='margin-top: 10px;'>";
                     for(let i = 1; i <= 5; i++) {
                         if(i <= rating) {
-                            v_html += "<span class='star selected'>★</span>";
+                            v_html += "<span class='star selected readonly'>★</span>";
                         } else {
-                            v_html += "<span class='star'>★</span>";
+                            v_html += "<span class='star readonly'>★</span>";
                         }
                     }
                     v_html += "</div>";
