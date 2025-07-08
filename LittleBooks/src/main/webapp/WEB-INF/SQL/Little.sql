@@ -211,3 +211,17 @@ where userid = 'jyc';
 
 commit;
 
+select *
+from tbl_loginhistory
+where fk_userid = 'jyc';
+
+UPDATE tbl_loginhistory
+SET lastpwdchangedate = ADD_MONTHS(SYSDATE, -4)
+WHERE fk_userid = 'jyc';
+
+UPDATE tbl_member
+SET lastpwdchangedate = ADD_MONTHS(SYSDATE, -4)
+WHERE userid = 'jyc';
+
+
+commit;
