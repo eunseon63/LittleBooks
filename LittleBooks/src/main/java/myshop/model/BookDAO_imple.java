@@ -1133,6 +1133,7 @@ public class BookDAO_imple implements BookDAO {
 	    String impUid = (String) paraMap.get("imp_uid"); // 결제 고유번호
 	    
 	    String[] pnum_arr = (String[]) paraMap.get("pnum_arr");
+	    
 	    String[] oqty_arr = (String[]) paraMap.get("oqty_arr");
 	    String[] totalPrice_arr = (String[]) paraMap.get("totalPrice_arr");
 	    String[] cartseq_arr = (String[]) paraMap.get("cartseq_arr");
@@ -1287,6 +1288,330 @@ public class BookDAO_imple implements BookDAO {
 	    return result;
 	    
 	}
+
+	@Override
+	public List<Map<String, String>> myPurchase_byCategory(String userid) throws SQLException {
+		List<Map<String, String>> myPurchase_map_List = new ArrayList<>();
+	      
+	      try {
+	         conn = ds.getConnection();
+	         
+	         String sql = " WITH O AS ( "
+	         		+ "    SELECT ordercode "
+	         		+ "    FROM tbl_order "
+	         		+ "    WHERE fk_userid = ? "
+	         		+ " ), "
+	         		+ " OD AS ( "
+	         		+ "    SELECT fk_ordercode, fk_bookseq, oqty, odrprice "
+	         		+ "    FROM tbl_orderdetail "
+	         		+ " ) "
+	         		+ " SELECT "
+	         		+ "    C.categoryname, "
+	         		+ "    COUNT(C.categoryname) AS cnt, "
+	         		+ "    SUM(OD.oqty * OD.odrprice) AS sumpay, "
+	         		+ "    ROUND( "
+	         		+ "        SUM(OD.oqty * OD.odrprice) / "
+	         		+ "        ( "
+	         		+ "            SELECT SUM(OD2.oqty * OD2.odrprice) "
+	         		+ "            FROM O "
+	         		+ "            JOIN OD OD2 ON O.ordercode = OD2.fk_ordercode "
+	         		+ "        ) * 100, "
+	         		+ "        2\r\n"
+	         		+ "    ) AS sumpay_pct "
+	         		+ " FROM O "
+	         		+ " JOIN OD ON O.ordercode = OD.fk_ordercode "
+	         		+ " JOIN tbl_book B ON OD.fk_bookseq = B.bookseq "
+	         		+ " JOIN tbl_category C ON B.fk_categoryseq = C.categoryseq "
+	         		+ " GROUP BY C.categoryname "
+	         		+ " ORDER BY 3 DESC ";
+	         
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setString(1, userid);
+	         
+	         rs = pstmt.executeQuery();
+	                  
+	         while(rs.next()) {
+	            String categoryname = rs.getString("CATEGORYNAME");
+	            String cnt = rs.getString("CNT");
+	            String sumpay = rs.getString("SUMPAY");
+	            String sumpay_pct = rs.getString("SUMPAY_PCT");
+	            
+	            Map<String, String> map = new HashMap<>();
+	            map.put("categoryname", categoryname);
+	            map.put("cnt", cnt);
+	            map.put("sumpay", sumpay);
+	            map.put("sumpay_pct", sumpay_pct);
+	            
+	            myPurchase_map_List.add(map);
+	         } // end of while----------------------------------
+	         
+	      } finally {
+	         close();
+	      }
+	      
+	      return myPurchase_map_List;
+	}
+
+	
+	
+
+	//나의 카테고리별 월별 주문 알아오기
+	@Override
+	public List<Map<String, String>> myPurchase_byMonth_byCategory(String userid) throws SQLException {
+
+	    List<Map<String, String>> myPurchase_map_List = new ArrayList<>();
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " WITH "
+	                + " O AS (SELECT ordercode, orderdate "
+	                + "       FROM tbl_order "
+	                + "       WHERE fk_userid = ? "
+	                + "     ), "
+	                + " OD AS (SELECT fk_ordercode, fk_bookseq, oqty, odrprice "
+	                + "        FROM tbl_orderdetail "
+	                + "       ) "
+	                + " SELECT C.CATEGORYNAME "
+	                + "      , COUNT(*) AS CNT "
+	                + "      , SUM(OD.oqty * OD.odrprice) AS SUMPAY "
+	                + "      , ROUND(SUM(OD.oqty * OD.odrprice) / (SELECT SUM(OD.oqty * OD.odrprice) FROM O JOIN OD ON O.ordercode = OD.fk_ordercode) * 100, 2) AS SUMPAY_PCT "
+	                + "      , SUM(CASE WHEN TO_CHAR(O.orderdate, 'MM') = '01' THEN OD.oqty * OD.odrprice ELSE 0 END) AS m_01 "
+	                + "      , SUM(CASE WHEN TO_CHAR(O.orderdate, 'MM') = '02' THEN OD.oqty * OD.odrprice ELSE 0 END) AS m_02 "
+	                + "      , SUM(CASE WHEN TO_CHAR(O.orderdate, 'MM') = '03' THEN OD.oqty * OD.odrprice ELSE 0 END) AS m_03 "
+	                + "      , SUM(CASE WHEN TO_CHAR(O.orderdate, 'MM') = '04' THEN OD.oqty * OD.odrprice ELSE 0 END) AS m_04 "
+	                + "      , SUM(CASE WHEN TO_CHAR(O.orderdate, 'MM') = '05' THEN OD.oqty * OD.odrprice ELSE 0 END) AS m_05 "
+	                + "      , SUM(CASE WHEN TO_CHAR(O.orderdate, 'MM') = '06' THEN OD.oqty * OD.odrprice ELSE 0 END) AS m_06 "
+	                + "      , SUM(CASE WHEN TO_CHAR(O.orderdate, 'MM') = '07' THEN OD.oqty * OD.odrprice ELSE 0 END) AS m_07 "
+	                + "      , SUM(CASE WHEN TO_CHAR(O.orderdate, 'MM') = '08' THEN OD.oqty * OD.odrprice ELSE 0 END) AS m_08 "
+	                + "      , SUM(CASE WHEN TO_CHAR(O.orderdate, 'MM') = '09' THEN OD.oqty * OD.odrprice ELSE 0 END) AS m_09 "
+	                + "      , SUM(CASE WHEN TO_CHAR(O.orderdate, 'MM') = '10' THEN OD.oqty * OD.odrprice ELSE 0 END) AS m_10 "
+	                + "      , SUM(CASE WHEN TO_CHAR(O.orderdate, 'MM') = '11' THEN OD.oqty * OD.odrprice ELSE 0 END) AS m_11 "
+	                + "      , SUM(CASE WHEN TO_CHAR(O.orderdate, 'MM') = '12' THEN OD.oqty * OD.odrprice ELSE 0 END) AS m_12 "
+	                + " FROM O "
+	                + " JOIN OD ON O.ordercode = OD.fk_ordercode "
+	                + " JOIN tbl_book B ON OD.fk_bookseq = B.bookseq "
+	                + " JOIN tbl_category C ON B.fk_categoryseq = C.categoryseq "
+	                + " GROUP BY C.CATEGORYNAME "
+	                + " ORDER BY SUMPAY DESC";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            Map<String, String> map = new HashMap<>();
+
+	            map.put("categoryname", rs.getString("CATEGORYNAME"));
+	            map.put("cnt", rs.getString("CNT"));
+	            map.put("sumpay", rs.getString("SUMPAY"));
+	            map.put("sumpay_pct", rs.getString("SUMPAY_PCT"));
+	            map.put("m_01", rs.getString("m_01"));
+	            map.put("m_02", rs.getString("m_02"));
+	            map.put("m_03", rs.getString("m_03"));
+	            map.put("m_04", rs.getString("m_04"));
+	            map.put("m_05", rs.getString("m_05"));
+	            map.put("m_06", rs.getString("m_06"));
+	            map.put("m_07", rs.getString("m_07"));
+	            map.put("m_08", rs.getString("m_08"));
+	            map.put("m_09", rs.getString("m_09"));
+	            map.put("m_10", rs.getString("m_10"));
+	            map.put("m_11", rs.getString("m_11"));
+	            map.put("m_12", rs.getString("m_12"));
+
+	            myPurchase_map_List.add(map);
+	        }
+
+	    } finally {
+	        close();
+	    }
+
+	    return myPurchase_map_List;
+	}
+	
+	
+	
+	
+	
+	//관리자(admin) 전용 카테고리별 월별 매출 통계 
+	@Override
+	public List<Map<String, String>> adminCategorySalesByMonth() throws SQLException {
+	    List<Map<String, String>> list = new ArrayList<>();
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql =
+	            " WITH O AS ( " +
+	            "     SELECT ordercode, TO_CHAR(orderdate, 'MM') AS order_month " +
+	            "     FROM tbl_order " +
+	            " ), " +
+	            " OD AS ( " +
+	            "     SELECT fk_ordercode, fk_bookseq, oqty, odrprice " +
+	            "     FROM tbl_orderdetail " +
+	            " ) " +
+	            " SELECT C.categoryname, " +
+	            "  SUM(CASE WHEN O.order_month='01' THEN OD.oqty*OD.odrprice ELSE 0 END) AS m_01, " +
+	            "  SUM(CASE WHEN O.order_month='02' THEN OD.oqty*OD.odrprice ELSE 0 END) AS m_02, " +
+	            "  SUM(CASE WHEN O.order_month='03' THEN OD.oqty*OD.odrprice ELSE 0 END) AS m_03, " +
+	            "  SUM(CASE WHEN O.order_month='04' THEN OD.oqty*OD.odrprice ELSE 0 END) AS m_04, " +
+	            "  SUM(CASE WHEN O.order_month='05' THEN OD.oqty*OD.odrprice ELSE 0 END) AS m_05, " +
+	            "  SUM(CASE WHEN O.order_month='06' THEN OD.oqty*OD.odrprice ELSE 0 END) AS m_06, " +
+	            "  SUM(CASE WHEN O.order_month='07' THEN OD.oqty*OD.odrprice ELSE 0 END) AS m_07, " +
+	            "  SUM(CASE WHEN O.order_month='08' THEN OD.oqty*OD.odrprice ELSE 0 END) AS m_08, " +
+	            "  SUM(CASE WHEN O.order_month='09' THEN OD.oqty*OD.odrprice ELSE 0 END) AS m_09, " +
+	            "  SUM(CASE WHEN O.order_month='10' THEN OD.oqty*OD.odrprice ELSE 0 END) AS m_10, " +
+	            "  SUM(CASE WHEN O.order_month='11' THEN OD.oqty*OD.odrprice ELSE 0 END) AS m_11, " +
+	            "  SUM(CASE WHEN O.order_month='12' THEN OD.oqty*OD.odrprice ELSE 0 END) AS m_12 " +
+	            " FROM O " +
+	            " JOIN OD ON O.ordercode = OD.fk_ordercode " +
+	            " JOIN tbl_book B ON OD.fk_bookseq = B.bookseq " +
+	            " JOIN tbl_category C ON B.fk_categoryseq = C.categoryseq " +
+	            " GROUP BY C.categoryname " +
+	            " ORDER BY C.categoryname ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            Map<String, String> map = new HashMap<>();
+	            map.put("categoryname", rs.getString("categoryname"));
+	            for (int i = 1; i <= 12; i++) {
+	                String key = String.format("m_%02d", i);
+	                String val = rs.getString(key);
+	                map.put(key, val != null ? val : "0");
+	            }
+	            list.add(map);
+	        }
+	    } finally {
+	        close();
+	    }
+	    return list;
+	}
+	
+	
+	 // 총 매출액 조회 
+	@Override
+    public int getTotalSales() throws SQLException {
+        int totalSales = 0;
+        try {
+            conn = ds.getConnection();
+            String sql = " SELECT NVL(SUM(totalprice), 0) AS totalSales FROM tbl_order ";
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                totalSales = rs.getInt("totalSales");
+            }
+        } finally {
+            close();
+        }
+        return totalSales;
+    }
+	
+	
+	// 매출 상세 리스트 조회 
+	@Override
+    public List<Map<String, Object>> getSalesList() throws SQLException {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " SELECT o.ordercode, o.orderdate, o.totalprice, o.fk_userid, od.oqty, b.bname " +
+                " FROM tbl_order o " +
+                " JOIN tbl_orderdetail od ON o.ordercode = od.fk_ordercode " +
+                " JOIN tbl_book b ON od.fk_bookseq = b.bookseq " +
+                " ORDER BY o.orderdate DESC ";
+
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("ordercode", rs.getString("ordercode"));
+                map.put("orderdate", rs.getTimestamp("orderdate"));
+                map.put("totalprice", rs.getInt("totalprice"));
+                map.put("userid", rs.getString("fk_userid"));
+                map.put("oqty", rs.getInt("oqty"));
+                map.put("bname", rs.getString("bname"));
+
+                list.add(map);
+            }
+        } finally {
+            close();
+        }
+        return list;
+    }
+
+	@Override
+	public List<Map<String, Object>> getUserTotalSpentList() throws SQLException {
+		List<Map<String, Object>> list = new ArrayList<>();
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = 
+	            " SELECT fk_userid, SUM(totalprice) AS total_spent " +
+	            " FROM tbl_order " +
+	            " GROUP BY fk_userid " +
+	            " ORDER BY total_spent DESC ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            Map<String, Object> map = new HashMap<>();
+	            map.put("userid", rs.getString("fk_userid"));
+	            map.put("totalSpent", rs.getInt("total_spent"));
+	            list.add(map);
+	        }
+	    } finally {
+	        close();
+	    }
+
+	    return list;
+	}
+
+	
+	// 최근 30일 일별 매출 통계
+	@Override
+	public List<Map<String, String>> getDailySalesLast30Days() throws SQLException {
+	    
+		List<Map<String, String>> list = new ArrayList<>();
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = 
+	            " SELECT TO_CHAR(orderdate, 'YYYY-MM-DD') AS order_day, " +
+	            "       SUM(totalprice) AS day_total " +
+	            " FROM tbl_order " +
+	            " WHERE orderdate >= SYSDATE - 30 " +
+	            " GROUP BY TO_CHAR(orderdate, 'YYYY-MM-DD') " +
+	            " ORDER BY order_day ASC ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            Map<String, String> map = new HashMap<>();
+	            map.put("date", rs.getString("order_day"));         // key 변경
+	            map.put("date_total", rs.getString("day_total"));    // key 변경
+	            list.add(map);
+	        }
+
+	    } finally {
+	        close();
+	    }
+
+	    return list;
+	}
+
+
+
+	
+	
+
 
 }
 
