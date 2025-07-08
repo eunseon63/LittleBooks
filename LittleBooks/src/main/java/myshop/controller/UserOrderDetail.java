@@ -1,12 +1,14 @@
 package myshop.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import member.domain.MemberVO;
+import myshop.domain.OrderDetailVO;
 import myshop.model.OrderDAO;
 import myshop.model.OrderDAO_imple;
 
@@ -32,6 +34,9 @@ public class UserOrderDetail extends AbstractController {
 		MemberVO member = odao.selectOrderMember(paraMap);
 		// System.out.println(member);
 		
+		List<OrderDetailVO> orderDetailList = odao.selectAllDetail(userid);  // 모든 주문 내역을 조회
+        
+        request.setAttribute("orderDetailList", orderDetailList);
 		request.setAttribute("member", member);
 		request.setAttribute("ordercode", ordercode);
 		

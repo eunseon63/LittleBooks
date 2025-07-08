@@ -273,24 +273,28 @@ public class OrderDAO_imple implements OrderDAO {
 
            String sql = "SELECT "
                    + "    od.fk_ordercode, "
-                   + "    od.deliverdate, "
                    + "    od.odrseq, "
                    + "    od.fk_bookseq AS bookseq, "
                    + "    od.oqty, "
                    + "    od.odrprice, "
                    + "    od.deliverstatus, "
+                   + "    o.orderdate, "
+                   + "    o.totalprice, "
+                   + "    o.usepoint, "
                    + "    b.bname, "
                    + "    b.price, "
                    + "    b.bimage, "
                    + "    b.author "
-                   + "FROM tbl_orderdetail od "
-                   + "JOIN tbl_order o ON od.fk_ordercode = o.ordercode "
-                   + "JOIN tbl_book b ON od.fk_bookseq = b.bookseq "
-                   + "JOIN tbl_member m ON o.fk_userid = m.userid ";
+                   + " FROM tbl_orderdetail od "
+                   + " JOIN tbl_order o ON od.fk_ordercode = o.ordercode "
+                   + " JOIN tbl_book b ON od.fk_bookseq = b.bookseq "
+                   + " JOIN tbl_member m ON o.fk_userid = m.userid ";
 
            if (!"admin".equals(userid)) {
                sql += "WHERE m.userid = ? ";
            }
+           
+           sql += " order by od.fk_ordercode asc ";
 
            pstmt = conn.prepareStatement(sql);
 
@@ -308,9 +312,13 @@ public class OrderDAO_imple implements OrderDAO {
                detailVO.setFk_bookseq(rs.getInt("bookseq"));
                detailVO.setOqty(rs.getInt("oqty"));
                detailVO.setOdrprice(rs.getInt("odrprice"));
-               detailVO.setDeliverdate(rs.getString("deliverdate"));
                detailVO.setDeliverstatus(rs.getString("deliverstatus"));
 
+               OrderVO order = new OrderVO();
+               order.setOrderdate(rs.getString("orderdate"));
+               order.setTotalPrice(rs.getInt("totalprice"));
+               order.setUsePoint(rs.getInt("usepoint"));
+               
                BookVO book = new BookVO();
                book.setBookseq(rs.getInt("bookseq"));
                book.setBname(rs.getString("bname"));
@@ -319,7 +327,8 @@ public class OrderDAO_imple implements OrderDAO {
                book.setAuthor(rs.getString("author"));
 
                detailVO.setBook(book);
-
+               detailVO.setOrder(order);
+               
                orderDetailList.add(detailVO);
            }
 
@@ -395,6 +404,101 @@ public class OrderDAO_imple implements OrderDAO {
 
        return member;
    }
+
+   // 배송 정보 변경
+	@Override
+	public int updateDeliverStatus(String ordercode, int status) throws SQLException {
+		
+		int result = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = "UPDATE tbl_orderdetail SET deliverstatus = ?, deliverdate = SYSDATE WHERE fk_ordercode = ?";
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setInt(1, status);
+	        pstmt.setString(2, ordercode);
+
+	        result = pstmt.executeUpdate();
+
+	    } finally {
+	        close();
+	    }
+
+	    return result;
+	    
+	}
+
+	// 한 주문 내역 조회
+	@Override
+	public List<OrderDetailVO> selectOneDetail(String ordercode) throws SQLException {
+		
+	       List<OrderDetailVO> orderDetailList = new ArrayList<>();
+
+	       try {
+	           conn = ds.getConnection();
+
+	           String sql = "SELECT "
+	                   + "    od.fk_ordercode, "
+	                   + "    od.odrseq, "
+	                   + "    od.fk_bookseq AS bookseq, "
+	                   + "    od.oqty, "
+	                   + "    od.odrprice, "
+	                   + "    od.deliverstatus, "
+	                   + "    o.orderdate, "
+	                   + "    o.totalprice, "
+	                   + "    o.usepoint, "
+	                   + "    b.bname, "
+	                   + "    b.price, "
+	                   + "    b.bimage, "
+	                   + "    b.author "
+	                   + " FROM tbl_orderdetail od "
+	                   + " JOIN tbl_order o ON od.fk_ordercode = o.ordercode "
+	                   + " JOIN tbl_book b ON od.fk_bookseq = b.bookseq "
+	                   + " JOIN tbl_member m ON o.fk_userid = m.userid "
+	                   + " WHERE od.fk_ordercode = ? "
+	                   + " order by od.fk_ordercode asc ";
+
+	           pstmt = conn.prepareStatement(sql);
+
+	           pstmt.setString(1, ordercode);
+	           
+	           rs = pstmt.executeQuery();
+
+	           while (rs.next()) {
+	               OrderDetailVO detailVO = new OrderDetailVO();
+
+	               detailVO.setOdrseq(rs.getString("odrseq"));
+	               detailVO.setFk_ordercode(rs.getString("fk_ordercode"));
+	               detailVO.setFk_bookseq(rs.getInt("bookseq"));
+	               detailVO.setOqty(rs.getInt("oqty"));
+	               detailVO.setOdrprice(rs.getInt("odrprice"));
+	               detailVO.setDeliverstatus(rs.getString("deliverstatus"));
+
+	               OrderVO order = new OrderVO();
+	               order.setOrderdate(rs.getString("orderdate"));
+	               order.setTotalPrice(rs.getInt("totalprice"));
+	               order.setUsePoint(rs.getInt("usepoint"));
+	               
+	               BookVO book = new BookVO();
+	               book.setBookseq(rs.getInt("bookseq"));
+	               book.setBname(rs.getString("bname"));
+	               book.setPrice(rs.getInt("price"));
+	               book.setBimage(rs.getString("bimage"));
+	               book.setAuthor(rs.getString("author"));
+
+	               detailVO.setBook(book);
+	               detailVO.setOrder(order);
+	               
+	               orderDetailList.add(detailVO);
+	           }
+
+	       } finally {
+	           close();
+	       }
+
+	       return orderDetailList;
+	}
 
 
 
