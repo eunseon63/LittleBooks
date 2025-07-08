@@ -202,3 +202,26 @@ select mobile
 from tbl_member join tbl_order
 on userid = fk_userid
 where userid = 'jyc';
+
+select *
+from tbl_member;
+
+update tbl_member set idle = 1
+where userid = 'jyc';
+
+commit;
+
+select *
+from tbl_loginhistory
+where fk_userid = 'jyc';
+
+UPDATE tbl_loginhistory
+SET lastpwdchangedate = ADD_MONTHS(SYSDATE, -4)
+WHERE fk_userid = 'jyc';
+
+UPDATE tbl_member
+SET lastpwdchangedate = ADD_MONTHS(SYSDATE, -4)
+WHERE userid = 'jyc';
+
+
+commit;

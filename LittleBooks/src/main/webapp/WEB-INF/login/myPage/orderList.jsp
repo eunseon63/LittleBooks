@@ -136,6 +136,10 @@
 <body>
 <jsp:include page="../../header1.jsp" />
 
+<br>
+<br>
+<br>
+
 <div class="container mt-5 mb-5">
     <div class="row">
         <!-- 좌측 네비게이션 -->

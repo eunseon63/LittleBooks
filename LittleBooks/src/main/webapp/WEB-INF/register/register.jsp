@@ -1,9 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
-    // context path 가져오기 (리소스 경로에 사용됨)
+   
     String ctxPath = request.getContextPath();
 %>
-
+<script>
+  const ctxPath = '<%= ctxPath %>';
+</script>
 <!-- Google Web Font -->
 <link href="https://fonts.googleapis.com/css2?family=Cafe24+Surround&display=swap" rel="stylesheet">
 
@@ -68,7 +70,7 @@
                             <td>
                                 <input type="text" name="userid" id="userid" maxlength="40"autocomplete="off" class="requiredInfo" />
                                 <img src="<%= ctxPath %>/images/b_id_check.gif" id="idcheck" />
-                                <span id="idcheckResult"></span>
+								<span id="idcheckResult"></span>
                                 <span class="error">아이디는 필수입력 사항입니다.</span>
                             </td>
                         </tr>

@@ -101,11 +101,15 @@ function validateName() {
 }
 
 function validateUserId() {
+	 if ($('#idcheckResult').text() === '이미 사용 중입니다.') {
+    return true; // 이미 메시지 출력했으므로 중복 메시지 방지
+  }
   return checkRequired('#userid', '아이디');
 }
 
 function validatePassword() {
   const regex = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$/;
+   
   return checkPattern('#pwd', regex, '비밀번호는 영문자+숫자+특수문자 포함 8~15자입니다.');
 }
 
@@ -115,6 +119,9 @@ function validatePasswordConfirm() {
 
 function validateEmail() {
   const regex = /^[\w.-]+@([\w-]+\.)+[A-Za-z]{2,3}$/;
+  if ($('#emailCheckResult').text() === '이미 사용 중입니다.') {
+    return true; // 이미 메시지 출력했으므로 중복 메시지 방지
+  }
   return checkPattern('#email', regex, '유효한 이메일 형식이 아닙니다.');
 }
 
@@ -158,34 +165,59 @@ function checkDuplicate(type) {
     alert(`${type === 'userid' ? '아이디' : '이메일'}를 입력하세요.`);
     return;
   }
+
+  let url = '';
+  if(type === 'userid') {
+    url = `${ctxPath}/register/idDuplicateCheck.go`;  // 여기서 정확한 매핑 URL로 맞춤
+  } else if(type === 'email') {
+    url = `${ctxPath}/register/emailDuplicateCheck.go`;
+  }
+
   $.post(
-    `${type}DuplicateCheck.go`,
+    url,
     { [type]: val },
     type === 'email' ? handleEmailCheck : handleIdCheck,
-    type === 'email' ? 'json' : 'text'
+    'json'  // 서버에서 항상 JSON을 응답하므로 타입을 통일하는 게 좋음
   );
 }
 
-function handleIdCheck(res) {
-  const json = JSON.parse(res);
-  idChecked = true;
+function handleIdCheck(json) {
   if (json.isExists) {
     $('#idcheckResult').text('이미 사용 중입니다.').css('color', 'red');
-    $('#userid').val('').focus();
+
+    // 중복된 아이디일 경우: blur 이벤트 제거 → 값 비우기 → 포커스 → blur 이벤트 재등록
+    $('#userid').off('blur');
+    $('#userid').val('');
     idChecked = false;
+
+    // blur 이벤트 재등록 (validateUserId가 자동 실행되지 않도록 시간차)
+    setTimeout(() => {
+      $('#userid').on('blur', validateUserId);
+    }, 300);
+
+    $('#userid').focus(); // 마지막에 포커스를 주어 사용자 입력 유도
   } else {
     $('#idcheckResult').text('사용 가능한 아이디입니다.').css('color', 'navy');
+    idChecked = true;
   }
 }
 
 function handleEmailCheck(json) {
-  emailChecked = true;
   if (json.isExists) {
     $('#emailCheckResult').text('이미 사용 중입니다.').css('color', 'red');
-    $('#email').val('').focus();
+
+    $('#email').off('blur');
+    $('#email').val('');
     emailChecked = false;
+
+    setTimeout(() => {
+      $('#email').on('blur', validateEmail);
+    }, 300);
+
+    $('#email').focus();
   } else {
     $('#emailCheckResult').text('사용 가능한 이메일입니다.').css('color', 'navy');
+    emailChecked = true;
   }
 }
 
