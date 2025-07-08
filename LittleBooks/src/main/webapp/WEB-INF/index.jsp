@@ -112,6 +112,7 @@
     </div>
 	
 	<h3>BEST 도서 목록</h3>
+	<br><a href="${pageContext.request.contextPath}/myshop/bestbooks.go" class="more-link">더보기 ›</a>
 	<div class="book-list">
 	    <c:forEach var="book" items="${bestBooks}" varStatus="status">
 		    <c:if test="${status.index < 5}">
@@ -126,6 +127,7 @@
 	</div>
 
 	<h3>NEW 도서 목록</h3>
+	<br><a href="${pageContext.request.contextPath}/myshop/newbooks.go" class="more-link">더보기 ›</a>
 	<div class="book-list">
 	    <c:forEach var="book" items="${newBooks}" varStatus="status">
 		    <c:if test="${status.index < 5}">
@@ -138,6 +140,7 @@
 		    </c:if>
 		</c:forEach>
 	</div>
+	
 </div>
 
 <jsp:include page="footer.jsp" />

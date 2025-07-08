@@ -199,3 +199,32 @@ h4 {
     font-weight: 400;
     font-style: italic;
 }
+
+h3 {
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 8px;
+    border-bottom: 3px solid #ff6f61; /* 밑줄 강조 */
+}
+
+h3::before {
+    content: "📚 ";
+    font-size: 20px;
+}
+
+.more-link {
+    font-size: 14px;
+    margin-left: 10px;
+    color: #ff6f61;
+    text-decoration: none;
+}
+.more-link:hover {
+    text-decoration: underline;
+}
+
