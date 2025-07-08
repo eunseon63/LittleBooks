@@ -19,6 +19,7 @@
     margin-bottom: 20px;
     color: #333;
 }
+
 .search-box {
     max-width: 600px;
     margin: 0 auto 40px auto;
@@ -26,6 +27,7 @@
     justify-content: center;
     gap: 0;
 }
+
 .search-select {
     height: 45px;
     border: 2px solid #f4c900;
@@ -37,6 +39,7 @@
     cursor: pointer;
     outline: none;
 }
+
 .search-input {
     height: 45px;
     border: 2px solid #f4c900;
@@ -48,6 +51,7 @@
     outline: none;
     background-color: #fffef5;
 }
+
 .search-button {
     height: 45px;
     border: 2px solid #f4c900;
@@ -60,21 +64,24 @@
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
+
 .search-button:hover {
     background-color: #ffcc00;
 }
+
 .container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 25px;
     padding: 40px;
-    justify-content: center;
     background-color: #fff;
     margin: 0 auto;
     max-width: 1000px;
+    justify-content: center; /* ✅ 중요: 전체 그리드를 가운데 정렬 */
 }
+
 .card {
-    width: 240px;
+    width: 240px; /* ✅ 카드 고정 크기 */
     height: 400px;
     background-color: #fffef5;
     border: 1px solid #f4c900;
@@ -83,9 +90,11 @@
     overflow: hidden;
     transition: transform 0.2s ease;
 }
+
 .card:hover {
     transform: translateY(-5px);
 }
+
 .image-box {
     width: 100%;
     height: 300px;
@@ -95,6 +104,7 @@
     justify-content: center;
     border-bottom: 1px solid #eee;
 }
+
 .image-box img {
     width: 100%;
     height: 100%;
@@ -104,16 +114,19 @@
     padding: 13px;
     text-align: center;
 }
+
 .card-title {
     font-size: 14px;
     font-weight: bold;
     margin-bottom: 8px;
     color: #222;
 }
+
 .card-price {
     font-size: 16px;
     color: #666;
 }
+
 .card-link {
     text-decoration: none;
     color: inherit;
@@ -121,11 +134,13 @@
     width: 100%;
     height: 100%;
 }
+
 .card-author {
     font-size: 13px;
     color: #666;
     margin-bottom: 5px;
 }
+
 </style>
 
 <!-- 도서목록 제목 -->
