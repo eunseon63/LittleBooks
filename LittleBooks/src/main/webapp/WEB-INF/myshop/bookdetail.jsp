@@ -217,8 +217,9 @@ function updateTotalPrice(qty) {
     const price = ${book.price};
     const total = qty * price;
     $("#totalPrice").text(total.toLocaleString('ko-KR', { style: 'currency', currency: 'KRW' }));
-    
-    $("input[name='cqty']").val(qty); // 수량 반영
+
+    $("#cqty").val(qty);
+    $("#oqtyHidden").val(qty);
 }
 
 //장바구니에 현재 선택한 상품을 추가하는 함수
