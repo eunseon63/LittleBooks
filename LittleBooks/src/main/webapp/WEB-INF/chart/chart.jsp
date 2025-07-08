@@ -76,14 +76,14 @@ div#table_container th {background-color: #595959; color: white;}
    <form name="searchFrm" style="margin: 20px 0 50px 0; ">
       <select name="searchType" id="searchType" style="height: 40px;">
          <option value="">통계선택하세요</option>
-         <option value="myPurchase_byCategory">나의 카테고리별주문 통계</option>
+         <option value="myPurchase_byCategory" selected>나의 카테고리별주문 통계</option>
          <option value="myPurchase_byMonth_byCategory">나의 카테고리별 월별주문 통계</option>
       </select>
    </form>
    
    <div id="chart_container"></div>
    <div id="table_container" style="margin: 40px 0 0 0;"></div>
-
+	
  </div>
 </div>
  
@@ -96,7 +96,7 @@ div#table_container th {background-color: #595959; color: white;}
 		  func_choice($(e.target).val());
 		// $(e.target).val() 은 "" 또는 "myPurchase_byCategory" 또는 "myPurchase_byMonth_byCategory" 이다. 
 	  });
-	  
+	  func_choice('myPurchase_byCategory');
   });// end of $(function(){})----------------------
 
 
@@ -115,15 +115,15 @@ div#table_container th {background-color: #595959; color: white;}
 	      case "myPurchase_byCategory": // "나의 카테고리별주문 통계" 를 선택한 경우
 			
 	          $.ajax({
-	        	  url:"<%= ctxPath%>/shop/myPurchase_byCategoryJSON.up",
+	        	  url:"<%= ctxPath%>/shop/myPurchase_byCategoryJSON.go",
 	        	  data:{"userid":"${sessionScope.loginuser.userid}"},
 				  dataType:"json",
 	        	  success:function(json){
 	        		 // console.log(JSON.stringify(json));
 	        		 /*
-	        		    [{"cname":"전자제품", "cnt":"1", "sumpay":"1000000", "sumpay_pct":"66.05"}
-	        		    ,{"cname":"도서",    "cnt":"1", "sumpay":"297000",  "sumpay_pct":"19.62"}
-	        		    ,{"cname":"의류",    "cnt":"3", "sumpay":"217000",  "sumpay_pct":"14.33"}]
+	        		    [{"categoryname":"전자제품", "cnt":"1", "sumpay":"1000000", "sumpay_pct":"66.05"}
+	        		    ,{"categoryname":"도서",    "cnt":"1", "sumpay":"297000",  "sumpay_pct":"19.62"}
+	        		    ,{"categoryname":"의류",    "cnt":"3", "sumpay":"217000",  "sumpay_pct":"14.33"}]
 	        		 */
 	        		  	  
 	        		  $("div#chart_container").empty(); 
@@ -135,13 +135,13 @@ div#table_container th {background-color: #595959; color: white;}
 	        			  let obj;
 	        			  
 	        			  if(i==0){
-	        				  obj = {name: json[i].cname,
+	        				  obj = {name: json[i].categoryname,
 			    		             y: Number(json[i].sumpay_pct),
 			    		             sliced: true,
 			    		             selected: true};
 	        			  }
 	        			  else {
-	        				  obj = {name: json[i].cname,
+	        				  obj = {name: json[i].categoryname,
 			    		             y: Number(json[i].sumpay_pct)};
 	        			  }
 	        			  
@@ -195,7 +195,7 @@ div#table_container th {background-color: #595959; color: white;}
 	      
 	                $.each(json, function(index, item){
 	                      html += "<tr>" +
-	                                  "<td>"+ item.cname +"</td>" +
+	                                  "<td>"+ item.categoryname +"</td>" +
 	                                  "<td>"+ item.cnt +"</td>" +
 	                                  "<td style='text-align: right;'>"+ Number(item.sumpay).toLocaleString('en') +" 원</td>" +
 	                                  "<td>"+ Number(item.sumpay_pct) +" %</td>" +
@@ -218,18 +218,13 @@ div#table_container th {background-color: #595959; color: white;}
 	      case "myPurchase_byMonth_byCategory": // "나의 카테고리별 월별주문 통계" 를 선택한 경우
 			
 	    	  $.ajax({
-					url:"<%= ctxPath%>/shop/myPurchase_byMonth_byCategoryJSON.up",
+					url:"<%= ctxPath%>/shop/myPurchase_byMonth_byCategoryJSON.go",
 					data:{"userid":"${sessionScope.loginuser.userid}"},
 					dataType:"json",
 					success:function(json){
 					    
 					 // console.log(JSON.stringify(json));
-					  /*
-					  	[{"m_11":"0","m_01":"0","m_12":"0","m_10":"0","m_04":"0","sumpay_pct":"61.46","m_05":"0","m_02":"1000000","m_03":"0","cname":"전자제품","cnt":"1","m_08":"0","m_09":"0","m_06":"0","m_07":"0","sumpay":"1000000"}
-					  	,{"m_11":"0","m_01":"170000","m_12":"0","m_10":"0","m_04":"0","sumpay_pct":"30.42","m_05":"0","m_02":"325000","m_03":"0","cname":"의류","cnt":"4","m_08":"0","m_09":"0","m_06":"0","m_07":"0","sumpay":"495000"}
-					  	,{"m_11":"0","m_01":"132000","m_12":"0","m_10":"0","m_04":"0","sumpay_pct":"8.11","m_05":"0","m_02":"0","m_03":"0","cname":"도서","cnt":"1","m_08":"0","m_09":"0","m_06":"0","m_07":"0","sumpay":"132000"}
-					  	]
-					  */
+					 
 					     $("div#chart_container").empty();
 					  
 					     const resultArr = [];
@@ -250,7 +245,7 @@ div#table_container th {background-color: #595959; color: white;}
 					    	 month_arr.push(Number(json[i].m_11));
 					    	 month_arr.push(Number(json[i].m_12));
 					    	 
-					    	 const obj = {name: json[i].cname,
+					    	 const obj = {name: json[i].categoryname,
 					    		          data: month_arr};
 					    	 
 					    	 resultArr.push(obj); // 배열속에 객체를 넣기
