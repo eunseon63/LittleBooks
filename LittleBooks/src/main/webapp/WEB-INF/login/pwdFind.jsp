@@ -71,22 +71,40 @@ function goFind() {
 function goUpdate() {
     const pwd = $('#pwd').val().trim();
     const pwd2 = $('#pwd2').val().trim();
-    
+
+    // 비밀번호 정규표현식: 8~15자, 숫자+영문자+특수문자 포함
+    const regExp_pwd = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$/;
+
     if (pwd === "") {
         alert("새 암호를 입력하세요!");
+        $('#pwd').focus();
         return;
     }
+
+    if (!regExp_pwd.test(pwd)) {
+        alert("암호는 8~15자, 숫자/영문자/특수문자를 모두 포함해야 합니다.");
+        $('#pwd').focus();
+        return;
+    }
+
+    if (pwd2 === "") {
+        alert("새 암호 확인을 입력하세요!");
+        $('#pwd2').focus();
+        return;
+    }
+
     if (pwd !== pwd2) {
-        alert("새 암호가 일치하지 않습니다!");
+        alert("새 암호가 서로 일치하지 않습니다!");
+        $('#pwd2').focus();
         return;
     }
-    
- // 비밀번호 변경 요청 전송
+
+    // 유효성 검사 통과 → 비밀번호 변경 요청 전송
     const frm = document.pwdUpdateEndFrm;
     frm.action = "<%= ctxPath %>/login/pwdUpdate.go";
     frm.method = "post";
     frm.submit();
-}; // end of function goUpdate()-----------------
+} // function goUpdate() {}-------------------------
 </script>
 
 <!-- 비밀번호 찾기 폼 -->
