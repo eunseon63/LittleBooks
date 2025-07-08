@@ -9,27 +9,31 @@ import common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+// 아이디  중복 확인 처리
 public class IdDuplicateCheck extends AbstractController {
 
 	private MemberDAO mdao = new MemberDAO_imple();
+
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String method= request.getMethod();
-		
-		if("POST".equals(method)){
-			
-			String userid= request.getParameter("userid");
-		
+		String method = request.getMethod();
+
+		if ("POST".equals(method)) { // POST 방식일 때
+
+			String userid = request.getParameter("userid");
+
+			// 아이디가 존재하는지 확인
 			boolean isExists = mdao.idDuplicateCheck(userid);
-			
-			JSONObject jsonObj = new JSONObject(); //https://mvnrepository.com/artifact/org.json/json/20240303 에서 bundle 다운 후 webinf lib 폴더에 넣어둬야 import 사용 가능함
-			jsonObj.put("isExists", isExists); // {"isExists":true}또는 {"isExists":false} 으로 만들어 준다.
-			
-			String json = jsonObj.toString(); // 문자열 형태인  "{"isExists":true}"또는 "{"isExists":false}" 으로 만들어 준다.
-			System.out.println(">>> 확인용 json =>" + json);
-		
+
+			JSONObject jsonObj = new JSONObject(); 
+
+			jsonObj.put("isExists", isExists);
+
+			String json = jsonObj.toString(); 
+			// System.out.println(">>> 확인용 json =>" + json);
+
 			request.setAttribute("json", json);
-			
+
 			super.setRedirect(false);
 			super.setViewPage("/WEB-INF/jsonview.jsp");
 		}
