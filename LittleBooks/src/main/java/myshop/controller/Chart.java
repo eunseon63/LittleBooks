@@ -1,3 +1,4 @@
+
 package myshop.controller;
 
 import common.controller.AbstractController;
@@ -8,7 +9,6 @@ public class Chart extends AbstractController {
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
 		// === 로그인 유무 검사하기 === //
 	      if(!super.checkLogin(request)) {
 	         // 로그인 하지 않은 경우이라면
@@ -16,7 +16,7 @@ public class Chart extends AbstractController {
 	         request.setAttribute("message", "주문통계를 조회하려면 먼저 로그인 부터 하세요!!");
 	         request.setAttribute("loc", "javascript:history.back()"); 
 	         
-	         super.setRedirect(false);
+	      //   super.setRedirect(false);
 	         super.setViewPage("/WEB-INF/msg.jsp");
 	         return; // 종료
 	      }
@@ -30,3 +30,4 @@ public class Chart extends AbstractController {
 	}
 
 }
+

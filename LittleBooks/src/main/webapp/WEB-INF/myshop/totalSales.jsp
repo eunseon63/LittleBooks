@@ -8,18 +8,15 @@
     body {
         font-family: 'Noto Sans KR', sans-serif;
     }
-
     .sales-container {
         padding: 100px 50px 50px 50px;
     }
-
     h3 {
         font-weight: bold;
         color: #333;
         text-align: center;
         margin-bottom: 40px;
     }
-
     .summary-box {
         background-color: #fff8e1;
         border: 1px solid #fbc02d;
@@ -28,26 +25,21 @@
         margin-bottom: 40px;
         text-align: center;
     }
-
     .summary-box h4 {
         font-weight: 600;
         color: #f57f17;
     }
-
     .summary-box .amount {
         font-size: 2rem;
         font-weight: bold;
         color: #d84315;
     }
-
     .table thead {
         background-color: #fffde7;
     }
-
     .table th, .table td {
         vertical-align: middle;
     }
-
     .table td {
         font-size: 0.95rem;
     }
@@ -71,7 +63,7 @@
             <thead>
                 <tr>
                     <th>주문번호</th>
-                    <th>구매자</th>
+                    <th>구매자 아이디</th>
                     <th>도서 제목</th>
                     <th>수량</th>
                     <th>총금액</th>
@@ -82,12 +74,12 @@
                 <c:if test="${not empty requestScope.salesList}">
                     <c:forEach var="sale" items="${requestScope.salesList}">
                         <tr>
-                            <td>${sale.orderNo}</td>
-                            <td>${sale.buyerName}</td>
-                            <td>${sale.bookTitle}</td>
-                            <td>${sale.quantity}</td>
-                            <td><fmt:formatNumber value="${sale.totalPrice}" type="currency" currencySymbol="₩" /></td>
-                            <td><fmt:formatDate value="${sale.orderDate}" pattern="yyyy-MM-dd HH:mm" /></td>
+                            <td>${sale.ordercode}</td>
+                            <td>${sale.userid}</td>
+                            <td>${sale.bname}</td>
+                            <td>${sale.oqty}</td>
+                            <td><fmt:formatNumber value="${sale.totalprice}" type="currency" currencySymbol="₩" /></td>
+                            <td><fmt:formatDate value="${sale.orderdate}" pattern="yyyy-MM-dd HH:mm" /></td>
                         </tr>
                     </c:forEach>
                 </c:if>

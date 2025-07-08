@@ -79,13 +79,25 @@
     <c:if test="${not empty sessionScope.loginuser and sessionScope.loginuser.userid != 'admin'}"> <%-- 로그인 했을 경우 --%> 
 	    <a class="nav-link" href="<%= ctxPath %>/login/myPage.go">마이페이지</a>
 	    <a class="nav-link" href="<%= ctxPath %>/login/logout.go">로그아웃</a>
+	    <a class="nav-link" href="<%= ctxPath%>/shop/chart.go">주문통계</a>
 	    <a class="nav-link" href="<%= ctxPath %>/shop/cartList.go">장바구니</a>
+	    
     </c:if>
    	<c:if test="${not empty sessionScope.loginuser and sessionScope.loginuser.userid == 'admin'}"> <%-- 로그인 했을 경우 --%> 
 	    <a class="nav-link" href="<%= ctxPath %>/myshop/bookRegister.go">제품등록</a>
 	    <a class="nav-link" href="<%= ctxPath %>/member/memberList.go">회원목록</a>
-	    <a class="nav-link" href="<%= ctxPath %>/myshop/totalSales.go">전체매출확인</a>
-	    <a class="nav-link" href="<%= ctxPath %>/myshop/totalOrderList.go">전체주문내역</a>
+	    
+	     <div class="dropdown mr-3">
+      <span class="nav-link font-weight-bold" style="cursor: pointer;" id="bookMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+     	관리
+      </span>
+	    <div class="dropdown-menu" aria-labelledby="bookMenu">
+        <a class="dropdown-item" href="<%= ctxPath %>/myshop/totalSales.go?category=전체매출확인">전체매출확인</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/myshop/totalOrderList.go?category=전체주문내역">전체주문내역</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/shop/adminChart.go?category=회원주문통계">회원주문통계</a>
+        <a class="dropdown-item" href="<%= ctxPath %>/shop/userTotalSpent.go?category=고객관리">고객관리</a>
+      </div>
+	    </div>
 	    <a class="nav-link" href="<%= ctxPath %>/login/logout.go">로그아웃</a>
     </c:if>
     <a class="nav-link" href="<%= ctxPath %>/search/searchPage.go" style="color: black;" title="검색">
