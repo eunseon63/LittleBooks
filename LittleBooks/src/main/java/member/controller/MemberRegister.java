@@ -59,8 +59,6 @@ public class MemberRegister extends AbstractController {
 			member.setAddress(address);
 			member.setDetailaddress(detailaddress);
 			member.setExtraaddress(extraaddress);
-			
-			member.setAddress(address);
 			member.setBirthday(birthday);
 			
 			
