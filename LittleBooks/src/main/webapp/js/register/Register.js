@@ -109,9 +109,7 @@ function validateUserId() {
 
 function validatePassword() {
   const regex = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$/;
-   if ($('#idcheckResult').text() === '이미 사용 중입니다.') {
-    return true; // 이미 메시지 출력했으므로 중복 메시지 방지
-  }
+   
   return checkPattern('#pwd', regex, '비밀번호는 영문자+숫자+특수문자 포함 8~15자입니다.');
 }
 
@@ -121,6 +119,9 @@ function validatePasswordConfirm() {
 
 function validateEmail() {
   const regex = /^[\w.-]+@([\w-]+\.)+[A-Za-z]{2,3}$/;
+  if ($('#emailCheckResult').text() === '이미 사용 중입니다.') {
+    return true; // 이미 메시지 출력했으므로 중복 메시지 방지
+  }
   return checkPattern('#email', regex, '유효한 이메일 형식이 아닙니다.');
 }
 
