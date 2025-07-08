@@ -27,10 +27,12 @@
     grid-template-columns: repeat(4, 1fr);
     gap: 25px;
     padding: 40px;
-    margin-left: 190px;
+    margin: 0 auto;  /* ✅ 중앙 정렬 */
     justify-items: center;
     background-color: #fff;
+    max-width: 1200px; /* 선택사항: 너무 넓어지지 않도록 */
 }
+
 
 .card {
     width: 230px;
@@ -81,7 +83,8 @@
     height: 100%;
 }
 .sort-box {
-    margin: 20px 0 0 240px;  /* 책 목록과 정렬 위치 맞춤 */
+    margin: 20px 0 0 4006px;  /* 책 목록과 정렬 위치 맞춤 */
+
 }
 
 .sort-select {
