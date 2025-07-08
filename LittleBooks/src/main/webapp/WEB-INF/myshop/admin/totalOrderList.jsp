@@ -166,7 +166,11 @@
 	    let nextStatus;
 	    if (currentStatus == "0") nextStatus = "1";
 	    else if (currentStatus == "1") nextStatus = "2";
-	    else nextStatus = "0";
+	    else {
+	        // 배송 완료(2) 이상 상태에서는 버튼 비활성화
+	        $btn.prop("disabled", true);
+	        return; // 함수 종료
+	    }
 
 	    $.ajax({
 	        url: "<%= ctxPath %>/myshop/updateDeliverStatus.go",
