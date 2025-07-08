@@ -255,12 +255,12 @@ function goOrder() {
             <button type="button" class="btn-yellow" onclick="goOrder()">주문하기</button>
             <a href="<%= ctxPath %>/index.go" class="btn-outline-yellow">계속 쇼핑</a>
             <form id="orderForm" method="post" action="<%= ctxPath %>/shop/payment.go">
-			    <input type="hidden" name="str_bookseq_join" />
-			    <input type="hidden" name="str_oqty_join" />
-			    <input type="hidden" name="str_price_join" />
-			    <input type="hidden" name="sum_totalPrice" />
-			    <input type="hidden" name="str_cartseq_join" />
-			</form>
+             <input type="hidden" name="str_bookseq_join" />
+             <input type="hidden" name="str_oqty_join" />
+             <input type="hidden" name="str_price_join" />
+             <input type="hidden" name="sum_totalPrice" />
+             <input type="hidden" name="str_cartseq_join" />
+         </form>
 
         </div>
     </c:if>

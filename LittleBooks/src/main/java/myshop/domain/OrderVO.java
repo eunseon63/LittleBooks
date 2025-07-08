@@ -21,6 +21,15 @@ public class OrderVO {
     // 주문 상세 목록 (1:N 관계)
     private List<OrderDetailVO> orderDetailList;
 
+    // 추가 배송 정보 필드 (DAO 쿼리에서 받는 alias)
+    private String recipient;    // receiver_name AS recipient
+    private String phone;        // receiver_phone AS phone
+    private String memo;         // memo 컬럼 (빈 문자열로 처리)
+
+    // 주문 날짜, 상태 등
+    private String orderdate;
+    private int orderstatus;
+
     // --- Getter & Setter ---
 
     public String getOrdercode() {
@@ -119,25 +128,41 @@ public class OrderVO {
         this.orderDetailList = orderDetailList;
     }
 
-	public void setRecipient(String string) {
-		// TODO Auto-generated method stub
-		
-	}
+    public String getRecipient() {
+        return recipient;
+    }
 
-	public void setPhone(String string) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void setRecipient(String recipient) {
+        this.recipient = recipient;
+    }
 
-	public void setMemo(String string) {
-		// TODO Auto-generated method stub
-		
-	}
+    public String getPhone() {
+        return phone;
+    }
 
-	public void setOrderdate(String string) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getMemo() {
+        return memo;
+    }
+
+    public void setMemo(String memo) {
+        this.memo = memo;
+    }
+
+    public String getOrderdate() {
+        return orderdate;
+    }
+
+    public void setOrderdate(String orderdate) {
+        this.orderdate = orderdate;
+    }
+
+    public int getOrderstatus() {
+        return orderstatus;
+    }
 
 	public void setTotalprice(int int1) {
 		// TODO Auto-generated method stub
@@ -148,4 +173,5 @@ public class OrderVO {
 		// TODO Auto-generated method stub
 		
 	}
+	
 }

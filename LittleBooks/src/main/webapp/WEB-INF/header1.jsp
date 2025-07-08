@@ -52,7 +52,9 @@
 
   <!-- 가운데: 어린이 서점 -->
   <div style="position: absolute; left: 50%; transform: translateX(-50%);">
-    <a class="navbar-brand font-weight-bold" href="<%= ctxPath %>/index.go" style="font-size: 24px;"><img src="${pageContext.request.contextPath}/images/logo.png" alt="메인로고" style="height: 100px; margin-top:10%;"/></a>
+    <a class="navbar-brand font-weight-bold" href="<%= ctxPath %>/index.go" style="font-size: 24px;">
+      <img src="${pageContext.request.contextPath}/images/logo.png" alt="메인로고" style="height: 100px; margin-top:10%;"/>
+    </a>
   </div>
 
   <!-- 오른쪽 요소들 -->
@@ -72,25 +74,46 @@
       </div>
     </div>
 
-	<c:if test="${empty sessionScope.loginuser}"> <%-- 로그인 안했을 경우 --%> 
-	    <a class="nav-link" href="<%= ctxPath %>/login/login.go">로그인</a>
-	    <a class="nav-link" href="<%= ctxPath %>/register/register.go">회원가입</a>
+    <c:if test="${empty sessionScope.loginuser}">
+      <!-- 로그인 안했을 경우 -->
+      <a class="nav-link" href="<%= ctxPath %>/login/login.go">로그인</a>
+      <a class="nav-link" href="<%= ctxPath %>/register/register.go">회원가입</a>
     </c:if>
-    <c:if test="${not empty sessionScope.loginuser and sessionScope.loginuser.userid != 'admin'}"> <%-- 로그인 했을 경우 --%> 
-	    <a class="nav-link" href="<%= ctxPath %>/login/myPage.go">마이페이지</a>
-	    <a class="nav-link" href="<%= ctxPath %>/login/logout.go">로그아웃</a>
-	    <a class="nav-link" href="<%= ctxPath %>/shop/cartList.go">장바구니</a>
+
+    <c:if test="${not empty sessionScope.loginuser and sessionScope.loginuser.userid != 'admin'}">
+      <!-- 일반 사용자 로그인 -->
+      <a class="nav-link" href="<%= ctxPath %>/login/myPage.go">마이페이지</a>
+      <a class="nav-link" href="<%= ctxPath %>/login/logout.go">로그아웃</a>
+      <a class="nav-link" href="<%= ctxPath%>/shop/chart.go">주문통계</a>
+      <a class="nav-link" href="<%= ctxPath %>/shop/cartList.go">장바구니</a>
     </c:if>
-   	<c:if test="${not empty sessionScope.loginuser and sessionScope.loginuser.userid == 'admin'}"> <%-- 로그인 했을 경우 --%> 
-	    <a class="nav-link" href="<%= ctxPath %>/myshop/bookRegister.go">제품등록</a>
-	    <a class="nav-link" href="<%= ctxPath %>/member/memberList.go">회원목록</a>
-	    <a class="nav-link" href="<%= ctxPath %>/myshop/totalSales.go">전체매출확인</a>
-	    <a class="nav-link" href="<%= ctxPath %>/myshop/totalOrderList.go">전체주문내역</a>
-	    <a class="nav-link" href="<%= ctxPath %>/login/logout.go">로그아웃</a>
+
+    <c:if test="${not empty sessionScope.loginuser and sessionScope.loginuser.userid == 'admin'}">
+      <!-- 관리자 로그인 -->
+      <a class="nav-link" href="<%= ctxPath %>/myshop/bookRegister.go">제품등록</a>
+      <a class="nav-link" href="<%= ctxPath %>/member/memberList.go">회원목록</a>
+
+      <!-- 관리자 전용 드롭다운 -->
+      <div class="dropdown mr-3">
+        <span class="nav-link font-weight-bold" style="cursor: pointer;" id="adminMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          관리
+        </span>
+        <div class="dropdown-menu" aria-labelledby="adminMenu">
+          <a class="dropdown-item" href="<%= ctxPath %>/myshop/totalSales.go?category=전체매출확인">전체매출확인</a>
+          <a class="dropdown-item" href="<%= ctxPath %>/myshop/totalOrderList.go?category=전체주문내역">전체주문내역</a>
+          <a class="dropdown-item" href="<%= ctxPath %>/shop/adminChart.go?category=회원주문통계">회원주문통계</a>
+          <a class="dropdown-item" href="<%= ctxPath %>/shop/userTotalSpent.go?category=고객관리">고객관리</a>
+        </div>
+      </div>
+
+      <a class="nav-link" href="<%= ctxPath %>/login/logout.go">로그아웃</a>
     </c:if>
+
+    <!-- 검색 아이콘 -->
     <a class="nav-link" href="<%= ctxPath %>/search/searchPage.go" style="color: black;" title="검색">
       <i class="fas fa-search fa-lg"></i>
     </a>
+
   </div>
 
 </nav>
