@@ -5,54 +5,56 @@ import java.util.List;
 import common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import myshop.domain.BookVO;
 import myshop.model.BookDAO;
 import myshop.model.BookDAO_imple;
-import myshop.domain.BookVO;
+import myshop.model.OrderDAO;
+import myshop.model.OrderDAO_imple;
 
 public class BookList extends AbstractController {
 
-	@Override
-	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	    
-	    // 1) category, sort 파라미터 받기
-	    String category = request.getParameter("category");
-	    if (category == null || category.isEmpty()) {
-	        category = "all";
-	    }
+    @Override
+    public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        
+        String category = request.getParameter("category");
+        if (category == null || category.isEmpty()) {
+            category = "all";
+        }
 
-	    String sort = request.getParameter("sort");  // "new" or null
+        String sort = request.getParameter("sort");  // "new", "sales", or null
 
-	    // 2) DAO 호출
-	    BookDAO dao = new BookDAO_imple();
-	    List<BookVO> bookList;
+        List<BookVO> bookList;
 
-	    if ("all".equals(category)) {
-	        bookList = dao.selectAllBooksSorted(sort);  // 전체 정렬
-	    } else {
-	        bookList = dao.selectBooksByCategorySorted(category, sort); // 카테고리 정렬
-	    }
+        if ("sales".equals(sort)) {
+            // 판매순 정렬은 OrderDAO에서 처리 (판매량 합산)
+            OrderDAO orderDao = new OrderDAO_imple();
 
-	    // 3) 로그 찍기
-	    /*
-	    System.out.println(">>> [카테고리: " + category + ", 정렬: " + sort + "] 도서 목록 조회 결과 <<<");
-	    for (BookVO book : bookList) {
-	        System.out.println("책제목: " + book.getBname());
-	        System.out.println("저자: " + book.getAuthor());
-	        System.out.println("가격: " + book.getPrice());
-	        System.out.println("카테고리: " + (book.getCvo() != null ? book.getCvo().getCategoryname() : "없음"));
-	        System.out.println("입고일자: " + book.getBinputdate());
-	        System.out.println("-----------------------------");
-	    }
-	    */
+            int categorySeq = 0;
+            try {
+                categorySeq = Integer.parseInt(category);
+            } catch (Exception e) {
+                // all인 경우 등 숫자가 아닐 때 0으로 처리 (전체)
+                categorySeq = 0;
+            }
 
-	    // 4) JSP에 전달
-	    request.setAttribute("bookList", bookList);
-	    request.setAttribute("category", category);
-	    request.setAttribute("sort", sort);  // 정렬 유지용
+            bookList = orderDao.selectBooksOrderBySales(categorySeq);
 
-	    super.setRedirect(false);
-	    super.setViewPage("/WEB-INF/myshop/booklist.jsp");
-	}
+        } else {
+            // 기존 new, 기본 정렬 처리
+            BookDAO dao = new BookDAO_imple();
 
+            if ("all".equals(category)) {
+                bookList = dao.selectAllBooksSorted(sort);
+            } else {
+                bookList = dao.selectBooksByCategorySorted(category, sort);
+            }
+        }
 
+        request.setAttribute("bookList", bookList);
+        request.setAttribute("category", category);
+        request.setAttribute("sort", sort);
+
+        super.setRedirect(false);
+        super.setViewPage("/WEB-INF/myshop/booklist.jsp");
+    }
 }

@@ -180,17 +180,19 @@
 	            console.log("응답:", trimmed); // 디버깅용
 	            if (trimmed === "success") {
 	                $btn.data("status", nextStatus);
-	                
+
+	                // 기존 상태 클래스 모두 제거
 	                $btn.removeClass("btn-waiting btn-delivering btn-delivered");
-	                
+
+	                // 다음 상태에 맞는 클래스와 텍스트 지정
 	                if (nextStatus === "0") {
-	                    $btn.addClass("btn-waiting").addClass("btn-waiting");
+	                    $btn.addClass("btn-waiting");
 	                    $btn.text("배송대기");
 	                } else if (nextStatus === "1") {
-	                    $btn.removeClass("btn-delivered").addClass("btn-delivering");
+	                    $btn.addClass("btn-delivering");
 	                    $btn.text("배송중");
-	                } else {
-	                    $btn.removeClass("btn-delivering").addClass("btn-delivered");
+	                } else if (nextStatus === "2") {
+	                    $btn.addClass("btn-delivered");
 	                    $btn.text("배송완료");
 	                }
 	            } else {

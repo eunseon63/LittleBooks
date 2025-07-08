@@ -26,6 +26,7 @@
 
 <!-- 캐러셀 감싸는 컨테이너: height 제거 -->
 <div class="container" style="width: 80%; margin: 100px auto 0 auto; padding: 20px;">
+	<p class="text-muted text-center mb-2" style="font-size: 1.1rem;">리틀북스가 선정한 청소년 권장 도서</p>
     <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
 
         <!-- 총 책 수와 슬라이드당 아이템 수 설정 -->
@@ -78,7 +79,6 @@
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
             <span class="sr-only">Next</span>
         </a>
-
     </div>
 </div>
 
@@ -112,6 +112,7 @@
     </div>
 	
 	<h3>BEST 도서 목록</h3>
+	<br><a href="${pageContext.request.contextPath}/myshop/bestbooks.go" class="more-link">더보기 ›</a>
 	<div class="book-list">
 	    <c:forEach var="book" items="${bestBooks}" varStatus="status">
 		    <c:if test="${status.index < 5}">
@@ -126,6 +127,7 @@
 	</div>
 
 	<h3>NEW 도서 목록</h3>
+	<br><a href="${pageContext.request.contextPath}/myshop/newbooks.go" class="more-link">더보기 ›</a>
 	<div class="book-list">
 	    <c:forEach var="book" items="${newBooks}" varStatus="status">
 		    <c:if test="${status.index < 5}">
@@ -138,6 +140,7 @@
 		    </c:if>
 		</c:forEach>
 	</div>
+	
 </div>
 
 <jsp:include page="footer.jsp" />

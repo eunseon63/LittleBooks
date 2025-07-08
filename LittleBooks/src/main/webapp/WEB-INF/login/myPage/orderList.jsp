@@ -1,7 +1,7 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%
     String ctxPath = request.getContextPath();
@@ -18,10 +18,9 @@
     <link rel="stylesheet" href="<%=ctxPath%>/bootstrap-4.6.2-dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="<%=ctxPath%>/css/mypage_custom.css" />
 
-    <!-- jQuery (가장 위에 위치해야 함) -->
+    <!-- jQuery -->
     <script src="<%=ctxPath%>/js/jquery-3.7.1.min.js"></script>
 
-    <!-- 내부 스타일 -->
     <style>
         body {
             font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
@@ -116,7 +115,6 @@
         .btn-delivered { background-color: #4caf50; color: #fff; }
     </style>
 
-    <!-- 주문행 클릭 시 팝업 열기 -->
     <script type="text/javascript">
         $(function () {
             $('.orderTbl').on('click', 'tr.orderInfo', function (e) {
@@ -147,17 +145,24 @@
                      style="width: 70px; height: 70px; line-height: 70px; font-size: 20px; font-weight: bold;">
                     <c:out value="${loginuser.name}" />
                 </div>
-                <div class="mt-2 font-weight-bold"><c:out value="${loginuser.name}" /> 님</div>
-                <div style="font-size: 0.9rem; color: gray;">POINT: <c:out value="${loginuser.point}" /></div>
+                <div class="mt-2 font-weight-bold">
+                    <c:out value="${loginuser.name}" />님
+                </div>
+                <div style="font-size: 0.9rem; color: gray;">
+                    POINT: <c:out value="${loginuser.point}" />
+                </div>
                 <ul class="nav flex-column mt-4">
                     <li class="nav-item mb-2">
-                        <button class="btn btn-outline-secondary btn-block" onclick="location.href='myPage.go'">내 정보 수정</button>
+                        <button type="button" class="btn btn-outline-secondary btn-block"
+                                onclick="location.href='myPage.go'">내 정보 수정</button>
                     </li>
                     <li class="nav-item mb-2">
-                        <button class="btn btn-outline-secondary btn-block" onclick="location.href='orderList.go'">나의 주문 내역</button>
+                        <button type="button" class="btn btn-outline-secondary btn-block"
+                                onclick="location.href='orderList.go'">나의 주문 내역</button>
                     </li>
                     <li class="nav-item">
-                        <button class="btn btn-outline-danger btn-block" onclick="location.href='deleteMember.go'">회원 탈퇴</button>
+                        <button type="button" class="btn btn-outline-danger btn-block"
+                                onclick="location.href='deleteMember.go'">회원 탈퇴</button>
                     </li>
                 </ul>
             </div>
@@ -165,12 +170,12 @@
 
         <!-- 우측 주문 상세 내역 -->
         <div class="col-md-9">
-            <div class="section-title">주문 상세 내역</div>
+            <div class="section-title" style="text-align:left;">주문 상세 내역</div>
 
             <c:choose>
                 <c:when test="${not empty orderDetailList}">
                     <c:set var="prevOrderCode" value="" />
-                    <c:forEach var="orderDetail" items="${requestScope.orderDetailList}" varStatus="loop">
+                    <c:forEach var="orderDetail" items="${orderDetailList}" varStatus="loop">
                         <c:set var="currentOrderCode" value="${orderDetail.fk_ordercode}" />
                         <c:if test="${prevOrderCode ne currentOrderCode}">
                             <div class="order-box">
@@ -211,7 +216,7 @@
                             </td>
                         </tr>
 
-                        <c:if test="${(loop.last) || (fn:length(orderDetailList) > loop.index + 1 && orderDetailList[loop.index + 1].fk_ordercode ne currentOrderCode)}">
+                        <c:if test="${loop.last || (fn:length(orderDetailList) > loop.index + 1 && orderDetailList[loop.index + 1].fk_ordercode ne currentOrderCode)}">
                                     </tbody>
                                 </table>
                             </div>
@@ -234,6 +239,5 @@
 <!-- Bootstrap JS -->
 <script src="<%=ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js"></script>
 <script src="<%=ctxPath%>/js/member/deleteMember.js"></script>
-
 </body>
 </html>

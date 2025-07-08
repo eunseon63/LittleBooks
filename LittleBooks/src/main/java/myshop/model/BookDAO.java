@@ -94,4 +94,39 @@ public interface BookDAO {
 
 	// 사용자 포인트 내역 업데이트 
 	int updateUserPoint(String userid, int newPoint) throws SQLException;
+
+	
+	
+	//나의 카테고리별 주문 통계정보 알아오기
+	List<Map<String, String>> myPurchase_byCategory(String userid)throws SQLException;
+
+	
+	//나의 월별 카테고리별 주문 통계정보 알아오기 
+	List<Map<String, String>> myPurchase_byMonth_byCategory(String userid)throws SQLException;
+
+	
+	//관리자(admin) 전용 카테고리별 월별 매출 통계 
+	List<Map<String, String>> adminCategorySalesByMonth()throws SQLException;
+
+	 // 총 매출액 조회 
+	int getTotalSales()throws SQLException;
+
+	
+	
+	// 매출 상세 리스트 조회 
+	List<Map<String, Object>> getSalesList()throws SQLException;
+	
+	
+	//회원별 누적 구매 금액
+	List<Map<String, Object>> getUserTotalSpentList()throws SQLException;
+
+	
+	//최근 30일 일별 매출 통계
+	List<Map<String, String>> getDailySalesLast30Days()throws SQLException;
+	
+	
+	
+	
+	
+	
 }
