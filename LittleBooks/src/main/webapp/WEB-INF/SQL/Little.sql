@@ -197,3 +197,8 @@ INSERT INTO tbl_orderdetail (
 ) VALUES (
     3, 183, '20250703003', 1, 12000, 1, 25/07/04
 );
+
+select mobile
+from tbl_member join tbl_order
+on userid = fk_userid
+where userid = 'jyc';
