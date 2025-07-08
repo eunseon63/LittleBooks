@@ -234,104 +234,6 @@ public class OrderDAO_imple implements OrderDAO {
         return orderList;
     }
     
-
-   // 주문상세 정보 찾는 함수
-   @Override
-   public List<OrderDetailVO> selectAllDetail(String userid) throws SQLException {
-       List<OrderDetailVO> orderDetailList = new ArrayList<>();
-
-       try {
-           conn = ds.getConnection();
-
-           String sql = "SELECT "
-                   + "    od.fk_ordercode, "
-                   + "    od.deliverdate, "
-                   + "    od.odrseq, "
-                   + "    od.fk_bookseq AS bookseq, "
-                   + "    od.oqty, "
-                   + "    od.odrprice, "
-                   + "    od.deliverstatus, "
-                   + "    b.bname, "
-                   + "    b.price, "
-                   + "    b.bimage, "
-                   + "    b.author "
-                   + "FROM tbl_orderdetail od "
-                   + "JOIN tbl_order o ON od.fk_ordercode = o.ordercode "
-                   + "JOIN tbl_book b ON od.fk_bookseq = b.bookseq "
-                   + "JOIN tbl_member m ON o.fk_userid = m.userid ";
-
-           if (!"admin".equals(userid)) {
-               sql += "WHERE m.userid = ? ";
-           }
-
-           pstmt = conn.prepareStatement(sql);
-
-           if (!"admin".equals(userid)) {
-               pstmt.setString(1, userid);
-           }
-
-           rs = pstmt.executeQuery();
-
-           while (rs.next()) {
-               OrderDetailVO detailVO = new OrderDetailVO();
-
-               detailVO.setOdrseq(rs.getString("odrseq"));
-               detailVO.setFk_ordercode(rs.getString("fk_ordercode"));
-               detailVO.setFk_bookseq(rs.getInt("bookseq"));
-               detailVO.setOqty(rs.getInt("oqty"));
-               detailVO.setOdrprice(rs.getInt("odrprice"));
-               detailVO.setDeliverdate(rs.getString("deliverdate"));
-               detailVO.setDeliverstatus(rs.getString("deliverstatus"));
-
-               BookVO book = new BookVO();
-               book.setBookseq(rs.getInt("bookseq"));
-               book.setBname(rs.getString("bname"));
-               book.setPrice(rs.getInt("price"));
-               book.setBimage(rs.getString("bimage"));
-               book.setAuthor(rs.getString("author"));
-
-               detailVO.setBook(book);
-
-               orderDetailList.add(detailVO);
-           }
-
-       } finally {
-           close();
-       }
-
-       return orderDetailList;
-   } // end of public List<OrderDetailVO> selectAllDetail(String userid) throws SQLException {}-----------
-
-    // 주문코드를 찾는 함수
-	@Override
-	public String selectOrdercode(String userid) throws SQLException {
-
-		String ordercode = null;
-		
-		try {
-			conn = ds.getConnection();
-			
-			String sql = " select ordercode "
-					+ " from tbl_order "
-					+ " where fk_userid = ? ";
-			
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, userid);
-            rs = pstmt.executeQuery();
-            
-            if (rs.next()) {
-            	ordercode = rs.getString("ordercode");
-            }
-			
-		} finally {
-			close();
-		}
-		
-		return ordercode;
-
-	} // end of public String selectOrdercode(String userid) throws SQLException {}---------------
-	
-	
 	// 판매량순정렬
 	@Override
 	public List<BookVO> selectBooksOrderBySales(int categorySeq) throws SQLException {
@@ -416,44 +318,6 @@ public class OrderDAO_imple implements OrderDAO {
 		return userid;
 	} // end of public String selectUserid(String ordercode) throws SQLException {}-------------------
 
-	// 주문자 정보 찾기
-	@Override
-	public MemberVO selectOrderMember(Map<String, String> paraMap) throws SQLException {
-	    MemberVO member = null;
-
-	    try {
-	        conn = ds.getConnection();
-
-	        String sql = " SELECT m.userid, m.name, m.email, m.mobile, m.postcode, m.address, m.detailaddress, m.extraaddress " +
-	                     " FROM tbl_order o " +
-	                     " JOIN tbl_member m ON o.fk_userid = m.userid " +
-	                     " WHERE o.ordercode = ? AND o.fk_userid = ? ";
-
-	        pstmt = conn.prepareStatement(sql);
-	        pstmt.setString(1, paraMap.get("ordercode"));
-	        pstmt.setString(2, paraMap.get("userid"));
-
-	        rs = pstmt.executeQuery();
-
-	        if (rs.next()) {
-	            member = new MemberVO();
-	            member.setUserid(rs.getString("userid"));
-	            member.setName(rs.getString("name"));
-	            member.setEmail(aes.decrypt(rs.getString("email")));
-	            member.setMobile(aes.decrypt(rs.getString("mobile")));
-	            member.setPostcode(rs.getString("postcode"));
-	            member.setAddress(rs.getString("address"));
-	            member.setDetailaddress(rs.getString("detailaddress"));
-	            member.setExtraaddress(rs.getString("extraaddress"));
-	        }
-	    } catch(GeneralSecurityException | UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} finally {
-			close();
-		}
-
-	    return member;
-	} // end of public MemberVO selectOrderMember(Map<String, String> paraMap) throws SQLException {]-----------
 
 	// 주문번호로 전화번호 찾기
 	@Override
@@ -508,6 +372,248 @@ public class OrderDAO_imple implements OrderDAO {
 		
 	} // end of public int updateDeliverstatus(String ordercode) throws SQLException {}-----------------
 
-}
+    
+    // 주문코드를 찾는 함수
+   @Override
+   public String selectOrdercode(String userid) throws SQLException {
 
+      String ordercode = null;
+      
+      try {
+         conn = ds.getConnection();
+         
+         String sql = " select ordercode "
+               + " from tbl_order "
+               + " where fk_userid = ? ";
+         
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userid);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+               ordercode = rs.getString("ordercode");
+            }
+         
+      } finally {
+         close();
+      }
+      
+      return ordercode;
+
+   } // end of public String selectOrdercode(String userid) throws SQLException {}---------------
+
+   // 주문상세 정보 찾는 함수
+   @Override
+   public List<OrderDetailVO> selectAllDetail(String userid) throws SQLException {
+       List<OrderDetailVO> orderDetailList = new ArrayList<>();
+
+       try {
+           conn = ds.getConnection();
+
+           String sql = "SELECT "
+                   + "    od.fk_ordercode, "
+                   + "    od.odrseq, "
+                   + "    od.fk_bookseq AS bookseq, "
+                   + "    od.oqty, "
+                   + "    od.odrprice, "
+                   + "    od.deliverstatus, "
+                   + "    o.orderdate, "
+                   + "    o.totalprice, "
+                   + "    o.usepoint, "
+                   + "    b.bname, "
+                   + "    b.price, "
+                   + "    b.bimage, "
+                   + "    b.author "
+                   + " FROM tbl_orderdetail od "
+                   + " JOIN tbl_order o ON od.fk_ordercode = o.ordercode "
+                   + " JOIN tbl_book b ON od.fk_bookseq = b.bookseq "
+                   + " JOIN tbl_member m ON o.fk_userid = m.userid ";
+
+           if (!"admin".equals(userid)) {
+               sql += "WHERE m.userid = ? ";
+           }
+           
+           sql += " order by od.fk_ordercode asc ";
+
+           pstmt = conn.prepareStatement(sql);
+
+           if (!"admin".equals(userid)) {
+               pstmt.setString(1, userid);
+           }
+
+           rs = pstmt.executeQuery();
+
+           while (rs.next()) {
+               OrderDetailVO detailVO = new OrderDetailVO();
+
+               detailVO.setOdrseq(rs.getString("odrseq"));
+               detailVO.setFk_ordercode(rs.getString("fk_ordercode"));
+               detailVO.setFk_bookseq(rs.getInt("bookseq"));
+               detailVO.setOqty(rs.getInt("oqty"));
+               detailVO.setOdrprice(rs.getInt("odrprice"));
+               detailVO.setDeliverstatus(rs.getString("deliverstatus"));
+
+               OrderVO order = new OrderVO();
+               order.setOrderdate(rs.getString("orderdate"));
+               order.setTotalPrice(rs.getInt("totalprice"));
+               order.setUsePoint(rs.getInt("usepoint"));
+               
+               BookVO book = new BookVO();
+               book.setBookseq(rs.getInt("bookseq"));
+               book.setBname(rs.getString("bname"));
+               book.setPrice(rs.getInt("price"));
+               book.setBimage(rs.getString("bimage"));
+               book.setAuthor(rs.getString("author"));
+
+               detailVO.setBook(book);
+               detailVO.setOrder(order);
+               
+               orderDetailList.add(detailVO);
+           }
+
+       } finally {
+           close();
+       }
+
+       return orderDetailList;
+   } // end of public List<OrderDetailVO> selectAllDetail(String userid) throws SQLException {}-----------
+   
+   // 주문자 정보 찾기
+   @Override
+   public MemberVO selectOrderMember(Map<String, String> paraMap) throws SQLException {
+       MemberVO member = null;
+
+       try {
+           conn = ds.getConnection();
+
+           String sql = " SELECT m.userid, m.name, m.email, m.mobile, m.postcode, m.address, m.detailaddress, m.extraaddress " +
+                        " FROM tbl_order o " +
+                        " JOIN tbl_member m ON o.fk_userid = m.userid " +
+                        " WHERE o.ordercode = ? AND o.fk_userid = ? ";
+
+           pstmt = conn.prepareStatement(sql);
+           pstmt.setString(1, paraMap.get("ordercode"));
+           pstmt.setString(2, paraMap.get("userid"));
+
+           rs = pstmt.executeQuery();
+
+           if (rs.next()) {
+               member = new MemberVO();
+               member.setUserid(rs.getString("userid"));
+               member.setName(rs.getString("name"));
+               member.setEmail(aes.decrypt(rs.getString("email")));
+               member.setMobile(aes.decrypt(rs.getString("mobile")));
+               member.setPostcode(rs.getString("postcode"));
+               member.setAddress(rs.getString("address"));
+               member.setDetailaddress(rs.getString("detailaddress"));
+               member.setExtraaddress(rs.getString("extraaddress"));
+           }
+       } catch(GeneralSecurityException | UnsupportedEncodingException e) {
+         e.printStackTrace();
+      } finally {
+         close();
+      }
+
+       return member;
+   }
+
+   // 배송 정보 변경
+	@Override
+	public int updateDeliverStatus(String ordercode, int status) throws SQLException {
+		
+		int result = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = "UPDATE tbl_orderdetail SET deliverstatus = ?, deliverdate = SYSDATE WHERE fk_ordercode = ?";
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setInt(1, status);
+	        pstmt.setString(2, ordercode);
+
+	        result = pstmt.executeUpdate();
+
+	    } finally {
+	        close();
+	    }
+
+	    return result;
+	    
+	}
+
+	// 한 주문 내역 조회
+	@Override
+	public List<OrderDetailVO> selectOneDetail(String ordercode) throws SQLException {
+		
+	       List<OrderDetailVO> orderDetailList = new ArrayList<>();
+
+	       try {
+	           conn = ds.getConnection();
+
+	           String sql = "SELECT "
+	                   + "    od.fk_ordercode, "
+	                   + "    od.odrseq, "
+	                   + "    od.fk_bookseq AS bookseq, "
+	                   + "    od.oqty, "
+	                   + "    od.odrprice, "
+	                   + "    od.deliverstatus, "
+	                   + "    o.orderdate, "
+	                   + "    o.totalprice, "
+	                   + "    o.usepoint, "
+	                   + "    b.bname, "
+	                   + "    b.price, "
+	                   + "    b.bimage, "
+	                   + "    b.author "
+	                   + " FROM tbl_orderdetail od "
+	                   + " JOIN tbl_order o ON od.fk_ordercode = o.ordercode "
+	                   + " JOIN tbl_book b ON od.fk_bookseq = b.bookseq "
+	                   + " JOIN tbl_member m ON o.fk_userid = m.userid "
+	                   + " WHERE od.fk_ordercode = ? "
+	                   + " order by od.fk_ordercode asc ";
+
+	           pstmt = conn.prepareStatement(sql);
+
+	           pstmt.setString(1, ordercode);
+	           
+	           rs = pstmt.executeQuery();
+
+	           while (rs.next()) {
+	               OrderDetailVO detailVO = new OrderDetailVO();
+
+	               detailVO.setOdrseq(rs.getString("odrseq"));
+	               detailVO.setFk_ordercode(rs.getString("fk_ordercode"));
+	               detailVO.setFk_bookseq(rs.getInt("bookseq"));
+	               detailVO.setOqty(rs.getInt("oqty"));
+	               detailVO.setOdrprice(rs.getInt("odrprice"));
+	               detailVO.setDeliverstatus(rs.getString("deliverstatus"));
+
+	               OrderVO order = new OrderVO();
+	               order.setOrderdate(rs.getString("orderdate"));
+	               order.setTotalPrice(rs.getInt("totalprice"));
+	               order.setUsePoint(rs.getInt("usepoint"));
+	               
+	               BookVO book = new BookVO();
+	               book.setBookseq(rs.getInt("bookseq"));
+	               book.setBname(rs.getString("bname"));
+	               book.setPrice(rs.getInt("price"));
+	               book.setBimage(rs.getString("bimage"));
+	               book.setAuthor(rs.getString("author"));
+
+	               detailVO.setBook(book);
+	               detailVO.setOrder(order);
+	               
+	               orderDetailList.add(detailVO);
+	           }
+
+	       } finally {
+	           close();
+	       }
+
+	       return orderDetailList;
+	}
+
+
+
+   
+}
 

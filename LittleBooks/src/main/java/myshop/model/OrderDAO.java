@@ -38,6 +38,11 @@ public interface OrderDAO {
 	// 전화번호 찾기
 	String selectMobile(String userid) throws SQLException;
 
+   // 배송 정보 변경
+   int updateDeliverStatus(String ordercode, int status) throws SQLException;
+
+   // 한 주문 내역 조회
+   List<OrderDetailVO> selectOneDetail(String ordercode) throws SQLException;
 	// 배송상태 변경
 	void updateDeliverstatus(String ordercode) throws SQLException;
 
@@ -46,5 +51,5 @@ public interface OrderDAO {
 	
 	// 판매량순정렬
 	List<BookVO> selectBooksOrderBySales(int categorySeq) throws SQLException;
-
+ 
 }
