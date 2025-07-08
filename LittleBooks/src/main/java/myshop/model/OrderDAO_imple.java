@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 
 import myshop.domain.OrderVO;
 import myshop.domain.BookVO;
+import myshop.domain.CategoryVO;
 import myshop.domain.OrderDetailVO;
 
 public class OrderDAO_imple implements OrderDAO {
@@ -311,6 +312,64 @@ public class OrderDAO_imple implements OrderDAO {
 	    
 	    return orderDetailList;
 	} // end of public List<OrderDetailVO> selectAllDetail() throws SQLException {}-----------
+	
+	// 판매량순정렬
+	@Override
+	public List<BookVO> selectBooksOrderBySales(int categorySeq) throws SQLException {
+	    List<BookVO> list = new ArrayList<>();
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = "SELECT b.bookseq, b.bname, b.bcontent, b.price, b.bqty, b.author, b.bimage, " +
+	                     "b.fk_publishseq, b.fk_categoryseq, b.binputdate, b.fk_snum, c.categoryname, " +
+	                     "NVL(SUM(od.oqty), 0) AS total_sales " +
+	                     "FROM tbl_book b " +
+	                     "JOIN tbl_category c ON b.fk_categoryseq = c.categoryseq " +
+	                     "LEFT JOIN tbl_orderdetail od ON b.bookseq = od.fk_bookseq " +
+	                     "WHERE (? = 0 OR b.fk_categoryseq = ?) " +  // 0이면 전체 카테고리
+	                     "GROUP BY b.bookseq, b.bname, b.bcontent, b.price, b.bqty, b.author, b.bimage, " +
+	                     "b.fk_publishseq, b.fk_categoryseq, b.binputdate, b.fk_snum, c.categoryname " +
+	                     "ORDER BY total_sales DESC";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setInt(1, categorySeq);
+	        pstmt.setInt(2, categorySeq);
+
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            BookVO book = new BookVO();
+	            book.setBookseq(rs.getInt("bookseq"));
+	            book.setBname(rs.getString("bname"));
+	            book.setBcontent(rs.getString("bcontent"));
+	            book.setPrice(rs.getInt("price"));
+	            book.setBqty(rs.getInt("bqty"));
+	            book.setAuthor(rs.getString("author"));
+	            book.setBimage(rs.getString("bimage"));
+	            book.setFk_publishseq(rs.getInt("fk_publishseq"));
+	            book.setFk_categoryseq(rs.getInt("fk_categoryseq"));
+	            book.setBinputdate(rs.getString("binputdate"));
+	            book.setFk_snum(rs.getInt("fk_snum"));
+
+	            CategoryVO cvo = new CategoryVO();
+	            cvo.setCategoryseq(rs.getInt("fk_categoryseq"));
+	            cvo.setCategoryname(rs.getString("categoryname"));
+	            book.setCvo(cvo);
+
+	            // 판매량 저장할 필드가 BookVO에 있다면 세팅
+	            book.setTotalSales(rs.getInt("total_sales"));
+
+	            list.add(book);
+	        }
+
+	    } finally {
+	        close();
+	    }
+
+	    return list;
+	}
+
 	
 }
 

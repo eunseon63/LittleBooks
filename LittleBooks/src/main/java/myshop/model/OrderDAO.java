@@ -3,6 +3,7 @@ package myshop.model;
 import java.sql.SQLException;
 import java.util.List;
 
+import myshop.domain.BookVO;
 import myshop.domain.OrderDetailVO;
 import myshop.domain.OrderVO;
 
@@ -25,6 +26,9 @@ public interface OrderDAO {
 
 	// 주문상세 정보 찾는 함수
 	List<OrderDetailVO> selectAllDetail() throws SQLException;
+	
+	// 판매량순정렬
+	List<BookVO> selectBooksOrderBySales(int categorySeq) throws SQLException;
 
 
 }
