@@ -142,32 +142,6 @@
 	    // 이벤트 위임: #orderTbl 내 tr.orderInfo 클릭 시 팝업 띄우기
 	    $('.orderTbl').on('click', 'tr.orderInfo', function (e) {
 
-		    const popupUrl = "<%= ctxPath %>/myshop/userOrderDetail.go?ordercode=" + encodeURIComponent(ordercode);
-		    const popupOptions = "width=800,height=600,scrollbars=yes,resizable=no";
-
-		    window.open(popupUrl, "memberDetailPopup", popupOptions);
-		});
-        
-		// 체크박스가 변경될 때 이벤트
-	    $('input[name="ordercodes"]').change(function() {
-	        // 체크된 체크박스 값들 수집
-	        checkedValues = $('input[name="ordercodes"]:checked').map(function() {
-	            return $(this).val();
-	        }).get();
-
-	        // console.log(checkedValues);
-	    });
-	    
-        // 배송하기 버튼클릭시
-	    $('#bulkDeliveryForm').submit(function(e) {
-	    	e.preventDefault(); // ★ 이 줄 추가!
-	    	
-	        console.log(checkedValues);
-	        
-	        if (checkedValues === "" || checkedValues == null) {
-	        	alert('체크박스를 클릭하세요');
-	        	return;
-	        }
 	    	 // 버튼을 클릭한 경우는 무시 (상위 tr의 클릭 이벤트 차단)
 	        if ($(e.target).closest('.toggleDeliveryBtn').length > 0) {
 	            return;
@@ -178,7 +152,6 @@
 	            alert("주문코드가 없습니다.");
 	            return;
 	        }
-	        
 	        const popupUrl = "<%= ctxPath %>/myshop/userOrderDetail.go?ordercode=" + encodeURIComponent(ordercode);
 		    const popupOptions = "width=800,height=600,scrollbars=yes,resizable=no";
 	        window.open(popupUrl, "memberDetailPopup", popupOptions);

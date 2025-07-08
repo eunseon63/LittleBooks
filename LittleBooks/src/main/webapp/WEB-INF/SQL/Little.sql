@@ -171,7 +171,7 @@ from tbl_book;
  from TBL_BOOK
  
 select *
- from TBL_Member;
+ from TBL_Member
  
  desc  TBL_BOOK;
  
@@ -202,3 +202,12 @@ select mobile
 from tbl_member join tbl_order
 on userid = fk_userid
 where userid = 'jyc';
+
+select *
+from tbl_member;
+
+update tbl_member set idle = 1
+where userid = 'jyc';
+
+commit;
+
