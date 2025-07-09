@@ -1635,6 +1635,32 @@ public class BookDAO_imple implements BookDAO {
         return list;
 	}
 
+	// BookDAO_imple.java 또는 CategoryDAO_imple.java 중 선택
+	@Override
+	public int getCategorySeqByName(String categoryName) throws SQLException {
+	    int categorySeq = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = "SELECT categoryseq FROM tbl_category WHERE categoryname = ?";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, categoryName);
+
+	        rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            categorySeq = rs.getInt("categoryseq");
+	        }
+	    } finally {
+	        close();
+	    }
+
+	    return categorySeq;
+	}
+
+
 
 
 	

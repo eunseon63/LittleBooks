@@ -109,33 +109,25 @@
 <c:if test="${not empty bookList}">
     <div class="page-title">
         <c:choose>
-            <c:when test="${category eq 'all'}">
-                전체 도서
-            </c:when>
-            <c:otherwise>
-                ${bookList[0].cvo.categoryname}
-            </c:otherwise>
-        </c:choose>
+		    <c:when test="${category eq 'all'}">
+		        전체 도서
+		    </c:when>
+		    <c:otherwise>
+		        ${category}
+		    </c:otherwise>
+		</c:choose>
     </div>
 </c:if>
 
 <div class="sort-box">
     <form method="get" action="<c:url value='/myshop/booklist.go' />">
-    <c:choose>
-        <c:when test="${sort eq 'sales'}">
-            <input type="hidden" name="category" value="${categorySeq}" />
-        </c:when>
-        <c:otherwise>
-            <input type="hidden" name="category" value="${categoryName}" />
-        </c:otherwise>
-    </c:choose>
-
-    <select name="sort" onchange="this.form.submit()" class="sort-select">
-        <option value="">-- 정렬 선택 --</option>
-        <option value="new" ${sort eq 'new' ? 'selected' : ''}>입고일 순</option>
-        <option value="sales" ${sort eq 'sales' ? 'selected' : ''}>판매순</option>
-    </select>
-</form>
+	    <input type="hidden" name="category" value="${category}" />
+	    <select name="sort" onchange="this.form.submit()" class="sort-select">
+	        <option value="">-- 정렬 선택 --</option>
+	        <option value="new" ${sort eq 'new' ? 'selected' : ''}>입고일 순</option>
+	        <option value="sales" ${sort eq 'sales' ? 'selected' : ''}>판매순</option>
+	    </select>
+	</form>
 </div>
 
 <div class="container">

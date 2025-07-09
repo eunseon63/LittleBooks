@@ -122,6 +122,10 @@ public interface BookDAO {
 	
 	//최근 30일 일별 매출 통계
 	List<Map<String, String>> getDailySalesLast30Days()throws SQLException;
+
+	// BookDAO.java
+	int getCategorySeqByName(String categoryName) throws SQLException;
+
 	
 	
 	
