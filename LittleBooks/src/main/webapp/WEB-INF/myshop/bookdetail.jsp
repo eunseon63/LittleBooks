@@ -27,6 +27,7 @@
 const isLoggedIn = ${not empty sessionScope.loginuser ? 'true' : 'false'};
 const loginUserid = "<c:out value='${sessionScope.loginuser.userid}' default='' />";
 const bookseq = "<c:out value='${book.bookseq}' default='' />";
+const maxStock = parseInt("${book.bqty}");
 
 $(function(){
 	goReviewListView();
@@ -238,6 +239,11 @@ function goCart() {
     const cqty = frm.cqty.value;
     const regExp = /^[1-9][0-9]*$/;
 
+    if (parseInt(cqty) > maxStock) {
+        swal("재고 부족", ``, "error");
+        return;
+    }
+    
     if (!regExp.test(cqty) || cqty < 1 || cqty > 100) {
         swal("수량 오류", "수량은 1에서 100 사이의 숫자만 가능합니다.", "warning");
         frm.cqty.focus();
@@ -271,6 +277,11 @@ function goOrder() {
     const qty = parseInt(frm.cqty.value);
     const bookseqVal = frm.fk_bookseq.value;
 
+    if (parseInt(qty) > maxStock) {
+        swal("재고 부족", ``, "error");
+        return;
+    }
+    
     if (!qty || isNaN(qty) || qty < 1 || qty > 100) {
         swal("수량 오류", "수량은 1~100 사이의 숫자만 가능합니다.", "warning");
         return;
@@ -284,7 +295,7 @@ function goOrder() {
     if (!isLoggedIn) {
         swal({
             title: "로그인이 필요합니다!",
-            text: "장바구니에 담으려면 먼저 로그인해주세요.",
+            text: "구매하시려면 먼저 로그인해주세요.",
             type: "warning"
         }, function() {
             location.href = "<%= ctxPath %>/login/login.go";
