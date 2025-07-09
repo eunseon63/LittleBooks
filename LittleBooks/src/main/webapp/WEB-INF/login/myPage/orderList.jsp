@@ -135,46 +135,40 @@
 <body>
 <jsp:include page="../../header1.jsp" />
 
-<div class="container mb-5" style="margin-top: 7%;">
+<div class="container mb-5" style="margin-top: 5%;">
 <br>
 <br>
 <br>
 
 <div class="container mt-5 mb-5">
-    <div class="row">
-        <!-- 좌측 네비게이션 -->
-        <div class="col-md-3" style="margin-top: 6.5%;">
-            <div class="card shadow-sm p-3 text-center">
-                <div class="rounded-circle bg-warning text-white d-inline-block"
-                     style="width: 70px; height: 70px; line-height: 70px; font-size: 20px; font-weight: bold;">
-                    <c:out value="${loginuser.name}" />
-                </div>
-                <div class="mt-2 font-weight-bold">
-                    <c:out value="${loginuser.name}" />님
-                </div>
-                <div style="font-size: 0.9rem; color: gray;">
-                    POINT: <c:out value="${loginuser.point}" />
-                </div>
-                <ul class="nav flex-column mt-4">
-                    <li class="nav-item mb-2">
-                        <button type="button" class="btn btn-outline-secondary btn-block"
-                                onclick="location.href='myPage.go'">내 정보 수정</button>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <button type="button" class="btn btn-outline-secondary btn-block"
-                                onclick="location.href='orderList.go'">나의 주문 내역</button>
-                    </li>
-                    <li class="nav-item">
-                        <button type="button" class="btn btn-outline-danger btn-block"
-                                onclick="location.href='deleteMember.go'">회원 탈퇴</button>
-                    </li>
-                </ul>
-            </div>
+  <div class="row">
+    <!-- 왼쪽 네비게이션 -->
+    <div class="col-md-3">
+      <div class="card shadow-sm rounded-lg p-3">
+        <div class="text-center mb-3">
+          <div class="rounded-circle bg-warning text-white d-inline-block" style="width:70px; height:70px; line-height:70px; font-size:20px; font-weight:bold;">
+            ${loginuser.name}
+          </div>
+          <div class="mt-2 font-weight-bold">${loginuser.name}님</div>
+          <div style="font-size: 0.9rem; color: gray;">POINT: ${loginuser.point}</div>
         </div>
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2">
+            <button class="btn btn-outline-secondary btn-block" onclick="location.href='myPage.go'">내 정보 수정</button>
+          </li>
+          <li class="nav-item mb-2">
+            <button class="btn btn-outline-secondary btn-block" onclick="location.href='orderList.go'">나의 주문 내역</button>
+          </li>
+          <li class="nav-item">
+			<button class="btn btn-outline-danger btn-block" onclick="confirmDelete()">회원 탈퇴</button>
+          </li>
+        </ul>
+      </div>
+    </div>
 
         <!-- 우측 주문 상세 내역 -->
         <div class="col-md-9">
-            <div class="section-title" style="text-align:left;">나의 주문 내역</div>
+            <%--<div class="section-title" style="text-align:left;">나의 주문 내역</div>--%>
 
 			<form method="get" action="orderList.go" class="mb-4">
 			    <div class="form-inline justify-content-end">
