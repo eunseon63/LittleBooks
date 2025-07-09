@@ -43,54 +43,81 @@
     .table td {
         font-size: 0.95rem;
     }
+    .order-group {
+        margin-bottom: 40px;
+    }
+    .order-header {
+        background-color: #e3f2fd;
+        padding: 10px 15px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+    }
 </style>
 
 <div class="sales-container container">
 
     <h3>전체 매출 확인</h3>
 
-    <!-- 요약 매출 박스 -->
+    <!-- 총 매출 박스 -->
     <div class="summary-box">
         <h4>총 매출 금액</h4>
         <div class="amount">
-            <fmt:formatNumber value="${requestScope.totalSales}" type="currency" currencySymbol="₩" />
+            <fmt:formatNumber value="${totalSales}" type="currency" currencySymbol="₩" />
         </div>
     </div>
 
-    <!-- 매출 목록 테이블 -->
-    <div class="table-responsive">
-        <table class="table table-bordered text-center">
-            <thead>
-                <tr>
-                    <th>주문번호</th>
-                    <th>구매자 아이디</th>
-                    <th>도서 제목</th>
-                    <th>수량</th>
-                    <th>총금액</th>
-                    <th>주문일자</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:if test="${not empty requestScope.salesList}">
-                    <c:forEach var="sale" items="${requestScope.salesList}">
-                        <tr>
-                            <td>${sale.ordercode}</td>
-                            <td>${sale.userid}</td>
-                            <td>${sale.bname}</td>
-                            <td>${sale.oqty}</td>
-                            <td><fmt:formatNumber value="${sale.totalprice}" type="currency" currencySymbol="₩" /></td>
-                            <td><fmt:formatDate value="${sale.orderdate}" pattern="yyyy-MM-dd HH:mm" /></td>
-                        </tr>
-                    </c:forEach>
+    <!-- 주문 단위로 묶은 매출 목록 -->
+    <c:if test="${not empty salesList}">
+        <c:set var="prevOrderCode" value="" />
+        <c:forEach var="sale" items="${salesList}">
+            <c:if test="${sale.ordercode ne prevOrderCode}">
+                <c:if test="${not empty prevOrderCode}">
+                    </tbody>
+                    </table>
+                    </div> <!-- order-group 끝 -->
                 </c:if>
-                <c:if test="${empty requestScope.salesList}">
-                    <tr>
-                        <td colspan="6">매출 데이터가 존재하지 않습니다.</td>
-                    </tr>
-                </c:if>
-            </tbody>
+
+                <!-- 새로운 주문 시작 -->
+                <div class="order-group">
+                    <div class="order-header">
+                        <strong>주문번호:</strong> ${sale.ordercode} &nbsp; | 
+                        <strong>구매자:</strong> ${sale.userid} &nbsp; | 
+                        <strong>주문일자:</strong> 
+                        <fmt:formatDate value="${sale.orderdate}" pattern="yyyy-MM-dd HH:mm" /> &nbsp; | 
+                        <strong>총금액:</strong> 
+                        <fmt:formatNumber value="${sale.totalprice}" type="currency" currencySymbol="₩" />
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>도서 제목</th>
+                                    <th>수량</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            </c:if>
+
+            <!-- 도서 목록 -->
+            <tr>
+                <td>${sale.bname}</td>
+                <td>${sale.oqty}</td>
+            </tr>
+
+            <!-- 현재 주문코드 기억 -->
+            <c:set var="prevOrderCode" value="${sale.ordercode}" />
+        </c:forEach>
+
+        <!-- 마지막 주문 닫기 -->
+        </tbody>
         </table>
-    </div>
+        </div> <!-- order-group 끝 -->
+    </c:if>
+
+    <c:if test="${empty salesList}">
+        <div class="text-center">매출 데이터가 존재하지 않습니다.</div>
+    </c:if>
 
 </div>
 

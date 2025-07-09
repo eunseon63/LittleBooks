@@ -225,3 +225,15 @@ WHERE userid = 'jyc';
 
 
 commit;
+
+select *
+from tbl_order
+
+
+UPDATE tbl_order
+SET orderdate = ADD_MONTHS(orderdate, -2)
+WHERE ordercode = 'b20250709-83';
+
+
+commit
+
