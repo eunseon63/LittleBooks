@@ -22,38 +22,35 @@ public class BookList extends AbstractController {
     	}
 
     	String sort = request.getParameter("sort");
+    	if (sort == null || sort.isEmpty()) {
+    	    sort = "new"; // 기본 정렬
+    	}
 
     	List<BookVO> bookList;
+    	BookDAO dao = new BookDAO_imple();
+    	OrderDAO orderDao = new OrderDAO_imple();
 
-    	if ("sales".equals(sort)) {
-    	    // sales 정렬은 숫자 category 받음
-    	    int categorySeq = 0;
-    	    try {
-    	        categorySeq = Integer.parseInt(category);
-    	    } catch(Exception e) {
-    	        categorySeq = 0; // all로 처리
-    	    }
-
-    	    OrderDAO orderDao = new OrderDAO_imple();
-    	    bookList = orderDao.selectBooksOrderBySales(categorySeq);
-
-    	} else {
-    	    // new 정렬은 한글 category 이름 받음 (기존 코드 유지)
-    	    BookDAO dao = new BookDAO_imple();
-
-    	    if ("all".equals(category)) {
+    	if ("all".equals(category)) {
+    	    if ("sales".equals(sort)) {
+    	        bookList = orderDao.selectBooksOrderBySales(0); // 0 → 전체
+    	    } else {
     	        bookList = dao.selectAllBooksSorted(sort);
+    	    }
+    	} else {
+    	    int categorySeq = dao.getCategorySeqByName(category);
+    	    if ("sales".equals(sort)) {
+    	        bookList = orderDao.selectBooksOrderBySales(categorySeq);
     	    } else {
     	        bookList = dao.selectBooksByCategorySorted(category, sort);
     	    }
     	}
 
+    	request.setAttribute("bookList", bookList);
+    	request.setAttribute("category", category);
+    	request.setAttribute("sort", sort);
 
-        request.setAttribute("bookList", bookList);
-        request.setAttribute("category", category);
-        request.setAttribute("sort", sort);
+    	super.setRedirect(false);
+    	super.setViewPage("/WEB-INF/myshop/booklist.jsp");
 
-        super.setRedirect(false);
-        super.setViewPage("/WEB-INF/myshop/booklist.jsp");
     }
 }
