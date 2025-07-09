@@ -205,6 +205,7 @@ public class MemberDAO_imple implements MemberDAO {
 				 member.setRegisterday(rs.getString("registerday"));
 				 
 				 if(rs.getInt("pwdchangegap") >= 3) {
+					 
 					 // 마지막으로 암호를 변경한 날짜가 현재시각으로 부터 3개월이 지났으면 true
 					 // 마지막으로 암호를 변경한 날짜가 현재시각으로 부터 3개월이 지나지 않았으면 false
 					 
@@ -220,7 +221,7 @@ public class MemberDAO_imple implements MemberDAO {
 				 
 				 
 				 // ==== 휴면이 아닌 회원만 tbl_loginhistory(로그인기록) 테이블에 insert 하기 시작 ==== // 
-				 if( rs.getInt("lastlogingap") < 12 ) {
+				 if( rs.getInt("lastlogingap") < 12 && rs.getInt("idle") == 0) {
 					 sql = " insert into tbl_loginhistory(logindate, fk_userid) "
 					 	 + " values(sysdate, ?) ";
 					 
