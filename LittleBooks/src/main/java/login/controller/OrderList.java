@@ -1,5 +1,6 @@
 package login.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import common.controller.AbstractController;
@@ -32,8 +33,23 @@ public class OrderList extends AbstractController {
 
         String userid = loginuser.getUserid();
         
+        String periodStr = request.getParameter("period"); 
+        int period = 1;
+        
+        try {
+            if (periodStr != null) {
+                period = Integer.parseInt(periodStr);
+            }
+        } catch (NumberFormatException e) {
+            period = 1;
+        }
+        
+        // 현재일 기준 N개월 전 날짜 구하기
+        LocalDate startDate = LocalDate.now().minusMonths(period);
+        String startDateStr = startDate.toString(); // "2024-04-08" 형식
+        
         // 전체 주문 상세 내역 가져오기
-        List<OrderDetailVO> orderDetailList = odao.selectAllDetail(userid);
+        List<OrderDetailVO> orderDetailList = odao.selectOrderDetailByPeriod(userid, startDateStr);
         // System.out.println(orderDetailList);
         
         
