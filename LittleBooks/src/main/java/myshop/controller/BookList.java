@@ -16,39 +16,38 @@ public class BookList extends AbstractController {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         
-        String category = request.getParameter("category");
-        if (category == null || category.isEmpty()) {
-            category = "all";
-        }
+    	String category = request.getParameter("category");
+    	if (category == null || category.isEmpty()) {
+    	    category = "all";
+    	}
 
-        String sort = request.getParameter("sort");  // "new", "sales", or null
+    	String sort = request.getParameter("sort");
 
-        List<BookVO> bookList;
+    	List<BookVO> bookList;
 
-        if ("sales".equals(sort)) {
-            // 판매순 정렬은 OrderDAO에서 처리 (판매량 합산)
-            OrderDAO orderDao = new OrderDAO_imple();
+    	if ("sales".equals(sort)) {
+    	    // sales 정렬은 숫자 category 받음
+    	    int categorySeq = 0;
+    	    try {
+    	        categorySeq = Integer.parseInt(category);
+    	    } catch(Exception e) {
+    	        categorySeq = 0; // all로 처리
+    	    }
 
-            int categorySeq = 0;
-            try {
-                categorySeq = Integer.parseInt(category);
-            } catch (Exception e) {
-                // all인 경우 등 숫자가 아닐 때 0으로 처리 (전체)
-                categorySeq = 0;
-            }
+    	    OrderDAO orderDao = new OrderDAO_imple();
+    	    bookList = orderDao.selectBooksOrderBySales(categorySeq);
 
-            bookList = orderDao.selectBooksOrderBySales(categorySeq);
+    	} else {
+    	    // new 정렬은 한글 category 이름 받음 (기존 코드 유지)
+    	    BookDAO dao = new BookDAO_imple();
 
-        } else {
-            // 기존 new, 기본 정렬 처리
-            BookDAO dao = new BookDAO_imple();
+    	    if ("all".equals(category)) {
+    	        bookList = dao.selectAllBooksSorted(sort);
+    	    } else {
+    	        bookList = dao.selectBooksByCategorySorted(category, sort);
+    	    }
+    	}
 
-            if ("all".equals(category)) {
-                bookList = dao.selectAllBooksSorted(sort);
-            } else {
-                bookList = dao.selectBooksByCategorySorted(category, sort);
-            }
-        }
 
         request.setAttribute("bookList", bookList);
         request.setAttribute("category", category);

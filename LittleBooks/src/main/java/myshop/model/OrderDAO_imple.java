@@ -241,7 +241,7 @@ public class OrderDAO_imple implements OrderDAO {
 
 	    try {
 	        conn = ds.getConnection();
-
+	        // 도서 정보를 가져오되, 판매량(SUM(od.oqty)) 기준으로 정렬하며, 특정 카테고리만 조회하거나 전체를 조회할 수 있음.
 	        String sql = "SELECT b.bookseq, b.bname, b.bcontent, b.price, b.bqty, b.author, b.bimage, " +
 	                     "b.fk_publishseq, b.fk_categoryseq, b.binputdate, b.fk_snum, c.categoryname, " +
 	                     "NVL(SUM(od.oqty), 0) AS total_sales " +
@@ -610,6 +610,53 @@ public class OrderDAO_imple implements OrderDAO {
 	       }
 
 	       return orderDetailList;
+	}
+
+	@Override
+	public List<BookVO> selectAllBooksOrderBySales() throws SQLException {
+		List<BookVO> bookList = new ArrayList<>();
+
+	    try {
+	    	conn = ds.getConnection();
+
+	        String sql = "SELECT b.*, c.categoryname, NVL(SUM(od.OQTY), 0) AS total_sales " +
+	                     "FROM tbl_book b " +
+	                     "JOIN tbl_category c ON b.fk_categoryseq = c.categoryseq " +
+	                     "LEFT JOIN tbl_orderdetail od ON b.bookseq = od.fk_bookseq " +
+	                     "GROUP BY b.bookseq, b.bname, b.bcontent, b.price, b.bqty, b.author, " +
+	                     "         b.bimage, b.fk_publishseq, b.fk_categoryseq, b.binputdate, b.fk_snum, " +
+	                     "         c.categoryname " +
+	                     "ORDER BY total_sales DESC";
+
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            BookVO book = new BookVO();
+	            book.setBookseq(rs.getInt("bookseq"));
+	            book.setBname(rs.getString("bname"));
+	            book.setBcontent(rs.getString("bcontent"));
+	            book.setPrice(rs.getInt("price"));
+	            book.setBqty(rs.getInt("bqty"));
+	            book.setAuthor(rs.getString("author"));
+	            book.setBimage(rs.getString("bimage"));
+	            book.setFk_publishseq(rs.getInt("fk_publishseq"));
+	            book.setFk_categoryseq(rs.getInt("fk_categoryseq"));
+	            book.setBinputdate(rs.getString("binputdate"));  // ✅ String으로 저장
+	            book.setFk_snum(rs.getInt("fk_snum"));
+
+	            CategoryVO cvo = new CategoryVO();
+	            cvo.setCategoryname(rs.getString("categoryname"));
+	            book.setCvo(cvo);
+
+	            bookList.add(book);
+	        }
+
+	    } finally {
+	        close();
+	    }
+
+	    return bookList;
 	}
 
 

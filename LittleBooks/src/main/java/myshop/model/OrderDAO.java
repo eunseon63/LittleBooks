@@ -51,5 +51,7 @@ public interface OrderDAO {
 	
 	// 판매량순정렬
 	List<BookVO> selectBooksOrderBySales(int categorySeq) throws SQLException;
+
+	List<BookVO> selectAllBooksOrderBySales() throws SQLException;
  
 }

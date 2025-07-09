@@ -119,19 +119,24 @@
     </div>
 </c:if>
 
-<!-- 정렬 기준 선택 드롭다운 -->
 <div class="sort-box">
     <form method="get" action="<c:url value='/myshop/booklist.go' />">
-        <input type="hidden" name="category" value="${category}" />
-        <select name="sort" onchange="this.form.submit()" class="sort-select">
-            <option value="">-- 정렬 선택 --</option>
-            <option value="new" ${sort eq 'new' ? 'selected' : ''}>입고일 순</option>
-            <option value="sales" ${sort eq 'sales' ? 'selected' : ''}>판매순</option> <!-- 이 부분 추가 -->
-        </select>
-    </form>
+    <c:choose>
+        <c:when test="${sort eq 'sales'}">
+            <input type="hidden" name="category" value="${categorySeq}" />
+        </c:when>
+        <c:otherwise>
+            <input type="hidden" name="category" value="${categoryName}" />
+        </c:otherwise>
+    </c:choose>
+
+    <select name="sort" onchange="this.form.submit()" class="sort-select">
+        <option value="">-- 정렬 선택 --</option>
+        <option value="new" ${sort eq 'new' ? 'selected' : ''}>입고일 순</option>
+        <option value="sales" ${sort eq 'sales' ? 'selected' : ''}>판매순</option>
+    </select>
+</form>
 </div>
-
-
 
 <div class="container">
     <c:forEach var="book" items="${bookList}">

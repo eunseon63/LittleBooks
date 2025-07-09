@@ -42,7 +42,7 @@ public interface BookDAO {
 
 	int getTotalBookCount(Map<String, String> paraMap) throws SQLException;
 
-	
+    List<BookVO> selectBooksByCategorySorted(int categorySeq, String sort) throws Exception;
 
 	// 책 정렬
 	List<BookVO> selectAllBooksSorted(String sort) throws SQLException;
