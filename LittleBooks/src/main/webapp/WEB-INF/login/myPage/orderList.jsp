@@ -12,11 +12,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>주문 상세 내역</title>
+    <title>나의 주문 내역</title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="<%=ctxPath%>/bootstrap-4.6.2-dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="<%=ctxPath%>/css/mypage_custom.css" />
 
     <!-- jQuery -->
     <script src="<%=ctxPath%>/js/jquery-3.7.1.min.js"></script>
@@ -126,7 +125,7 @@
                     return;
                 }
 
-                const popupUrl = "<%= ctxPath %>/myshop/orderDetail.go?ordercode=" + encodeURIComponent(ordercode);
+                const popupUrl = "<%= ctxPath %>/login/orderDetail.go?ordercode=" + encodeURIComponent(ordercode);
                 window.open(popupUrl, "memberDetailPopup", "width=800,height=600,scrollbars=yes,resizable=no");
             });
         });
@@ -136,6 +135,7 @@
 <body>
 <jsp:include page="../../header1.jsp" />
 
+<div class="container mb-5" style="margin-top: 7%;">
 <br>
 <br>
 <br>
@@ -143,7 +143,7 @@
 <div class="container mt-5 mb-5">
     <div class="row">
         <!-- 좌측 네비게이션 -->
-        <div class="col-md-3">
+        <div class="col-md-3" style="margin-top: 6.5%;">
             <div class="card shadow-sm p-3 text-center">
                 <div class="rounded-circle bg-warning text-white d-inline-block"
                      style="width: 70px; height: 70px; line-height: 70px; font-size: 20px; font-weight: bold;">
@@ -174,8 +174,20 @@
 
         <!-- 우측 주문 상세 내역 -->
         <div class="col-md-9">
-            <div class="section-title" style="text-align:left;">주문 상세 내역</div>
+            <div class="section-title" style="text-align:left;">나의 주문 내역</div>
 
+			<form method="get" action="orderList.go" class="mb-4">
+			    <div class="form-inline justify-content-end">
+			        <label for="period" class="mr-2 font-weight-bold">조회 기간:</label>
+			        <select name="period" id="period" class="form-control mr-3">
+			            <option value="1" ${param.period == '1' ? 'selected' : ''}>1개월</option>
+			            <option value="3" ${param.period == '3' ? 'selected' : ''}>3개월</option>
+			            <option value="6" ${param.period == '6' ? 'selected' : ''}>6개월</option>
+			            <option value="12" ${param.period == '12' ? 'selected' : ''}>12개월</option>
+			        </select>
+			        <button type="submit" class="btn btn-primary" style="background-color: #ffb74d; color:black; border:none;">조회</button>
+			    </div>
+			</form>
             <c:choose>
                 <c:when test="${not empty orderDetailList}">
                     <c:set var="prevOrderCode" value="" />

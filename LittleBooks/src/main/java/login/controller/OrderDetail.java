@@ -1,4 +1,4 @@
-package myshop.controller;
+package login.controller;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +22,7 @@ public class OrderDetail extends AbstractController {
    public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	   
 		String ordercode = request.getParameter("ordercode");
+		request.setAttribute("ordercode", ordercode);
 
 		List<OrderDetailVO> orderOneDetailList = odao.selectOneDetail(ordercode);  // 한 주문 내역을 조회
         

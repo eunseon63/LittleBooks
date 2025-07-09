@@ -108,7 +108,7 @@ public class OrderAdd extends AbstractController {
             }
 
             int totalPriceInt = Integer.parseInt(sum_totalPrice);
-            int earnedPoint = (int) (totalPriceInt * 0.1 / 100);
+            int earnedPoint = (int) (totalPriceInt * 0.01);
             int newPoint = loginuser.getPoint() - usedPoint + earnedPoint;
 
             int updateResult = bdao.updateUserPoint(loginuser.getUserid(), newPoint);

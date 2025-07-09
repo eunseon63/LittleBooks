@@ -433,7 +433,7 @@ public class OrderDAO_imple implements OrderDAO {
                sql += "WHERE m.userid = ? ";
            }
            
-           sql += " order by od.fk_ordercode asc ";
+           sql += " order by o.orderdate desc ";
 
            pstmt = conn.prepareStatement(sql);
 
@@ -557,9 +557,15 @@ public class OrderDAO_imple implements OrderDAO {
 	                   + "    od.oqty, "
 	                   + "    od.odrprice, "
 	                   + "    od.deliverstatus, "
-	                   + "    o.orderdate, "
+	                   + " 	  o.orderdate, "
 	                   + "    o.totalprice, "
 	                   + "    o.usepoint, "
+	                   + "    o.receiver_name, "
+	                   + "    o.receiver_phone, "
+	                   + "    o.postcode, "
+	                   + "    o.address, "
+	                   + "    o.detail_address, "
+	                   + "    o.extra_address, "
 	                   + "    b.bname, "
 	                   + "    b.price, "
 	                   + "    b.bimage, "
@@ -569,7 +575,7 @@ public class OrderDAO_imple implements OrderDAO {
 	                   + " JOIN tbl_book b ON od.fk_bookseq = b.bookseq "
 	                   + " JOIN tbl_member m ON o.fk_userid = m.userid "
 	                   + " WHERE od.fk_ordercode = ? "
-	                   + " order by od.fk_ordercode asc ";
+	                   + " order by o.orderdate asc ";
 
 	           pstmt = conn.prepareStatement(sql);
 
@@ -591,6 +597,12 @@ public class OrderDAO_imple implements OrderDAO {
 	               order.setOrderdate(rs.getString("orderdate"));
 	               order.setTotalPrice(rs.getInt("totalprice"));
 	               order.setUsePoint(rs.getInt("usepoint"));
+	               order.setReceiverName(rs.getString("receiver_name"));
+	               order.setReceiverPhone(rs.getString("receiver_phone"));
+	               order.setPostcode(rs.getString("postcode"));
+	               order.setAddress(rs.getString("address"));
+	               order.setDetailAddress(rs.getString("detail_address"));
+	               order.setExtraAddress(rs.getString("extra_address"));
 	               
 	               BookVO book = new BookVO();
 	               book.setBookseq(rs.getInt("bookseq"));
@@ -611,6 +623,7 @@ public class OrderDAO_imple implements OrderDAO {
 
 	       return orderDetailList;
 	}
+
 
 	@Override
 	public List<BookVO> selectAllBooksOrderBySales() throws SQLException {
@@ -657,6 +670,75 @@ public class OrderDAO_imple implements OrderDAO {
 	    }
 
 	    return bookList;
+	}
+	// 주문 기간별 상세 정보 찾는 함수
+	@Override
+	public List<OrderDetailVO> selectOrderDetailByPeriod(String userid, String startDateStr) throws SQLException {
+
+	    List<OrderDetailVO> orderDetailList = new ArrayList<>();
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = "SELECT "
+	                + "    od.fk_ordercode, od.odrseq, od.fk_bookseq, od.oqty, od.odrprice, od.deliverstatus, "
+	                + "    o.orderdate, o.totalprice, o.usepoint, "
+	                + "    o.receiver_name, o.receiver_phone, o.postcode, o.address, o.detail_address, o.extra_address, "
+	                + "    b.bname, b.price, b.bimage, b.author "
+	                + "FROM tbl_orderdetail od "
+	                + "JOIN tbl_order o ON od.fk_ordercode = o.ordercode "
+	                + "JOIN tbl_book b ON od.fk_bookseq = b.bookseq "
+	                + "WHERE o.fk_userid = ? "
+	                + "AND o.orderdate >= TO_DATE(?, 'YYYY-MM-DD') "
+	                + "ORDER BY o.orderdate DESC";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+	        pstmt.setString(2, startDateStr); // LocalDate.now().minusMonths(N).toString()
+
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            OrderDetailVO detailVO = new OrderDetailVO();
+
+	            detailVO.setOdrseq(rs.getString("odrseq"));
+	            detailVO.setFk_ordercode(rs.getString("fk_ordercode"));
+	            detailVO.setFk_bookseq(rs.getInt("fk_bookseq"));
+	            detailVO.setOqty(rs.getInt("oqty"));
+	            detailVO.setOdrprice(rs.getInt("odrprice"));
+	            detailVO.setDeliverstatus(rs.getString("deliverstatus"));
+
+	            OrderVO order = new OrderVO();
+	            order.setOrderdate(rs.getString("orderdate"));
+	            order.setTotalPrice(rs.getInt("totalprice"));
+	            order.setUsePoint(rs.getInt("usepoint"));
+	            order.setReceiverName(rs.getString("receiver_name"));
+	            order.setReceiverPhone(rs.getString("receiver_phone"));
+	            order.setPostcode(rs.getString("postcode"));
+	            order.setAddress(rs.getString("address"));
+	            order.setDetailAddress(rs.getString("detail_address"));
+	            order.setExtraAddress(rs.getString("extra_address"));
+
+	            BookVO book = new BookVO();
+	            book.setBookseq(rs.getInt("fk_bookseq"));
+	            book.setBname(rs.getString("bname"));
+	            book.setPrice(rs.getInt("price"));
+	            book.setBimage(rs.getString("bimage"));
+	            book.setAuthor(rs.getString("author"));
+
+	            detailVO.setBook(book);
+	            detailVO.setOrder(order);
+
+	            orderDetailList.add(detailVO);
+	        }
+
+	    } finally {
+	        close();
+	    }
+
+	    return orderDetailList;
+	    
+
 	}
 
 
