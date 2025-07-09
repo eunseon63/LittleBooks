@@ -85,6 +85,7 @@ function goEdit() {
 				// 새암호가 기존암호와 동일한 경우
 				$('span#duplicate_pwd').html("현재 사용중인 비밀번호와 동일하므로 변경이 불가합니다."); 
 				isNewPwd = false;
+				return true;  // 이미 메세지 출력했으므로 중복메세지 방지
 			} else {
 				
 			}
