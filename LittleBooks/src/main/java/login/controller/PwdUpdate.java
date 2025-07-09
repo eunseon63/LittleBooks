@@ -19,7 +19,7 @@ public class PwdUpdate extends AbstractController {
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String userid = request.getParameter("userid");
-		String method = request.getMethod();
+		String method = request.getMethod(); 	
 		
 		if("POST".equalsIgnoreCase(method)) { // POST 방식일 때
 			

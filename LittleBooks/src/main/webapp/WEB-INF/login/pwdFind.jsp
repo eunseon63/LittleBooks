@@ -21,45 +21,45 @@
 
 <script type="text/javascript">
 $(function() {
-	// "비밀번호 찾기" 버튼 클릭 시 goFind() 실행
-	$('button#btnPwdFind').click(function(){
-		goFind();
-	});
-	
-	// "암호 변경하기" 버튼 클릭 시 goUpdate() 실행
-	$('button#btnUpdate').click(function(){
-		goUpdate();
-	});
-	
-	// 이메일 입력창에서 Enter 키 입력 시 goFind() 실행
-	$('input:text[name="email"]').bind('keyup', function(e){
-		if(e.keyCode == 13) {
-		   goFind();
-		}
-	});
+   // "비밀번호 찾기" 버튼 클릭 시 goFind() 실행
+   $('button#btnPwdFind').click(function(){
+      goFind();
+   });
+   
+   // "암호 변경하기" 버튼 클릭 시 goUpdate() 실행
+   $('button#btnUpdate').click(function(){
+      goUpdate();
+   });
+   
+   // 이메일 입력창에서 Enter 키 입력 시 goFind() 실행
+   $('input:text[name="email"]').bind('keyup', function(e){
+      if(e.keyCode == 13) {
+         goFind();
+      }
+   });
 }); // end of $(function(){})------------------------------
 
 // Function Declaration
 // 입력된 아이디와 이메일을 통해 비밀번호 찾기 팝업을 여는 함수
 function goFind() {
-	const userid = $('input:text[name="userid"]').val().trim();
-	const email = $('input:text[name="email"]').val();
-	const regExp_email = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
-	const frm = document.pwdFindFrm;
-	
-	if (userid == "") {
-		alert("아이디를 입력하세요!!");
-		return;
-	}
-	
-	if( !regExp_email.test(email) ) {
-		alert("e메일을 올바르게 입력하세요!!");
-		return;
-	}
-	
+   const userid = $('input:text[name="userid"]').val().trim();
+   const email = $('input:text[name="email"]').val();
+   const regExp_email = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+   const frm = document.pwdFindFrm;
+   
+   if (userid == "") {
+      alert("아이디를 입력하세요!!");
+      return;
+   }
+   
+   if( !regExp_email.test(email) ) {
+      alert("e메일을 올바르게 입력하세요!!");
+      return;
+   }
+   
     // 새 창 열기
     const popup = window.open("", "pwdFindPopup", "width=500,height=400,left=300,top=150,resizable=no,scrollbars=no");
-	
+   
  // 비밀번호 찾기 요청 전송
     frm.action = "<%= ctxPath %>/login/pwdFindSuccess.go";
     frm.method = "post";
@@ -98,60 +98,88 @@ function goUpdate() {
         $('#pwd2').focus();
         return;
     }
+    
+    let isNewPwd = true;
+    
+   $.ajax({
+      url:"/LittleBooks/login/duplicatePwdCheck.go",
+      data:{"new_pwd":$('input:password[name="pwd"]').val()
+          ,"userid":$('input:hidden[name="userid"]').val()
+           },
+      type:"post",
+      async:false,  // !!!! 반드시 동기방식 이어야 한다. !!!!!
+      dataType:"json",
+      success:function(json){
+         // console.log(json);
+         // {"isExists" : true}        또는    {"isExists" : false} 
+         // 새암호가 기존암호와 동일한 경우          새암호가 기존암호와 다른 경우
+         
+         if(json.isExists) {
+            // 새암호가 기존암호와 동일한 경우
+            alert("현재 사용중인 비밀번호와 동일하므로 변경이 불가합니다.");
+            isNewPwd = false;
+         }
+      },
+      error: function(request, status, error){
+            alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
+       }
+   });
 
     // 유효성 검사 통과 → 비밀번호 변경 요청 전송
-    const frm = document.pwdUpdateEndFrm;
-    frm.action = "<%= ctxPath %>/login/pwdUpdate.go";
-    frm.method = "post";
-    frm.submit();
+    if(isNewPwd) {
+       const frm = document.pwdUpdateEndFrm;
+       frm.action = "<%= ctxPath %>/login/pwdUpdate.go";
+       frm.method = "post";
+       frm.submit();
+    }
 } // function goUpdate() {}-------------------------
 </script>
 
 <!-- 비밀번호 찾기 폼 -->
 <c:if test="${empty param.userid}">
-	<div class="container" style="max-width: 400px; margin-top: 100px;">
-	    <h4 class="text-center mb-4">비밀번호 찾기</h4>
-	
-	    <form name="pwdFindFrm">
-	        <div class="form-group">
-	            <label for="userid">아이디</label>
-	            <input type="text" class="form-control" name="userid" id="userid" autocomplete="off" placeholder="아이디 입력하세요">
-	        </div>
-	
-	        <div class="form-group">
-	            <label for="email">이메일</label>
-	            <input type="text" class="form-control" name="email" id="email" autocomplete="off" placeholder="이메일 입력하세요">
-	        </div>
-	
-	        <div class="text-center mt-4">
-	            <button type="button" class="btn btn-warning btn-block" id="btnPwdFind">찾기</button>
-	        </div>
-	    </form>
-	</div>
+   <div class="container" style="max-width: 400px; margin-top: 100px;">
+       <h4 class="text-center mb-4">비밀번호 찾기</h4>
+   
+       <form name="pwdFindFrm">
+           <div class="form-group">
+               <label for="userid">아이디</label>
+               <input type="text" class="form-control" name="userid" id="userid" autocomplete="off" placeholder="아이디 입력하세요">
+           </div>
+   
+           <div class="form-group">
+               <label for="email">이메일</label>
+               <input type="text" class="form-control" name="email" id="email" autocomplete="off" placeholder="이메일 입력하세요">
+           </div>
+   
+           <div class="text-center mt-4">
+               <button type="button" class="btn btn-warning btn-block" id="btnPwdFind">찾기</button>
+           </div>
+       </form>
+   </div>
 </c:if>
 
 
 <c:if test="${not empty param.userid}">
-	<!-- 비밀번호 변경 폼 -->
-	<div  class="container" style="max-width: 400px; margin-top: 30px;">
-		<h4 class="text-center mb-4 my-4">비밀번호 변경</h4>
-	
-	   <form name="pwdUpdateEndFrm" class="container" style="max-width: 400px; margin-top: 40px;">
-	       <div class="form-group">
-	           <label for="pwd">새 암호</label>
-	           <input type="password" name="pwd" id="pwd" class="form-control mt-2" placeholder="새 암호 입력">
-	       </div>
-	
-	       <div class="form-group">
-	           <label for="pwd2">새 암호 확인</label>
-	           <input type="password" id="pwd2" class="form-control mt-2" placeholder="다시 입력">
-	       </div>
-	
-	       <input type="hidden" name="userid" value="${param.userid}" />
-	
-	       <div class="text-center mt-4">
-	           <button type="button" class="btn btn-warning btn-block" id="btnUpdate">암호 변경하기</button>
-	       </div>
-	   </form>
-	</div>
+   <!-- 비밀번호 변경 폼 -->
+   <div  class="container" style="max-width: 400px; margin-top: 30px;">
+      <h4 class="text-center mb-4 my-4">비밀번호 변경</h4>
+   
+      <form name="pwdUpdateEndFrm" class="container" style="max-width: 400px; margin-top: 40px;">
+          <div class="form-group">
+              <label for="pwd">새 암호</label>
+              <input type="password" name="pwd" id="pwd" class="form-control mt-2" placeholder="새 암호 입력">
+          </div>
+   
+          <div class="form-group">
+              <label for="pwd2">새 암호 확인</label>
+              <input type="password" id="pwd2" class="form-control mt-2" placeholder="다시 입력">
+          </div>
+   
+          <input type="hidden" name="userid" value="${param.userid}" />
+   
+          <div class="text-center mt-4">
+              <button type="button" class="btn btn-warning btn-block" id="btnUpdate">암호 변경하기</button>
+          </div>
+      </form>
+   </div>
 </c:if>
