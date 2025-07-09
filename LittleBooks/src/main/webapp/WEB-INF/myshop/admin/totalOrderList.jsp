@@ -196,12 +196,12 @@
 	                    $btn.addClass("btn-delivering");
 	                    alert('배송이 시작되었습니다.');
 	                    $btn.text("배송중");
-	                    location.reload(); // ⭐ 이게 즉시 새로고침시킴
+	                    location.reload();
 	                } else if (nextStatus === "2") {
 	                    $btn.addClass("btn-delivered");
-	                    alert('배송이 시작되었습니다.');
+	                    alert('배송이 완료되었습니다.');
 	                    $btn.text("배송완료");
-	                    location.reload(); // ⭐ 이게 즉시 새로고침시킴
+	                    location.reload();
 	                }
 	            } else {
 	                alert("상태 변경에 실패했습니다. 서버 응답: " + trimmed);

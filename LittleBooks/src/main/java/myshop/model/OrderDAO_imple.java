@@ -433,7 +433,7 @@ public class OrderDAO_imple implements OrderDAO {
                sql += "WHERE m.userid = ? ";
            }
            
-           sql += " order by od.fk_ordercode asc ";
+           sql += " order by o.orderdate desc ";
 
            pstmt = conn.prepareStatement(sql);
 
