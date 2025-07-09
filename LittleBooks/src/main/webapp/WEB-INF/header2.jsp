@@ -11,7 +11,7 @@
 <html>
 <head>
 
-<title>:::HOMEPAGE:::</title> 
+<title>Little Books</title> 
 
 <!-- Required meta tags -->
 <meta charset="utf-8">
