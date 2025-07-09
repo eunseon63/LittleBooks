@@ -72,7 +72,7 @@
 
 <div style="width: 90%; margin: auto; min-height: 1000px;">
     <br><br><br>
-    <h2>${sessionScope.loginuser.name} 주문통계 차트</h2>
+    <h2>${sessionScope.loginuser.name} 주문통계</h2>
 
     <form name="searchFrm" style="margin: 30px 0;">
         <select name="searchType" id="searchType">
