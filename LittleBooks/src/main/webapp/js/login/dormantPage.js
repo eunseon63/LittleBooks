@@ -13,7 +13,9 @@ $(function () {
 			$("div#form-group :input").prop("disabled", true);  
 			$(e.target).prop("disabled", false); 
 			
-			$(e.target).parent().find("span.error").show();
+			$("span#duplicate_pwd").hide(); // ✅ 중복 메시지 숨기기
+			$(e.target).parent().find("span.error").show(); // 유효성 오류 메시지 보이기
+			
 			$(e.target).val("").focus();
         } else {
 			$("div#form-group :input").prop("disabled", false);
@@ -83,9 +85,12 @@ function goEdit() {
 			
 			if(json.isExists) {
 				// 새암호가 기존암호와 동일한 경우
-				$('span#duplicate_pwd').html("현재 사용중인 비밀번호와 동일하므로 변경이 불가합니다."); 
+				$("span.error").hide(); // ✅ 유효성 메시지 숨기기
+				$('span#duplicate_pwd')
+				    .html("현재 사용중인 비밀번호와 동일하므로 변경이 불가합니다.")
+				    .show();
 				isNewPwd = false;
-				return true;  // 이미 메세지 출력했으므로 중복메세지 방지
+				return;  // 이미 메세지 출력했으므로 중복메세지 방지
 			} else {
 				
 			}

@@ -51,8 +51,8 @@
    <form name="pwdUpdateEndFrm" class="container" style="max-width: 400px; margin-top: 40px;">
    
        <div class="form-group">
-           <label for="new_pwd">새 암호</label><span class="error mx-2" style="color: red;">암호는 영문자,숫자,특수기호가 혼합된 8~15 글자로 입력하세요</span>
-           <span id="duplicate_pwd" style="color: red; margin-left: 2%;"></span>
+           <label for="new_pwd">새 암호</label><span class="error mx-2" style="color: red; display: none;">암호는 영문자,숫자,특수기호가 혼합된 8~15 글자로 입력하세요</span>
+           <span id="duplicate_pwd" style="color: red; margin-left: 2%; display: none;"></span>
            <input type="password" id="new_pwd" name="new_pwd" class="form-control mt-2 requiredInfo" placeholder="새 암호 입력">
        </div>
 
