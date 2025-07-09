@@ -505,60 +505,43 @@ public class BookDAO_imple implements BookDAO {
 	// 책 목록 정렬
 	@Override
 	public List<BookVO> selectAllBooksSorted(String sort) throws SQLException {
-			List<BookVO> list = new ArrayList<>();
+		List<BookVO> list = new ArrayList<>();
+        try {
+        	conn = ds.getConnection();
 
-		    try {
-		        conn = ds.getConnection();
+            String sql = "SELECT b.*, c.categoryname " +
+                         "FROM tbl_book b " +
+                         "JOIN tbl_category c ON b.fk_categoryseq = c.categoryseq " +
+                         "ORDER BY b.binputdate DESC";
 
-		        String sql = "SELECT b.*, c.categoryname " +
-		                     "FROM tbl_book b JOIN tbl_category c ON b.fk_categoryseq = c.categoryseq";
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
 
-		        if ("new".equals(sort)) {
-		            sql += " ORDER BY b.binputdate DESC";
-		        }
+            while (rs.next()) {
+                BookVO book = new BookVO();
+                book.setBookseq(rs.getInt("bookseq"));
+                book.setBname(rs.getString("bname"));
+                book.setBcontent(rs.getString("bcontent"));
+                book.setPrice(rs.getInt("price"));
+                book.setBqty(rs.getInt("bqty"));
+                book.setAuthor(rs.getString("author"));
+                book.setBimage(rs.getString("bimage"));
+                book.setFk_publishseq(rs.getInt("fk_publishseq"));
+                book.setFk_categoryseq(rs.getInt("fk_categoryseq"));
+                book.setBinputdate(rs.getString("binputdate"));
+                book.setFk_snum(rs.getInt("fk_snum"));
 
-		        pstmt = conn.prepareStatement(sql);
-		        rs = pstmt.executeQuery();
+                CategoryVO cvo = new CategoryVO();
+                cvo.setCategoryname(rs.getString("categoryname"));
+                book.setCvo(cvo);
 
-		        while (rs.next()) {
-		            BookVO book = new BookVO();
+                list.add(book);
+            }
+        } finally {
+            close();
+        }
 
-		            book.setBookseq(rs.getInt("bookseq"));
-		            book.setBname(rs.getString("bname"));
-		            book.setBcontent(rs.getString("bcontent"));
-		            book.setPrice(rs.getInt("price"));
-		            book.setBqty(rs.getInt("bqty"));
-		            book.setAuthor(rs.getString("author"));
-		            book.setBimage(rs.getString("bimage"));
-		            book.setFk_publishseq(rs.getInt("fk_publishseq"));
-		            book.setFk_categoryseq(rs.getInt("fk_categoryseq"));
-
-		            java.sql.Date binputDate = rs.getDate("binputdate");
-		            if (binputDate != null) {
-		                book.setBinputdate(binputDate.toString());
-		            } else {
-		                book.setBinputdate(null);
-		            }
-
-		            book.setFk_snum(rs.getInt("fk_snum"));
-
-		            CategoryVO cvo = new CategoryVO();
-		            cvo.setCategoryseq(rs.getInt("fk_categoryseq"));
-		            cvo.setCategoryname(rs.getString("categoryname"));
-		            book.setCvo(cvo);
-
-		            SpecVO spvo = new SpecVO();
-		            spvo.setSnum(rs.getInt("fk_snum"));
-		            book.setSpvo(spvo);
-
-		            list.add(book);
-		        }
-
-		    } finally {
-		        close();
-		    }
-
-		    return list;
+        return list;
 	}
 
 	// 청소년 권장 도서 (메인)
@@ -1607,6 +1590,76 @@ public class BookDAO_imple implements BookDAO {
 
 	    return list;
 	}
+
+	@Override
+	public List<BookVO> selectBooksByCategorySorted(int categorySeq, String sort) throws Exception {
+		List<BookVO> list = new ArrayList<>();
+        try {
+            conn = ds.getConnection();
+
+            String sql = "SELECT b.*, c.categoryname " +
+                         "FROM tbl_book b " +
+                         "JOIN tbl_category c ON b.fk_categoryseq = c.categoryseq " +
+                         "WHERE c.categoryseq = ? " +
+                         "ORDER BY b.binputdate DESC";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, categorySeq);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                BookVO book = new BookVO();
+                book.setBookseq(rs.getInt("bookseq"));
+                book.setBname(rs.getString("bname"));
+                book.setBcontent(rs.getString("bcontent"));
+                book.setPrice(rs.getInt("price"));
+                book.setBqty(rs.getInt("bqty"));
+                book.setAuthor(rs.getString("author"));
+                book.setBimage(rs.getString("bimage"));
+                book.setFk_publishseq(rs.getInt("fk_publishseq"));
+                book.setFk_categoryseq(rs.getInt("fk_categoryseq"));
+                book.setBinputdate(rs.getString("binputdate"));
+
+                book.setFk_snum(rs.getInt("fk_snum"));
+
+                CategoryVO cvo = new CategoryVO();
+                cvo.setCategoryname(rs.getString("categoryname"));
+                book.setCvo(cvo);
+
+                list.add(book);
+            }
+        } finally {
+            close();
+        }
+
+        return list;
+	}
+
+	// BookDAO_imple.java 또는 CategoryDAO_imple.java 중 선택
+	@Override
+	public int getCategorySeqByName(String categoryName) throws SQLException {
+	    int categorySeq = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = "SELECT categoryseq FROM tbl_category WHERE categoryname = ?";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, categoryName);
+
+	        rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            categorySeq = rs.getInt("categoryseq");
+	        }
+	    } finally {
+	        close();
+	    }
+
+	    return categorySeq;
+	}
+
 
 
 

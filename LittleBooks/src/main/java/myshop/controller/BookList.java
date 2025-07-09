@@ -16,45 +16,41 @@ public class BookList extends AbstractController {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         
-        String category = request.getParameter("category");
-        if (category == null || category.isEmpty()) {
-            category = "all";
-        }
+    	String category = request.getParameter("category");
+    	if (category == null || category.isEmpty()) {
+    	    category = "all";
+    	}
 
-        String sort = request.getParameter("sort");  // "new", "sales", or null
+    	String sort = request.getParameter("sort");
+    	if (sort == null || sort.isEmpty()) {
+    	    sort = "new"; // 기본 정렬
+    	}
 
-        List<BookVO> bookList;
+    	List<BookVO> bookList;
+    	BookDAO dao = new BookDAO_imple();
+    	OrderDAO orderDao = new OrderDAO_imple();
 
-        if ("sales".equals(sort)) {
-            // 판매순 정렬은 OrderDAO에서 처리 (판매량 합산)
-            OrderDAO orderDao = new OrderDAO_imple();
+    	if ("all".equals(category)) {
+    	    if ("sales".equals(sort)) {
+    	        bookList = orderDao.selectBooksOrderBySales(0); // 0 → 전체
+    	    } else {
+    	        bookList = dao.selectAllBooksSorted(sort);
+    	    }
+    	} else {
+    	    int categorySeq = dao.getCategorySeqByName(category);
+    	    if ("sales".equals(sort)) {
+    	        bookList = orderDao.selectBooksOrderBySales(categorySeq);
+    	    } else {
+    	        bookList = dao.selectBooksByCategorySorted(category, sort);
+    	    }
+    	}
 
-            int categorySeq = 0;
-            try {
-                categorySeq = Integer.parseInt(category);
-            } catch (Exception e) {
-                // all인 경우 등 숫자가 아닐 때 0으로 처리 (전체)
-                categorySeq = 0;
-            }
+    	request.setAttribute("bookList", bookList);
+    	request.setAttribute("category", category);
+    	request.setAttribute("sort", sort);
 
-            bookList = orderDao.selectBooksOrderBySales(categorySeq);
+    	super.setRedirect(false);
+    	super.setViewPage("/WEB-INF/myshop/booklist.jsp");
 
-        } else {
-            // 기존 new, 기본 정렬 처리
-            BookDAO dao = new BookDAO_imple();
-
-            if ("all".equals(category)) {
-                bookList = dao.selectAllBooksSorted(sort);
-            } else {
-                bookList = dao.selectBooksByCategorySorted(category, sort);
-            }
-        }
-
-        request.setAttribute("bookList", bookList);
-        request.setAttribute("category", category);
-        request.setAttribute("sort", sort);
-
-        super.setRedirect(false);
-        super.setViewPage("/WEB-INF/myshop/booklist.jsp");
     }
 }

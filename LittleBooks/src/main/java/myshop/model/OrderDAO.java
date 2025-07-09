@@ -52,7 +52,10 @@ public interface OrderDAO {
 	// 판매량순정렬
 	List<BookVO> selectBooksOrderBySales(int categorySeq) throws SQLException;
 
+
+	List<BookVO> selectAllBooksOrderBySales() throws SQLException;
+
 	// 주문 기간별 상세 정보 찾는 함수
 	List<OrderDetailVO> selectOrderDetailByPeriod(String userid, String startDateStr) throws SQLException;
- 
+
 }
