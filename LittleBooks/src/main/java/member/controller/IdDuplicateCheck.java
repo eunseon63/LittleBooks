@@ -32,7 +32,7 @@ public class IdDuplicateCheck extends AbstractController {
 			String json = jsonObj.toString(); 
 			// System.out.println(">>> 확인용 json =>" + json);
 
-			request.setAttribute("json", json);
+			request.setAttribute("json",json);
 
 			super.setRedirect(false);
 			super.setViewPage("/WEB-INF/jsonview.jsp");

@@ -7,7 +7,6 @@ import java.util.Map;
 import myshop.domain.BookVO;
 import myshop.domain.CartVO;
 import myshop.domain.CategoryVO;
-import myshop.domain.OrderVO;
 import myshop.domain.ReviewVO;
 import myshop.domain.SpecVO;
 

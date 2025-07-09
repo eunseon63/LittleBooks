@@ -136,6 +136,11 @@
 <jsp:include page="../../header1.jsp" />
 
 <div class="container mb-5" style="margin-top: 7%;">
+<br>
+<br>
+<br>
+
+<div class="container mt-5 mb-5">
     <div class="row">
         <!-- 좌측 네비게이션 -->
         <div class="col-md-3" style="margin-top: 6.5%;">

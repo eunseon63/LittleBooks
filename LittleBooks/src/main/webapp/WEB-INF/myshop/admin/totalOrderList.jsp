@@ -166,7 +166,11 @@
 	    let nextStatus;
 	    if (currentStatus == "0") nextStatus = "1";
 	    else if (currentStatus == "1") nextStatus = "2";
-	    else nextStatus = "0";
+	    else {
+	        // 배송 완료(2) 이상 상태에서는 버튼 비활성화
+	        $btn.prop("disabled", true);
+	        return; // 함수 종료
+	    }
 
 	    $.ajax({
 	        url: "<%= ctxPath %>/myshop/updateDeliverStatus.go",
@@ -190,10 +194,14 @@
 	                    $btn.text("배송대기");
 	                } else if (nextStatus === "1") {
 	                    $btn.addClass("btn-delivering");
+	                    alert('배송이 시작되었습니다.');
 	                    $btn.text("배송중");
+	                    location.reload(); // ⭐ 이게 즉시 새로고침시킴
 	                } else if (nextStatus === "2") {
 	                    $btn.addClass("btn-delivered");
+	                    alert('배송이 시작되었습니다.');
 	                    $btn.text("배송완료");
+	                    location.reload(); // ⭐ 이게 즉시 새로고침시킴
 	                }
 	            } else {
 	                alert("상태 변경에 실패했습니다. 서버 응답: " + trimmed);
